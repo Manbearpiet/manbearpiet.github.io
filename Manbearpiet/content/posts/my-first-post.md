@@ -1,7 +1,7 @@
 ---
 title: "Start a blog!"
 date: 2021-01-31T10:19:52+01:00
-draft: true
+draft: false
 ---
 
 # Blog! Blarg! Blorg!?
