@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Manbearpiet</title>
+    <link>manbearpiet.github.io/</link>
+    <description>Recent content on Manbearpiet</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Sun, 31 Jan 2021 10:19:52 +0100</lastBuildDate><atom:link href="manbearpiet.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Start a blog!</title>
+      <link>manbearpiet.github.io/posts/my-first-post/</link>
+      <pubDate>Sun, 31 Jan 2021 10:19:52 +0100</pubDate>
+      
+      <guid>manbearpiet.github.io/posts/my-first-post/</guid>
+      <description>Blog! Blarg! Blorg!? Why? Sometimes I have decent&amp;rsquo;ish ideas to solve challenges faced on the Microsoft Azure cloud, using Azure DevOps or with PowerShell. If there&amp;rsquo;s code involved with solving these problems, that code tends to disappear in a folder I&amp;rsquo;ve accordingly named Trash. I frequently hear from colleagues and read tweets of people struggling with the same challenges.
+This blog will mostly feature my noobish take on challenges with these topics.</description>
+    </item>
+    
+  </channel>
+</rss>
