@@ -1,4 +1,4 @@
-baseurl      = "https://manbearpiet.github.io"
+baseurl      = "manbearpiet.github.io/Manbearpiet"
 title        = "Azure and DevOops"
 languageCode = "en-us"
 theme        = "hello-friend-ng"
