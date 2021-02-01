@@ -1,7 +1,0 @@
-[submodule "Manbearpiet/themes/hello-friend-ng"]
-	path = Manbearpiet/themes/hello-friend-ng
-	url = https://github.com/rhazdon/hugo-theme-hello-friend-ng.git
-[submodule "public"]
-	path = public
-	url = https://github.com/manbearpiet/manbearpiet.github.io.git
-	branch = main
