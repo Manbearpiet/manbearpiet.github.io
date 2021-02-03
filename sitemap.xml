@@ -3,13 +3,28 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://manbearpiet.github.io/posts/guest-configuration-policy/</loc>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://manbearpiet.github.io/</loc>
-    <lastmod>2021-01-31T10:19:52+01:00</lastmod>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://manbearpiet.github.io/posts/</loc>
-    <lastmod>2021-01-31T10:19:52+01:00</lastmod>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://manbearpiet.github.io/tags/</loc>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://manbearpiet.github.io/tags/untagged/</loc>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
   </url>
   
   <url>
@@ -23,10 +38,6 @@
   
   <url>
     <loc>https://manbearpiet.github.io/series/</loc>
-  </url>
-  
-  <url>
-    <loc>https://manbearpiet.github.io/tags/</loc>
   </url>
   
 </urlset>
