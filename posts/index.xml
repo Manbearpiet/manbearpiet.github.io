@@ -114,7 +114,11 @@ This gives the nice overview over all VM&rsquo;s with a drilldown on settings, t
     <img src="/images/guest-configuration-policy/vmcompliance.png"  alt="VM Compliance"  class="left"  style="border-radius: 8px;"  />
 
 
-<p>Next steps are automating deployment to customers with tag filtering and creating a build pipeline when a new security policy is designed!</p>
+<h2 id="conclusion-and-next-steps">Conclusion and next steps</h2>
+<p>By converting the GPO&rsquo;s to .MOF, packaging them and applying them to audit OS-settings, we&rsquo;ve another method (next to Qualys) to check our security posture.
+Using this feature of Azure Policy you can check compliance and drill down on specific settings, or test your security baseline vs. a reference without applying it directly.
+The examples used were the Microsoft Windows Security Baselines, but you could as well use something internal or something like the CIS GPO&rsquo;s.
+Next steps are automating deployment to customers with tag filtering and creating a build pipeline when a new security policy is designed!</p>
 ]]></content>
         </item>
         
