@@ -49,7 +49,7 @@ Group Policy Objects are frequently used within a windows server domain to push 
 </code></pre></div><p>I&rsquo;m primairly focussed on the <code>Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip</code> so I did:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#75715e"># Focus on the zip file and unzip the content in the working directory</span>
 Get-ChildItem <span style="color:#e6db74">&#34;.\Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip&#34;</span> | Expand-archive
-</code></pre></div><p>Inside the unzipped folder another theres another folder, which contains a <code>GPOs</code> folder. That&rsquo;s what we&rsquo;re looking for! 
+</code></pre></div><p>Inside the unzipped folder another theres another folder, which contains a <code>GPOs</code> folder. That&rsquo;s what we&rsquo;re looking for!
 Now I was a bit bugged, because I had no idea which folder contains what inside the GPO folder (I don&rsquo;t speak GUID). Luckily there&rsquo;s an XML with the correct information.</p>
 
     <img src="/images/guest-configuration-policy/guid.png"  alt="GUID to GPO"  class="left"  style="border-radius: 8px;"  />
@@ -77,7 +77,7 @@ ConvertFrom-GPO -Path <span style="color:#e6db74">&#39;.\{A57A9BF8-C5CC-4CBE-AC7
 </code></pre></div><p>This creates an Output folder by default, which contains a configuration and MOF file.</p>
 <p>Later that week I saw a <a href="https://twitter.com/ThomasMaurer/status/1354531440944427008">post</a> on Twitter by Thomas Maurer mentioning <code>Azure Policy Guest Configuration</code>, waaait a minute I saw that before! I read the  Microsoft Docs page and came to the conclusion, this was my missing link to my solution! This was also the moment I realized I had performed the first steps in the <a href="https://docs.microsoft.com/en-us/azure/governance/policy/how-to/guest-configuration-create-group-policy">quickstart</a> on the Docs page, but no harm in doing so then!</p>
 <h2 id="azure-policy-guest-configuration">Azure Policy Guest Configuration</h2>
-<p>Maybe it&rsquo;s my English reading profiency, but I just couldn&rsquo;t really figure out what the quickstart was guiding me through. I think others will have no problem following the quickstart.
+<p>Maybe it&rsquo;s my English reading profiency, but I just couldn&rsquo;t really figure out what the quickstart was guiding me through. Eventually I came to the following conclusion:
 Azure Policy Guest Configuration uses a .MOF-file and modules to validate local settings and report the compliance status on Azure Policy. The VM&rsquo;s require a Managed Identity and a VM extensions, both of which can be deployed via a default initiative. The MOF-file and technical prerequisites must be packaged. It uses a distinct PowerShell instance and doesn&rsquo;t interfere with DSC if it&rsquo;s already utilized on the VM.</p>
 <p>The steps to be taken could be summarized to:</p>
 <ol>
