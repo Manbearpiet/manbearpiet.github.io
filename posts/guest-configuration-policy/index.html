@@ -5,7 +5,8 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="">
-<meta name="description" content="OS-hardening security auditing What? I wanted to check compliance vs. a security baseline for OS-hardening without using Qualys. Not that I dislike it or don&amp;rsquo;t want to use it (on the contrary!), I was just curious how to audit OS-level settings from Azure or Azure DevOps. My primary goal was to check out how to validate our own internal security controls. For production environments I tend to stick to Qualys for vulnerability assessment, but also want to add another control layer." />
+<meta name="description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&amp;rsquo;s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&amp;rsquo;s) in Azure." />
 <meta name="keywords" content=", untagged" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
@@ -33,10 +34,11 @@
 
 
 <meta itemprop="name" content="Azure Guest Configuration Policy">
-<meta itemprop="description" content="OS-hardening security auditing What? I wanted to check compliance vs. a security baseline for OS-hardening without using Qualys. Not that I dislike it or don&rsquo;t want to use it (on the contrary!), I was just curious how to audit OS-level settings from Azure or Azure DevOps. My primary goal was to check out how to validate our own internal security controls. For production environments I tend to stick to Qualys for vulnerability assessment, but also want to add another control layer.">
+<meta itemprop="description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure.">
 <meta itemprop="datePublished" content="2021-02-02T08:07:31+01:00" />
 <meta itemprop="dateModified" content="2021-02-02T08:07:31+01:00" />
-<meta itemprop="wordCount" content="1592">
+<meta itemprop="wordCount" content="1552">
 <meta itemprop="image" content="https://manbearpiet.github.io/"/>
 
 
@@ -47,13 +49,15 @@
 <meta name="twitter:image" content="https://manbearpiet.github.io/"/>
 
 <meta name="twitter:title" content="Azure Guest Configuration Policy"/>
-<meta name="twitter:description" content="OS-hardening security auditing What? I wanted to check compliance vs. a security baseline for OS-hardening without using Qualys. Not that I dislike it or don&rsquo;t want to use it (on the contrary!), I was just curious how to audit OS-level settings from Azure or Azure DevOps. My primary goal was to check out how to validate our own internal security controls. For production environments I tend to stick to Qualys for vulnerability assessment, but also want to add another control layer."/>
+<meta name="twitter:description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure."/>
 
 
 
 
     <meta property="og:title" content="Azure Guest Configuration Policy" />
-<meta property="og:description" content="OS-hardening security auditing What? I wanted to check compliance vs. a security baseline for OS-hardening without using Qualys. Not that I dislike it or don&rsquo;t want to use it (on the contrary!), I was just curious how to audit OS-level settings from Azure or Azure DevOps. My primary goal was to check out how to validate our own internal security controls. For production environments I tend to stick to Qualys for vulnerability assessment, but also want to add another control layer." />
+<meta property="og:description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://manbearpiet.github.io/posts/guest-configuration-policy/" />
 <meta property="og:image" content="https://manbearpiet.github.io/"/>
@@ -160,8 +164,7 @@
       <div class="post-content">
         <h1 id="os-hardening-security-auditing">OS-hardening security auditing</h1>
 <h2 id="what">What?</h2>
-<p>I wanted to check compliance vs. a security baseline for OS-hardening without using Qualys.
-Not that I dislike it or don&rsquo;t want to use it (on the contrary!), I was just curious how to audit OS-level settings from Azure or Azure DevOps. My primary goal was to check out how to validate our own internal security controls. For production environments I tend to stick to Qualys for vulnerability assessment, but also want to add another control layer.</p>
+<p>I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.</p>
 <p>Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure. Servers which reside in this network segment are exposed so they are not joined to the domain. But especially these servers do need to be checked on security controls. So there we have our puzzle. How to audit virtual machines on Azure for custom security configurations.</p>
 <h2 id="security-control-audit-mechanism">Security control audit-mechanism</h2>
 <p>To prevent me from making another overengineered solution based on our own security baseline, I went looking for reference data. Luckily Microsoft offers their <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-security-baselines">Windows Security Baselines</a> in exported GPO&rsquo;s, so we have some reference data to check for in our VM&rsquo;s. I&rsquo;d almost want to say half of the puzzle is done! You can find the GPO&rsquo;s here <a href="https://www.microsoft.com/en-us/download/details.aspx?id=55319">link</a>.</p>
@@ -257,7 +260,7 @@ This gives the nice overview over all VM&rsquo;s with a drilldown on settings, t
 
 
 <h2 id="conclusion-and-next-steps">Conclusion and next steps</h2>
-<p>By converting the GPO&rsquo;s to .MOF, packaging them and applying them to audit OS-settings, we&rsquo;ve another method (next to Qualys) to check our security posture.
+<p>By converting the GPO&rsquo;s to .MOF, packaging them and applying them to audit OS-settings, we&rsquo;ve a method to check our security posture using DSC and Azure Policy.
 Using this feature of Azure Policy you can check compliance and drill down on specific settings, or test your security baseline vs. a reference without applying it directly.
 The examples used were the Microsoft Windows Security Baselines, but you could as well use something internal or something like the CIS GPO&rsquo;s.
 Next steps are automating deployment to customers with tag filtering and creating a build pipeline when a new security policy is designed!</p>
@@ -286,7 +289,7 @@ Next steps are automating deployment to customers with tag filtering and creatin
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1592 Words
+        1552 Words
       </p>
 
       <p>

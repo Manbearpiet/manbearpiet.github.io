@@ -14,7 +14,8 @@
       <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
       
       <guid>https://manbearpiet.github.io/posts/guest-configuration-policy/</guid>
-      <description>OS-hardening security auditing What? I wanted to check compliance vs. a security baseline for OS-hardening without using Qualys. Not that I dislike it or don&amp;rsquo;t want to use it (on the contrary!), I was just curious how to audit OS-level settings from Azure or Azure DevOps. My primary goal was to check out how to validate our own internal security controls. For production environments I tend to stick to Qualys for vulnerability assessment, but also want to add another control layer.</description>
+      <description>OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&amp;rsquo;s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&amp;rsquo;s) in Azure.</description>
     </item>
     
     <item>
