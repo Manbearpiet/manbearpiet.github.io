@@ -30,23 +30,34 @@ Group Policy Objects are frequently used within a windows server domain to push 
 <p>Later on in my search for a solution to the security baseline challenge, I found a <a href="https://docs.microsoft.com/en-us/powershell/scripting/dsc/quickstarts/gpo-quickstart?view=powershell-7.1">quickstart</a> on Microsoft Docs which showed how to create a DSC configuration and .MOF file (compiled DSC configuration) from an exported GPO, which felt a little bit random, but hey let&rsquo;s see how far we can get.</p>
 <p>I converted a GPO from the Microsoft Security Baseline and received some errors, but it did deliver both the configuration.ps1 and .MOF. The modules referenced on the <a href="https://github.com/microsoft/BaselineManagement">GitHub page</a> of the module were already installed, so I applied it to a test VM using Azure Automation DSC' <code>ApplyAndMonitor</code> configuration. And it workses! Awesome! In case you&rsquo;d want to export your own GPO&rsquo;s you can use <a href="https://docs.microsoft.com/en-us/powershell/module/grouppolicy/backup-gpo?view=win10-ps">Backup-GPO</a> for this.</p>
 <p>Steps to download all the Windows Security baselines:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">@(<span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201909%20and%20Windows%20Server%20Version%201909%20Security%20Baseline.zip&#34;</span>,
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#75715e">&lt;# 
+</span><span style="color:#75715e">  All the download links found for Windows Security baselines
+</span><span style="color:#75715e">  Download each zip via it&#39;s link to the current working directory and replace the whitespace-character %20 with a space
+</span><span style="color:#75715e">#&gt;</span>
+@(
+<span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201909%20and%20Windows%20Server%20Version%201909%20Security%20Baseline.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201507%20Security%20Baseline.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201607%20and%20Windows%20Server%202016%20Security%20Baseline.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201803%20Security%20Baseline.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201809%20and%20Windows%20Server%202019%20Security%20Baseline.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201903%20and%20Windows%20Server%20Version%201903%20Security%20Baseline%20-%20Sept2019Update.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201909%20and%20Windows%20Server%20Version%201909%20Security%20Baseline.zip&#34;</span>,
-<span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%202004%20and%20Windows%20Server%20Version%202004%20Security%20Baseline.zip&#34;</span>) | <span style="color:#66d9ef">Foreach</span>-Object {
-  Invoke-Webrequest -URI $_ -OutFile ($_.split(<span style="color:#e6db74">&#34;/&#34;</span>)[-1].replace(<span style="color:#e6db74">&#39;%20&#39;</span>,<span style="color:#e6db74">&#39; &#39;</span>))}
-</code></pre></div><p>I&rsquo;m primairly focussed on the <code>Windows-10-Windows Server-v2004-Security-Baseline-FINAL.zip</code> so I did:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Get-ChildItem Windows-10-Windows Server-v2004-Security-Baseline-FINAL | Expand-archive
-</code></pre></div><p>This unpacks the zip, and allows us to pursue our journey. Now I was a bit bugged, because I had no idea which folder contains what inside the GPO folder (I don&rsquo;t speak GUID). Luckily there&rsquo;s an XML with the correct information.</p>
+<span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%202004%20and%20Windows%20Server%20Version%202004%20Security%20Baseline.zip&#34;</span>
+) | <span style="color:#66d9ef">Foreach</span>-Object {
+  Invoke-Webrequest -URI $_ -OutFile ($_.split(<span style="color:#e6db74">&#34;/&#34;</span>)[-1].replace(<span style="color:#e6db74">&#39;%20&#39;</span>,<span style="color:#e6db74">&#39; &#39;</span>))
+  }
+</code></pre></div><p>I&rsquo;m primairly focussed on the <code>Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip</code> so I did:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#75715e"># Focus on the zip file and unzip the content in the working directory</span>
+Get-ChildItem <span style="color:#e6db74">&#34;.\Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip&#34;</span> | Expand-archive
+</code></pre></div><p>Inside the unzipped folder another theres another folder, which contains a <code>GPOs</code> folder. That&rsquo;s what we&rsquo;re looking for! 
+Now I was a bit bugged, because I had no idea which folder contains what inside the GPO folder (I don&rsquo;t speak GUID). Luckily there&rsquo;s an XML with the correct information.</p>
 
     <img src="/images/guest-configuration-policy/guid.png"  alt="GUID to GPO"  class="left"  style="border-radius: 8px;"  />
 
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#66d9ef">[xml]</span>$xml = Get-Content .\manifest.xml
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#75715e"># Create an XML-variable object</span>
+<span style="color:#66d9ef">[xml]</span>$xml = Get-Content .\manifest.xml
+<span style="color:#75715e"># Create a new variable using the $xml and output the export ID (GUID) and the corresponding Displayname</span>
 $guidtogpo = $xml.Backups.BackupInst | Select-Object @(
     @{ n=<span style="color:#e6db74">&#39;ID&#39;</span>; e={ $_.ID.<span style="color:#e6db74">&#39;#cdata-section&#39;</span> }}
     @{ n=<span style="color:#e6db74">&#39;DisplayName&#39;</span>; e={ $_.GPOdisplayname.<span style="color:#e6db74">&#39;#cdata-section&#39;</span> }}
@@ -57,9 +68,11 @@ $guidtogpo = $xml.Backups.BackupInst | Select-Object @(
 
 
 <p>Configuration names can only contain alphanumerical characters and underscores, so knowing that I want to use the GPO <code>MSFT Windows Server 2004 - Member Server</code> I replace the spaces with underscores and convert the GPO inside the folder to a DSC configuration and MOF-file.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#e6db74">&#34;MSFT Windows Server 2004 - Member Server&#34;</span> <span style="color:#f92672">-replace</span> <span style="color:#e6db74">&#39;[\s-]&#39;</span>, <span style="color:#e6db74">&#39;_&#39;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#75715e"># Using a regex search replace the spaces and - characters with an underscore</span>
+<span style="color:#e6db74">&#34;MSFT Windows Server 2004 - Member Server&#34;</span> <span style="color:#f92672">-replace</span> <span style="color:#e6db74">&#39;[\s-]&#39;</span>, <span style="color:#e6db74">&#39;_&#39;</span>
 MSFT_Windows_Server_2004_-_Member_Server
 
+<span style="color:#75715e"># Convert the GPO and give the configuration the name of the GPO</span>
 ConvertFrom-GPO -Path <span style="color:#e6db74">&#39;.\{A57A9BF8-C5CC-4CBE-AC7D-A1D0746523FE}\&#39;</span> -OutputConfigurationScript -ConfigName <span style="color:#e6db74">&#34;MSFT_Windows_Server_2004___Member_Server&#34;</span>
 </code></pre></div><p>This creates an Output folder by default, which contains a configuration and MOF file.</p>
 <p>Later that week I saw a <a href="https://twitter.com/ThomasMaurer/status/1354531440944427008">post</a> on Twitter by Thomas Maurer mentioning <code>Azure Policy Guest Configuration</code>, waaait a minute I saw that before! I read the  Microsoft Docs page and came to the conclusion, this was my missing link to my solution! This was also the moment I realized I had performed the first steps in the <a href="https://docs.microsoft.com/en-us/azure/governance/policy/how-to/guest-configuration-create-group-policy">quickstart</a> on the Docs page, but no harm in doing so then!</p>
