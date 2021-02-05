@@ -206,12 +206,12 @@ No related resources match the effect details in the policy definition.</em></p>
 <p>This gives the nice overview over all VM&rsquo;s with a drilldown on settings, this is exactly what I needed and what I&rsquo;d expect from an integrated tool to assess compliance of each setting. I really like it, it ticks all the boxes for the said challenge.</p>
 <p><strong>Policy Compliance</strong></p>
 
-    <img src="/images/guest-configuration-policy/policycomplianceoverview.png"  alt="Policy Compliance"  class="left"  style="border-radius: 8px;"  />
+    <img src="/images/guest-configuration-policy/policycomplianceoverviewnew.png"  alt="Policy Compliance"  class="left"  style="border-radius: 8px;"  />
 
 
 <p><strong>VM Compliance details overview</strong></p>
 
-    <img src="/images/guest-configuration-policy/vmdetails.png"  alt="VM Compliance"  class="left "  style="border-radius: 8px;"  />
+    <img src="/images/guest-configuration-policy/vmdetailsnew.png"  alt="VM Compliance"  class="left "  style="border-radius: 8px;"  />
 
 
 <p><strong>VM Compliance</strong></p>
