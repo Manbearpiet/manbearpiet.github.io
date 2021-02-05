@@ -3,7 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://manbearpiet.github.io/tags/azure-guest-configuration/</loc>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://manbearpiet.github.io/posts/guest-configuration-policy/</loc>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://manbearpiet.github.io/tags/azure-policy/</loc>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://manbearpiet.github.io/tags/dsc/</loc>
+    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://manbearpiet.github.io/tags/gpo/</loc>
     <lastmod>2021-02-02T08:07:31+01:00</lastmod>
   </url>
   
@@ -19,11 +39,6 @@
   
   <url>
     <loc>https://manbearpiet.github.io/tags/</loc>
-    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://manbearpiet.github.io/tags/untagged/</loc>
     <lastmod>2021-02-02T08:07:31+01:00</lastmod>
   </url>
   

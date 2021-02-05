@@ -9,11 +9,38 @@
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
     <lastBuildDate>Tue, 02 Feb 2021 08:07:31 +0100</lastBuildDate><atom:link href="https://manbearpiet.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>untagged</title>
-      <link>https://manbearpiet.github.io/tags/untagged/</link>
+      <title>Azure Guest Configuration</title>
+      <link>https://manbearpiet.github.io/tags/azure-guest-configuration/</link>
       <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
       
-      <guid>https://manbearpiet.github.io/tags/untagged/</guid>
+      <guid>https://manbearpiet.github.io/tags/azure-guest-configuration/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Azure Policy</title>
+      <link>https://manbearpiet.github.io/tags/azure-policy/</link>
+      <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
+      
+      <guid>https://manbearpiet.github.io/tags/azure-policy/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>DSC</title>
+      <link>https://manbearpiet.github.io/tags/dsc/</link>
+      <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
+      
+      <guid>https://manbearpiet.github.io/tags/dsc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>GPO</title>
+      <link>https://manbearpiet.github.io/tags/gpo/</link>
+      <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
+      
+      <guid>https://manbearpiet.github.io/tags/gpo/</guid>
       <description></description>
     </item>
     
