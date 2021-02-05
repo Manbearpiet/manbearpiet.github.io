@@ -72,7 +72,7 @@ That way you&rsquo;d check your hardening for each server OS-version.</p>
   }
 </code></pre></div><p>I&rsquo;m primairly focussed on the <code>Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip</code> so I did:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"><span style="color:#75715e"># Focus on the zip file and unzip the content in the working directory</span>
-Get-ChildItem <span style="color:#e6db74">&#34;.\Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip&#34;</span> | 
+Get-ChildItem <span style="color:#e6db74">&#34;.\Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip&#34;</span> |
 Expand-archive
 </code></pre></div><p>Inside the unzipped folder another theres another folder, which contains a <code>GPOs</code> folder. That&rsquo;s what we&rsquo;re looking for!
 Now I was a bit bugged, because I had no idea which folder contains what inside the GPO folder (I don&rsquo;t speak GUID). Luckily there&rsquo;s an XML with the correct information.</p>
@@ -174,11 +174,11 @@ But I&rsquo;m lazy and want to make Azure Policy do the heavy lifting for me.</p
 <h3 id="6-create-an-azure-policy">6. Create an Azure Policy</h3>
 <p>We&rsquo;re going to use the link + sas token, a displayname, a description, platform specifion and potentially a tag filter, and create an Azure Policy with <code>New-GuestConfigurationPolicy</code>.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell"> $splat = @{
-     ContentUri = &lt;fill <span style="color:#66d9ef">in</span> your sharing link&gt; 
-     DisplayName = <span style="color:#e6db74">&#39;MSFT Windows Server 2004 - Member Server&#39;</span> 
-     Description = <span style="color:#e6db74">&#39;Validation os-hardening baseline configuration for Windows Server (2004) Domain Members&#39;</span> 
-     Path = <span style="color:#e6db74">&#39;./policyDefinitions&#39;</span>  
-     Platform = <span style="color:#e6db74">&#34;Windows&#34;</span> 
+     ContentUri = &lt;fill <span style="color:#66d9ef">in</span> your sharing link&gt;
+     DisplayName = <span style="color:#e6db74">&#39;MSFT Windows Server 2004 - Member Server&#39;</span>
+     Description = <span style="color:#e6db74">&#39;Validation os-hardening baseline configuration for Windows Server (2004) Domain Members&#39;</span>
+     Path = <span style="color:#e6db74">&#39;./policyDefinitions&#39;</span>
+     Platform = <span style="color:#e6db74">&#34;Windows&#34;</span>
      }
 New-GuestConfigurationPolicy @NewGuestConfigurationPolicySplat
 </code></pre></div><p>This creates a JSON-file (<code>AuditIfNotExists.json</code>) in the <code>Path</code> supplied in the splat. The contents of the file is the long awaited Azure Policy template!</p>
