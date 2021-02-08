@@ -334,7 +334,7 @@ But I&rsquo;m lazy and want to make Azure Policy do the heavy lifting for me.</p
      Path = <span style="color:#e6db74">&#39;./policyDefinitions&#39;</span>
      Platform = <span style="color:#e6db74">&#34;Windows&#34;</span>
      }
-New-GuestConfigurationPolicy @NewGuestConfigurationPolicySplat
+New-GuestConfigurationPolicy @splat
 </code></pre></div><p>This creates a JSON-file (<code>AuditIfNotExists.json</code>) in the <code>Path</code> supplied in the splat. The contents of the file is the long awaited Azure Policy template!</p>
 <p><strong>AuditIfNotExists.json</strong></p>
 
