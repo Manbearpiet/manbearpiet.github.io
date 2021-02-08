@@ -190,7 +190,8 @@ New-GuestConfigurationPolicy @splat
 <p>You can also immediately publish the Azure Policy, by doing <code>New-GuestConfigurationPolicy @NewGuestConfigurationPolicySplat</code>
 But we didn&rsquo;t do that so we have to Publish the policy the policy by hand.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Publish-GuestConfigurationPolicy -Path <span style="color:#e6db74">&#39;.\policyDefinitions&#39;</span>
-</code></pre></div><p>I received the output below and saw it in the Azure Policy blade, awesome!!</p>
+</code></pre></div><p>I received the output below and saw it in the policy definitions Azure Policy blade, awesome!!
+So I assigned the policy and waited for a while.</p>
 <p><strong>Policy</strong></p>
 
     <img src="/images/guest-configuration-policy/policy.png"  alt="VM Compliance"  class="left"  style="border-radius: 8px;"  />

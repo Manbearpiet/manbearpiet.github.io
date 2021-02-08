@@ -38,7 +38,7 @@ Group Policy Objects are frequently used within a windows server domain to push 
 Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure.">
 <meta itemprop="datePublished" content="2021-02-02T08:07:31+01:00" />
 <meta itemprop="dateModified" content="2021-02-02T08:07:31+01:00" />
-<meta itemprop="wordCount" content="2187">
+<meta itemprop="wordCount" content="2199">
 <meta itemprop="image" content="https://manbearpiet.github.io/"/>
 
 
@@ -344,7 +344,8 @@ New-GuestConfigurationPolicy @splat
 <p>You can also immediately publish the Azure Policy, by doing <code>New-GuestConfigurationPolicy @NewGuestConfigurationPolicySplat</code>
 But we didn&rsquo;t do that so we have to Publish the policy the policy by hand.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Publish-GuestConfigurationPolicy -Path <span style="color:#e6db74">&#39;.\policyDefinitions&#39;</span>
-</code></pre></div><p>I received the output below and saw it in the Azure Policy blade, awesome!!</p>
+</code></pre></div><p>I received the output below and saw it in the policy definitions Azure Policy blade, awesome!!
+So I assigned the policy and waited for a while.</p>
 <p><strong>Policy</strong></p>
 
     <img src="../../images/guest-configuration-policy/policy.png"  alt="VM Compliance"  class="left"  style="border-radius: 8px;"  />
@@ -406,7 +407,7 @@ Next steps are automating deployment to customers with tag filtering and creatin
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        2187 Words
+        2199 Words
       </p>
 
       <p>
