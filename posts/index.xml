@@ -197,6 +197,17 @@ But we didn&rsquo;t do that so we have to Publish the policy the policy by hand.
     <img src="/images/guest-configuration-policy/policy.png"  alt="VM Compliance"  class="left"  style="border-radius: 8px;"  />
 
 
+<p>This command stores the policy definition in the current PowerShell-scope (subscription, with azcontext), you could also publish the policy definition to a different scope/policy-store (maybe a Management Group).</p>
+
+    <img src="/images/guest-configuration-policy/policystore.png"  alt="Policy Store"  class="left"  style="border-radius: 8px;"  />
+
+
+<p><strong>Policy Assignment</strong></p>
+<p>The custom policy is available in the store, we assign the policy to a specific resource-scope, where can differentiate in assignment names (to specify scopes) and input our parameters. In this case we can chose to audit Azure Arc machines, but this is currently not relevant for our purpose.</p>
+
+    <img src="/images/guest-configuration-policy/assignment.png"  alt="Policy Assignment"  class="left"  style="border-radius: 8px;"  />
+
+
 <p>It took a while for all VM&rsquo;s to be processed, it stated for a long time:</p>
 <p><em>Reason for non-compliance
 No related resources match the effect details in the policy definition.</em></p>
@@ -221,7 +232,7 @@ No related resources match the effect details in the policy definition.</em></p>
 
 
 <h2 id="conclusion-and-next-steps">Conclusion and next steps</h2>
-<p>By converting the GPO&rsquo;s to .MOF, packaging them and applying them to audit OS-settings, we&rsquo;ve a method to check our security posture using DSC and Azure Policy.
+<p>By converting the GPO&rsquo;s to .MOF, packaging them and applying them to audit OS-settings, we&rsquo;ve a method to check our OS-hardening using DSC and Azure Policy.
 Using this feature of Azure Policy you can check compliance and drill down on specific settings, or test your security baseline vs. a reference without applying it directly.
 The examples used were the Microsoft Windows Security Baselines, but you could as well use something internal or something like the CIS GPO&rsquo;s.
 Next steps are automating deployment to customers with tag filtering and creating a build pipeline when a new security policy is designed!</p>
