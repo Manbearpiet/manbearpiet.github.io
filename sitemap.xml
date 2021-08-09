@@ -2,6 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://manbearpiet.github.io/tags/azure-front-door/</loc>
+    <lastmod>2021-08-04T19:31:39+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/basic-tour/</loc>
+    <lastmod>2021-08-04T19:31:39+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/posts/azurefrontdoor/</loc>
+    <lastmod>2021-08-04T19:31:39+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/</loc>
+    <lastmod>2021-08-04T19:31:39+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/posts/</loc>
+    <lastmod>2021-08-04T19:31:39+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/</loc>
+    <lastmod>2021-08-04T19:31:39+02:00</lastmod>
+  </url><url>
     <loc>https://manbearpiet.github.io/posts/guest-configuration-policy/</loc>
     <lastmod>2021-02-02T08:07:31+01:00</lastmod>
   </url><url>
@@ -17,17 +35,11 @@
     <loc>https://manbearpiet.github.io/tags/gpo/</loc>
     <lastmod>2021-02-02T08:07:31+01:00</lastmod>
   </url><url>
-    <loc>https://manbearpiet.github.io/</loc>
-    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
-  </url><url>
-    <loc>https://manbearpiet.github.io/posts/</loc>
-    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
-  </url><url>
-    <loc>https://manbearpiet.github.io/tags/</loc>
-    <lastmod>2021-02-02T08:07:31+01:00</lastmod>
-  </url><url>
     <loc>https://manbearpiet.github.io/posts/my-first-post/</loc>
     <lastmod>2021-01-31T10:19:52+01:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/about/</loc>
+    <priority>0</priority>
   </url><url>
     <loc>https://manbearpiet.github.io/blog/</loc>
   </url><url>

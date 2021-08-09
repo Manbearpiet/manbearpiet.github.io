@@ -26,7 +26,7 @@ Group Policy Objects are frequently used within a windows server domain to push 
 
 
 
-<link rel="stylesheet" href="../../main.d7bdd8ee18bfbf4c605488a7e5b1b92cd980dfeed2bdaeab4dd5e931a7a78bc0.css">
+<link rel="stylesheet" href="../../main.de188b3201233c251f4fd6306dbd2cb41e408fb8846c09781b2925de7df5025c.css">
 
 
 
@@ -35,8 +35,8 @@ Group Policy Objects are frequently used within a windows server domain to push 
 
 <meta itemprop="name" content="Auditing GPOs with Azure Guest Configuration Policy">
 <meta itemprop="description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
-Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure."><meta itemprop="datePublished" content="2021-02-02T08:07:31&#43;01:00" />
-<meta itemprop="dateModified" content="2021-02-02T08:07:31&#43;01:00" />
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure."><meta itemprop="datePublished" content="2021-02-02T08:07:31+01:00" />
+<meta itemprop="dateModified" content="2021-02-02T08:07:31+01:00" />
 <meta itemprop="wordCount" content="2276"><meta itemprop="image" content="https://manbearpiet.github.io/"/>
 <meta itemprop="keywords" content="Azure Guest Configuration,Azure Policy,GPO,DSC," />
 <meta name="twitter:card" content="summary_large_image"/>
@@ -54,8 +54,8 @@ Group Policy Objects are frequently used within a windows server domain to push 
 Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://manbearpiet.github.io/posts/guest-configuration-policy/" /><meta property="og:image" content="https://manbearpiet.github.io/"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-02-02T08:07:31&#43;01:00" />
-<meta property="article:modified_time" content="2021-02-02T08:07:31&#43;01:00" /><meta property="og:site_name" content="Manbearpiet" />
+<meta property="article:published_time" content="2021-02-02T08:07:31+01:00" />
+<meta property="article:modified_time" content="2021-02-02T08:07:31+01:00" /><meta property="og:site_name" content="Manbearpiet" />
 
 
 
@@ -72,6 +72,20 @@ Group Policy Objects are frequently used within a windows server domain to push 
 
 
 
+        
+    <script type="text/javascript">
+        !function(T,l,y){var S=T.location,u="script",k="instrumentationKey",D="ingestionendpoint",C="disableExceptionTracking",E="ai.device.",I="toLowerCase",b="crossOrigin",w="POST",e="appInsightsSDK",t=y.name||"appInsights";(y.name||T[e])&&(T[e]=t);var n=T[t]||function(d){var g=!1,f=!1,m={initialize:!0,queue:[],sv:"4",version:2,config:d};function v(e,t){var n={},a="Browser";return n[E+"id"]=a[I](),n[E+"type"]=a,n["ai.operation.name"]=S&&S.pathname||"_unknown_",n["ai.internal.sdkVersion"]="javascript:snippet_"+(m.sv||m.version),{time:function(){var e=new Date;function t(e){var t=""+e;return 1===t.length&&(t="0"+t),t}return e.getUTCFullYear()+"-"+t(1+e.getUTCMonth())+"-"+t(e.getUTCDate())+"T"+t(e.getUTCHours())+":"+t(e.getUTCMinutes())+":"+t(e.getUTCSeconds())+"."+((e.getUTCMilliseconds()/1e3).toFixed(3)+"").slice(2,5)+"Z"}(),iKey:e,name:"Microsoft.ApplicationInsights."+e.replace(/-/g,"")+"."+t,sampleRate:100,tags:n,data:{baseData:{ver:2}}}}var h=d.url||y.src;if(h){function a(e){var t,n,a,i,r,o,s,c,p,l,u;g=!0,m.queue=[],f||(f=!0,t=h,s=function(){var e={},t=d.connectionString;if(t)for(var n=t.split(";"),a=0;a<n.length;a++){var i=n[a].split("=");2===i.length&&(e[i[0][I]()]=i[1])}if(!e[D]){var r=e.endpointsuffix,o=r?e.location:null;e[D]="https://"+(o?o+".":"")+"dc."+(r||"services.visualstudio.com")}return e}(),c=s[k]||d[k]||"",p=s[D],l=p?p+"/v2/track":config.endpointUrl,(u=[]).push((n="SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details)",a=t,i=l,(o=(r=v(c,"Exception")).data).baseType="ExceptionData",o.baseData.exceptions=[{typeName:"SDKLoadFailed",message:n.replace(/\./g,"-"),hasFullStack:!1,stack:n+"\nSnippet failed to load ["+a+"] -- Telemetry is disabled\nHelp Link: https://go.microsoft.com/fwlink/?linkid=2128109\nHost: "+(S&&S.pathname||"_unknown_")+"\nEndpoint: "+i,parsedStack:[]}],r)),u.push(function(e,t,n,a){var i=v(c,"Message"),r=i.data;r.baseType="MessageData";var o=r.baseData;return o.message='AI (Internal): 99 message:"'+("SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details) ("+n+")").replace(/\"/g,"")+'"',o.properties={endpoint:a},i}(0,0,t,l)),function(e,t){if(JSON){var n=T.fetch;if(n&&!y.useXhr)n(t,{method:w,body:JSON.stringify(e),mode:"cors"});else if(XMLHttpRequest){var a=new XMLHttpRequest;a.open(w,t),a.setRequestHeader("Content-type","application/json"),a.send(JSON.stringify(e))}}}(u,l))}function i(e,t){f||setTimeout(function(){!t&&m.core||a()},500)}var e=function(){var n=l.createElement(u);n.src=h;var e=y[b];return!e&&""!==e||"undefined"==n[b]||(n[b]=e),n.onload=i,n.onerror=a,n.onreadystatechange=function(e,t){"loaded"!==n.readyState&&"complete"!==n.readyState||i(0,t)},n}();y.ld<0?l.getElementsByTagName("head")[0].appendChild(e):setTimeout(function(){l.getElementsByTagName(u)[0].parentNode.appendChild(e)},y.ld||0)}try{m.cookie=l.cookie}catch(p){}function t(e){for(;e.length;)!function(t){m[t]=function(){var e=arguments;g||m.queue.push(function(){m[t].apply(m,e)})}}(e.pop())}var n="track",r="TrackPage",o="TrackEvent";t([n+"Event",n+"PageView",n+"Exception",n+"Trace",n+"DependencyData",n+"Metric",n+"PageViewPerformance","start"+r,"stop"+r,"start"+o,"stop"+o,"addTelemetryInitializer","setAuthenticatedUserContext","clearAuthenticatedUserContext","flush"]),m.SeverityLevel={Verbose:0,Information:1,Warning:2,Error:3,Critical:4};var s=(d.extensionConfig||{}).ApplicationInsightsAnalytics||{};if(!0!==d[C]&&!0!==s[C]){method="onerror",t(["_"+method]);var c=T[method];T[method]=function(e,t,n,a,i){var r=c&&c(e,t,n,a,i);return!0!==r&&m["_"+method]({message:e,url:t,lineNumber:n,columnNumber:a,error:i}),r},d.autoExceptionInstrumented=!0}return m}(y.cfg);(T[t]=n).queue&&0===n.queue.length&&n.trackPageView({})}(window,document,{
+        src: "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js", 
+        
+        
+        
+        
+        cfg: { 
+            instrumentationKey: "c0304f97-eb9b-4f47-9c6b-4f2b08a2bad7"
+             
+        }});
+        </script>
+    
     </head>
 
     
@@ -99,7 +113,7 @@ Group Policy Objects are frequently used within a windows server domain to push 
         <span class="header__right">
             
                 <nav class="menu">
-    <ul class="menu__inner"><li><a href="../../posts">Blog</a></li>
+    <ul class="menu__inner"><li><a href="../../about/">About</a></li><li><a href="../../posts">Blog</a></li>
     </ul>
 </nav>
 
@@ -215,7 +229,7 @@ That way you&rsquo;d check your hardening for each server OS-version.</p>
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201903%20and%20Windows%20Server%20Version%201903%20Security%20Baseline%20-%20Sept2019Update.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%201909%20and%20Windows%20Server%20Version%201909%20Security%20Baseline.zip&#34;</span>,
 <span style="color:#e6db74">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%202004%20and%20Windows%20Server%20Version%202004%20Security%20Baseline.zip&#34;</span>
-) | <span style="color:#66d9ef">Foreach</span>-Object {
+) | Foreach-Object {
   Invoke-Webrequest -URI $_ -OutFile ($_.split(<span style="color:#e6db74">&#34;/&#34;</span>)[-1].replace(<span style="color:#e6db74">&#39;%20&#39;</span>,<span style="color:#e6db74">&#39; &#39;</span>))
   }
 </code></pre></div><p>I&rsquo;m primairly focussed on the <code>Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip</code> so I did:</p>
@@ -534,6 +548,13 @@ Next steps are automating deployment to customers with tag filtering and creatin
 
         <div class="pagination__buttons">
           
+            <span class="button previous">
+              <a href="https://manbearpiet.github.io/posts/azurefrontdoor/">
+                <span class="button__icon">←</span>
+                <span class="button__text">Deliver your apps using Azure Front Door</span>
+              </a>
+            </span>
+          
 
           
             <span class="button next">
@@ -568,7 +589,7 @@ Next steps are automating deployment to customers with tag filtering and creatin
     <div class="footer__inner">
         <div class="footer__content">
             <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
-            <span><a href="https://github.com/rhazdon">Hugo theme by rhazdon</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">Djordje Atlialp</a></span>
           </div>
     </div>
 </footer>

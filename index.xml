@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Tue, 02 Feb 2021 08:07:31 +0100</lastBuildDate><atom:link href="https://manbearpiet.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 04 Aug 2021 19:31:39 +0200</lastBuildDate><atom:link href="https://manbearpiet.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Deliver your apps using Azure Front Door</title>
+      <link>https://manbearpiet.github.io/posts/azurefrontdoor/</link>
+      <pubDate>Wed, 04 Aug 2021 19:31:39 +0200</pubDate>
+      
+      <guid>https://manbearpiet.github.io/posts/azurefrontdoor/</guid>
+      <description>Azure Front Door Frequently I speak to admins who&amp;rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &amp;ldquo;It&amp;rsquo;s a thing that does something with application delivery&amp;rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&amp;rsquo;s.</description>
+    </item>
+    
     <item>
       <title>Auditing GPOs with Azure Guest Configuration Policy</title>
       <link>https://manbearpiet.github.io/posts/guest-configuration-policy/</link>
@@ -26,6 +35,17 @@ Group Policy Objects are frequently used within a windows server domain to push 
       <guid>https://manbearpiet.github.io/posts/my-first-post/</guid>
       <description>Blog! Blarg! Blorg!? Why? Sometimes I have decent&amp;rsquo;ish ideas to solve challenges faced on the Microsoft Azure cloud, using Azure DevOps or with PowerShell. If there&amp;rsquo;s code involved with solving these problems, that code tends to disappear in a folder I&amp;rsquo;ve accordingly named Trash. I frequently hear from colleagues and read tweets of people struggling with the same challenges.
 This blog will mostly feature my noobish take on challenges with these topics.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://manbearpiet.github.io/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://manbearpiet.github.io/about/</guid>
+      <description>About me I&amp;rsquo;m 30 years old, working at InSpark at the Azure Infrastructure Engineering team. I&amp;rsquo;m mostly focused on Azure, deployment and automation. I have specific area of expertise, more allround. Aside from day to day operations and changes, I&amp;rsquo;m also developing at an internal team which builds management and deployment tooling for our colleagues.
+My personal tech focus for 2021 is primairly on a few topics:
+ &amp;lsquo;Mastering&amp;rsquo; safe and reliable application delivery on Azure, using Azure Front Door, API-Management, CDN etc.</description>
     </item>
     
   </channel>
