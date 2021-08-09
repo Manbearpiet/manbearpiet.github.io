@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="">
-<meta name="description" content="Azure Front Door Frequently I speak to admins who&amp;rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &amp;ldquo;It&amp;rsquo;s a thing that does something with application delivery&amp;rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&amp;rsquo;s." />
+<meta name="description" content="Azure Front Door Frequently I speak to admins who&amp;rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &amp;ldquo;It&amp;rsquo;s a thing that does something with application delivery&amp;rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&amp;rsquo;s." />
 <meta name="keywords" content=", Azure Front Door, Basic tour" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
@@ -33,23 +33,23 @@
 
 
 <meta itemprop="name" content="Deliver your apps using Azure Front Door">
-<meta itemprop="description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s."><meta itemprop="datePublished" content="2021-08-04T19:31:39+02:00" />
+<meta itemprop="description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s."><meta itemprop="datePublished" content="2021-08-04T19:31:39+02:00" />
 <meta itemprop="dateModified" content="2021-08-04T19:31:39+02:00" />
-<meta itemprop="wordCount" content="2171"><meta itemprop="image" content="https://manbearpiet.github.io/images/front-door/fd.png">
+<meta itemprop="wordCount" content="2171"><meta itemprop="image" content="https://manbearpiet.github.io/images/front-door/feature.png">
 <meta itemprop="keywords" content="Azure Front Door,Basic tour," />
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://manbearpiet.github.io/images/front-door/fd.png"/>
+<meta name="twitter:image" content="https://manbearpiet.github.io/images/front-door/feature.png"/>
 
 <meta name="twitter:title" content="Deliver your apps using Azure Front Door"/>
-<meta name="twitter:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s."/>
+<meta name="twitter:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s."/>
 
 
 
 
     <meta property="og:title" content="Deliver your apps using Azure Front Door" />
-<meta property="og:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s." />
+<meta property="og:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://manbearpiet.github.io/posts/azurefrontdoor/" /><meta property="og:image" content="https://manbearpiet.github.io/images/front-door/fd.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://manbearpiet.github.io/posts/azurefrontdoor/" /><meta property="og:image" content="https://manbearpiet.github.io/images/front-door/feature.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-08-04T19:31:39+02:00" />
 <meta property="article:modified_time" content="2021-08-04T19:31:39+02:00" /><meta property="og:site_name" content="Manbearpiet" />
 
@@ -83,18 +83,18 @@
         </script>
     
         <meta property="og:title" content="Deliver your apps using Azure Front Door" />
-<meta property="og:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s." />
+<meta property="og:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://manbearpiet.github.io/posts/azurefrontdoor/" /><meta property="og:image" content="https://manbearpiet.github.io/images/front-door/fd.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://manbearpiet.github.io/posts/azurefrontdoor/" /><meta property="og:image" content="https://manbearpiet.github.io/images/front-door/feature.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-08-04T19:31:39+02:00" />
 <meta property="article:modified_time" content="2021-08-04T19:31:39+02:00" /><meta property="og:site_name" content="Manbearpiet" />
 
 
         <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://manbearpiet.github.io/images/front-door/fd.png"/>
+<meta name="twitter:image" content="https://manbearpiet.github.io/images/front-door/feature.png"/>
 
 <meta name="twitter:title" content="Deliver your apps using Azure Front Door"/>
-<meta name="twitter:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s."/>
+<meta name="twitter:description" content="Azure Front Door Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s."/>
 
     </head>
 
@@ -163,12 +163,6 @@
       
 
       
-        <figure class="post-cover">
-          <img src="https://manbearpiet.github.io/images/front-door/fd.png" alt="Deliver your apps using Azure Front Door" />
-          
-          
-        </figure>
-      
         <hr />
         <aside id="toc">
           <div class="toc-title">Table of Contents</div>
@@ -213,6 +207,11 @@
 
       <div class="post-content">
         <h1 id="azure-front-door">Azure Front Door</h1>
+<p>
+    <img src="../../images/front-door/feature.png"  alt="HTTP Settings"  class="left"  style="border-radius: 8px;"  />
+
+<br>
+ </p>
 <p>Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s.</p>
 <p>At the end of this article hopefully you&rsquo;ll be able to answer these questions:</p>
 <ul>

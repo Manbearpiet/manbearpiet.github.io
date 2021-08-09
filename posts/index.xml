@@ -15,8 +15,13 @@
             <pubDate>Wed, 04 Aug 2021 19:31:39 +0200</pubDate>
             
             <guid>https://manbearpiet.github.io/posts/azurefrontdoor/</guid>
-            <description>Azure Front Door Frequently I speak to admins who&amp;rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &amp;ldquo;It&amp;rsquo;s a thing that does something with application delivery&amp;rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&amp;rsquo;s.</description>
+            <description>Azure Front Door Frequently I speak to admins who&amp;rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &amp;ldquo;It&amp;rsquo;s a thing that does something with application delivery&amp;rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&amp;rsquo;s.</description>
             <content type="html"><![CDATA[<h1 id="azure-front-door">Azure Front Door</h1>
+<p>
+    <img src="/images/front-door/feature.png"  alt="HTTP Settings"  class="left"  style="border-radius: 8px;"  />
+
+<br>
+ </p>
 <p>Frequently I speak to admins who&rsquo;ve heard about Azure Front Door, but are not sure about what it does. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery&rdquo;. In the near future I want to take on the AZ-700 exam, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s.</p>
 <p>At the end of this article hopefully you&rsquo;ll be able to answer these questions:</p>
 <ul>
