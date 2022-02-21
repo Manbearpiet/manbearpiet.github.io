@@ -259,7 +259,7 @@ policy has a reference to the resource scope where the policy definition is stor
 <p>Custom policy definition (id) stored in a Management group:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/providers/Microsoft.Management/managementGroups/MGNAME/providers/Microsoft.Authorization/policyDefinitions/0d030380-eff5-415c-8ea0-b4bb4af4bd20
 </code></pre></div><p>Custom policy definition (id) stored in a subscription:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/subscriptions/372ff4eb-841d-4efa-af11-f057c9460c0d/providers/Microsoft.Authorization/policyDefinitions/15f09619-2135-47c9-8af6-1f6a271b8f0d
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/subscriptions/91aab338-3ebc-420a-b94e-8874faa95ae4/providers/Microsoft.Authorization/policyDefinitions/15f09619-2135-47c9-8af6-1f6a271b8f0d
 </code></pre></div><p>Azure Policy Initiatives have a similar definition id, but just a small
 difference (policySetDefinitions instead of policyDefinitions):</p>
 <p>Built-in:</p>
@@ -342,7 +342,7 @@ Assigning the policy could be done with:</p>
 
 $splat = @{
   Name = <span style="color:#e6db74">&#39;Audit Windows machines - Timezone - Test&#39;</span>
-  Scope = <span style="color:#e6db74">&#34;/subscriptions/372ff4eb-841d-4efa-af11-f057c9460c0d&#34;</span>
+  Scope = <span style="color:#e6db74">&#34;/subscriptions/91aab338-3ebc-420a-b94e-8874faa95ae4&#34;</span>
   PolicyParameterObject = @{timeZone=<span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>}
   PolicyDefinition = Get-AzPolicyDefinition -Builtin | Where-Object PolicyDefinitionId <span style="color:#f92672">-eq</span> $DefinitionId
 }
@@ -367,7 +367,7 @@ This has a roleDefinition property in the policy definition:</p>
 $splat = @{
   Name = New-Guid
   DisplayName = <span style="color:#e6db74">&#39;Configure time zone on Windows machines - test&#39;</span>
-  Scope = <span style="color:#e6db74">&#34;/subscriptions/372ff4eb-841d-4efa-af11-f057c9460c0d&#34;</span>
+  Scope = <span style="color:#e6db74">&#34;/subscriptions/91aab338-3ebc-420a-b94e-8874faa95ae4&#34;</span>
   PolicyParameterObject = @{timeZone=<span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>}
   PolicyDefinition = Get-AzPolicyDefinition -Builtin | Where-Object PolicyDefinitionId <span style="color:#f92672">-eq</span> $DefinitionId
   Location = <span style="color:#e6db74">&#39;westeurope&#39;</span>
