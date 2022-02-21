@@ -10,7 +10,7 @@
         <atom:link href="https://manbearpiet.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
-            <title>Using Azure Policy to configure your resources</title>
+            <title>Using Azure Policy to audit and remediate your resources</title>
             <link>https://manbearpiet.github.io/posts/applying-guest-configuration-policy/</link>
             <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
             
