@@ -7,7 +7,34 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Wed, 04 Aug 2021 19:31:39 +0200</lastBuildDate><atom:link href="https://manbearpiet.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 25 Aug 2021 08:07:31 +0100</lastBuildDate><atom:link href="https://manbearpiet.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Assigning Azure policies</title>
+      <link>https://manbearpiet.github.io/tags/assigning-azure-policies/</link>
+      <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
+      
+      <guid>https://manbearpiet.github.io/tags/assigning-azure-policies/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Azure Guest Configuration</title>
+      <link>https://manbearpiet.github.io/tags/azure-guest-configuration/</link>
+      <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
+      
+      <guid>https://manbearpiet.github.io/tags/azure-guest-configuration/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Azure Policy</title>
+      <link>https://manbearpiet.github.io/tags/azure-policy/</link>
+      <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
+      
+      <guid>https://manbearpiet.github.io/tags/azure-policy/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Azure Front Door</title>
       <link>https://manbearpiet.github.io/tags/azure-front-door/</link>
@@ -23,24 +50,6 @@
       <pubDate>Wed, 04 Aug 2021 19:31:39 +0200</pubDate>
       
       <guid>https://manbearpiet.github.io/tags/basic-tour/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Azure Guest Configuration</title>
-      <link>https://manbearpiet.github.io/tags/azure-guest-configuration/</link>
-      <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
-      
-      <guid>https://manbearpiet.github.io/tags/azure-guest-configuration/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Azure Policy</title>
-      <link>https://manbearpiet.github.io/tags/azure-policy/</link>
-      <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
-      
-      <guid>https://manbearpiet.github.io/tags/azure-policy/</guid>
       <description></description>
     </item>
     
