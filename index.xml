@@ -7,11 +7,11 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Mon, 21 Feb 2022 22:00:00 +0100</lastBuildDate><atom:link href="https://manbearpiet.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 25 Aug 2021 08:07:31 +0100</lastBuildDate><atom:link href="https://manbearpiet.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Using Azure Policy to audit and remediate your resources</title>
+      <title>Using Azure Policy to configure your resources</title>
       <link>https://manbearpiet.github.io/posts/applying-guest-configuration-policy/</link>
-      <pubDate>Mon, 21 Feb 2022 22:00:00 +0100</pubDate>
+      <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
       
       <guid>https://manbearpiet.github.io/posts/applying-guest-configuration-policy/</guid>
       <description>Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&amp;rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned.</description>

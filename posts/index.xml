@@ -6,13 +6,13 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Mon, 21 Feb 2022 22:00:00 +0100</lastBuildDate>
+        <lastBuildDate>Wed, 25 Aug 2021 08:07:31 +0100</lastBuildDate>
         <atom:link href="https://manbearpiet.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
         
         <item>
-            <title>Using Azure Policy to audit and remediate your resources</title>
+            <title>Using Azure Policy to configure your resources</title>
             <link>https://manbearpiet.github.io/posts/applying-guest-configuration-policy/</link>
-            <pubDate>Mon, 21 Feb 2022 22:00:00 +0100</pubDate>
+            <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
             
             <guid>https://manbearpiet.github.io/posts/applying-guest-configuration-policy/</guid>
             <description>Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&amp;rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned.</description>
@@ -82,7 +82,7 @@ policy has a reference to the resource scope where the policy definition is stor
 <p>Custom policy definition (id) stored in a Management group:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/providers/Microsoft.Management/managementGroups/MGNAME/providers/Microsoft.Authorization/policyDefinitions/0d030380-eff5-415c-8ea0-b4bb4af4bd20
 </code></pre></div><p>Custom policy definition (id) stored in a subscription:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/subscriptions/91aab338-3ebc-420a-b94e-8874faa95ae4/providers/Microsoft.Authorization/policyDefinitions/15f09619-2135-47c9-8af6-1f6a271b8f0d
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017/providers/Microsoft.Authorization/policyDefinitions/15f09619-2135-47c9-8af6-1f6a271b8f0d
 </code></pre></div><p>Azure Policy Initiatives have a similar definition id, but just a small
 difference (policySetDefinitions instead of policyDefinitions):</p>
 <p>Built-in:</p>
@@ -111,7 +111,7 @@ previous blog I showed how to assign policies using the Azure Portal. I like
 using PowerShell, so I&rsquo;ll use that. More methods to assign Azure Policies can be
 found on the <a href="https://docs.microsoft.com/en-us/azure/governance/policy/">Microsoft Docs</a> at the Quickstarts tab.</p>
 <p>To make it extra interesting, let&rsquo;s configure objects we can&rsquo;t edit in the
-Azure portal.In example, settings in a virtual machine OS.</p>
+Azure portal. For example, settings in a virtual machine OS.</p>
 <h3 id="prerequisites">Prerequisites</h3>
 <p>We do need to setup a few things before we can configure Azure Policy to make
 changes to our VM&rsquo;s.</p>
@@ -155,50 +155,59 @@ There&rsquo;s also a built-in <a href="https://docs.microsoft.com/en-us/azure/go
 <code>Audit Windows machines that are not set to the specified time zone.</code> built-in
 Azure Guest Configuration Policy. It&rsquo;s policy definition ID is:
 <code>/providers/Microsoft.Authorization/policyDefinitions/4221adbc-5c0f-474f-88b7-037a99e6114c</code>.
-In the <a href="https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Guest%20Configuration/GuestConfiguration_WindowsTimeZone_AINE.json">policy definition</a> the policy parameter timeZone is
-referenced, but it has no defaultValue. So we&rsquo;re required to supply the
-parameter when assigning this policy.</p>
+In the <a href="https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Guest%20Configuration/GuestConfiguration_WindowsTimeZone_AINE.json">policy definition</a> the policy parameter timeZone is referenced, but it has no defaultValue. So we&rsquo;re required to supply the parameter when assigning this policy. Assigning the policy will create another unique ID, containing the scope of the assignment and the assignment name (<code>{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}</code>).</p>
 <h3 id="audit">Audit</h3>
-<p>We could start with an Azure Policy that audits the setting on the machine.
-Assigning the policy could be done with:</p>
+<p>We start with an Azure Policy that audits the setting on the machine. We&rsquo;ll perform the policy assignment with:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">$DefinitionId = <span style="color:#e6db74">&#34;/providers/Microsoft.Authorization/policyDefinitions/c633f6a2-7f8b-4d9e-9456-02f0f04f5505&#34;</span>
 
 $splat = @{
   Name = <span style="color:#e6db74">&#39;Audit Windows machines - Timezone - Test&#39;</span>
-  Scope = <span style="color:#e6db74">&#34;/subscriptions/91aab338-3ebc-420a-b94e-8874faa95ae4&#34;</span>
-  PolicyParameterObject = @{timeZone=<span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>}
+  Scope = <span style="color:#e6db74">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017&#34;</span>
+  PolicyParameterObject = @{
+    timeZone= <span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>
+    }
   PolicyDefinition = Get-AzPolicyDefinition -Builtin | Where-Object PolicyDefinitionId <span style="color:#f92672">-eq</span> $DefinitionId
 }
 
 New-AzPolicyAssignment @splat
-</code></pre></div><p>The code-block above assigns the policy. The policy we assigned has
-<code>AuditIfNotExists</code> as a policy effect. However, we&rsquo;re interested in configuring
+</code></pre></div><h3 id="deployifnotexists">DeployIfNotExists</h3>
+<p>The policy we assigned in the previous example has <code>AuditIfNotExists</code> as a policy effect. However, we&rsquo;re interested in configuring
 Windows Configuration via Azure Policies, instead of auditing.</p>
 <p>Some policies can deploy resources or modify existing resources to automate the
 steps towards desired state. Deploying and modifying does require a managed
 identity for the Assignment, to perform the policy effects. When assigning a
-policy with those effects (DeployIfNotExists (DINE) or modify), the managed
-identity is assigned the RBAC-role, as defined in the policy definition under the <code>roleDefinitionIds</code>.</p>
-<h3 id="deployifnotexists">DeployIfNotExists</h3>
-<p>Using Azure Policy, we can now also set the timezone used on the machine. We
-can do so with a policy definition conveniently named: <code>Configure time zone on Windows machines</code>.
+policy with those effects (<code>DeployIfNotExists</code> (DINE) or <code>Modify</code>), the managed identity is assigned the RBAC-role, as defined in the policy definition under the <code>roleDefinitionIds</code>.</p>
+<p>Using Azure Policy, we can now also set the timezone used on the machine. We can do so with a policy definition conveniently named: <code>Configure time zone on Windows machines</code>.
 This has a roleDefinition property in the policy definition:</p>
 <p><code>/providers/microsoft.authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c</code></p>
-<p>In the <a href="https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles">built-in roles reference</a> we can see that b24988ac-6180-42a0-ab88-20f7382dd24c, maps to Contributor.</p>
+<p>In the <a href="https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles">built-in roles reference</a> we can see that <code>b24988ac-6180-42a0-ab88-20f7382dd24c</code>, maps to Contributor resource role. The role is assigned to a special type of service principal called a managed identity <a href="https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview">(Microsoft Docs page about managed identities)</a>.</p>
+<p>Assigning the policy with a DeployIfNotExists policy, with the -AssignIdentity switch will create the Identity and assign the Contributor role to the Identity. Do mind that you need the proper authorizations to perform this assignment. Otherwise the remediation actions won&rsquo;t be performed.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">$DefinitionId =  <span style="color:#e6db74">&#34;/providers/Microsoft.Authorization/policyDefinitions/6141c932-9384-44c6-a395-59e4c057d7c9&#34;</span>
 
 $splat = @{
   Name = New-Guid
   DisplayName = <span style="color:#e6db74">&#39;Configure time zone on Windows machines - test&#39;</span>
-  Scope = <span style="color:#e6db74">&#34;/subscriptions/91aab338-3ebc-420a-b94e-8874faa95ae4&#34;</span>
-  PolicyParameterObject = @{timeZone=<span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>}
+  Scope = <span style="color:#e6db74">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017&#34;</span>
+  PolicyParameterObject = @{
+    timeZone=<span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>
+    }
   PolicyDefinition = Get-AzPolicyDefinition -Builtin | Where-Object PolicyDefinitionId <span style="color:#f92672">-eq</span> $DefinitionId
   Location = <span style="color:#e6db74">&#39;westeurope&#39;</span>
 }
 
 New-AzPolicyAssignment @splat -AssignIdentity
-</code></pre></div><p>After waiting a while</p>
+</code></pre></div><p>After assigning the policy, the same principles apply as with the previous blogpost. Monitoring policy compliance is done with the <code>Compliance</code>-view in the <code>Policy</code>-management blade:</p>
+<p>
+    <img src="/images/applying-guest-config/compliance.png"  alt="Azure Policy"  class="left"  style="border-radius: 8px;"  />
+
+<br>
+ </p>
+<p>Non-compliant resources will not be remediated until a remediation action is performed, a resource deployment is done (including a tag deployment). So don&rsquo;t forget to perform a remediation action or trigger a policy evaluation by adjusting a resource property.</p>
+<p>In this case the assignment is done on an Azure Subscription. To remediate non-compliant resources of an assignment, using a remediation task, you have two options. You can remediate per-resource or remediate all the non-compliant resources for the whole assignment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Start-AzPolicyRemediation -Name <span style="color:#e6db74">&#34;RemediationAction&#34;</span> -PolicyAssignmentId <span style="color:#e6db74">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017/providers/Microsoft.Authorization/policyAssignments/b0b59220-dcfa-4dc2-9638-bda2133ed7b4&#34;</span>
+</code></pre></div><p>Using the name we supplied we can view the changes in the <code>Remediation</code>-view in the <code>Policy</code>-blade. Under the <code>Remediation Tasks</code> we can see the progress of the remediation task. After a few minutes if remediation succeeded, the compliance will show that the previously non-compliant items are remediated. This can take up to 30 minutes. If remediation failed you can check the task and it&rsquo;s deployments (remediation actions use regular resource deployments to change configuration to be compliant).</p>
 <h2 id="conclusion-and-next-steps">Conclusion and next steps</h2>
+<p>In this blog I&rsquo;ve explained what Azure Policies definitions and assignments are. I&rsquo;ve shown the differences in assigning the policies using Azure PowerShell with the policy actions Audit and DeployIfNotExists. I also showed how you can initiate Remediate Tasks using Azure PowerShell.</p>
 ]]></content>
         </item>
         
