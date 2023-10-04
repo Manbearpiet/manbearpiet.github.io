@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Necromancing on Azure and DevOops</title>
+    <link>https://manbearpiet.github.io/tags/necromancing/</link>
+    <description>Recent content in Necromancing on Azure and DevOops</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <copyright>Christian Piet (CC BY 4.0)</copyright>
+    <lastBuildDate>Wed, 04 Oct 2023 12:47:03 +0200</lastBuildDate><atom:link href="https://manbearpiet.github.io/tags/necromancing/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Necromancing my blog</title>
+      <link>https://manbearpiet.github.io/posts/necromancing-blog/</link>
+      <pubDate>Wed, 04 Oct 2023 12:47:03 +0200</pubDate>
+      
+      <guid>https://manbearpiet.github.io/posts/necromancing-blog/</guid>
+      <description>Starting to blog again The last few years have been great for me.
+My girlfriend and I bought a house 🏡, and we&amp;rsquo;ve done all sorts of DIY I wouldn&amp;rsquo;t dream of being able to. I learned it&amp;rsquo;s great fun to do because you can immediately see/bear the the fruits of your work. It was tiring, which was one of the reasons I didn&amp;rsquo;t pursue blogging anymore.
+I&amp;rsquo;ve had success with my team, I started a new team with a valued colleague of mine, primarily focused on Deployment and Automation 🚀 (DNA).</description>
+    </item>
+    
+  </channel>
+</rss>
