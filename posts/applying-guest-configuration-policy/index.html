@@ -1,202 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="author" content="">
-<meta name="description" content="Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&amp;rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned." />
-<meta name="keywords" content=", Azure Guest Configuration, Azure Policy, Assigning Azure policies" />
-<meta name="robots" content="noodp" />
-<meta name="theme-color" content="" />
-<link rel="canonical" href="https://manbearpiet.github.io/posts/applying-guest-configuration-policy/" />
+<html lang="en-US">
 
-
-    <title>
-        
-            Using Azure Policy to configure your resources :: Manbearpiet  — DevOps
-        
-    </title>
-
-
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet"
-    type="text/css">
-
-
-
-<link rel="stylesheet" href="../../main.de188b3201233c251f4fd6306dbd2cb41e408fb8846c09781b2925de7df5025c.css">
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Using Azure Policy to configure your resources | Azure and DevOops</title>
+<meta name="title" content="Using Azure Policy to configure your resources" />
+<meta name="description" content="Azure Policy as a configuration engine? Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned." />
+<meta name="keywords" content="Azure Guest Configuration,Azure Policy,Assigning Azure policies," />
 
 
 
 
 
 
-<meta itemprop="name" content="Using Azure Policy to configure your resources">
-<meta itemprop="description" content="Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned."><meta itemprop="datePublished" content="2021-08-25T08:07:31+01:00" />
+  
+  <meta property="og:title" content="Using Azure Policy to configure your resources" />
+<meta property="og:description" content="Azure Policy as a configuration engine? Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://manbearpiet.github.io/posts/applying-guest-configuration-policy/" /><meta property="og:image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-08-25T08:07:31+01:00" />
+<meta property="article:modified_time" content="2021-08-25T08:07:31+01:00" /><meta property="og:site_name" content="Azure and DevOops" />
+
+
+  
+  <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png"/>
+
+<meta name="twitter:title" content="Using Azure Policy to configure your resources"/>
+<meta name="twitter:description" content="Azure Policy as a configuration engine? Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned."/>
+
+
+  
+  <meta itemprop="name" content="Using Azure Policy to configure your resources">
+<meta itemprop="description" content="Azure Policy as a configuration engine? Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned."><meta itemprop="datePublished" content="2021-08-25T08:07:31+01:00" />
 <meta itemprop="dateModified" content="2021-08-25T08:07:31+01:00" />
-<meta itemprop="wordCount" content="1484"><meta itemprop="image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png">
+<meta itemprop="wordCount" content="1502"><meta itemprop="image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png">
 <meta itemprop="keywords" content="Azure Guest Configuration,Azure Policy,Assigning Azure policies," />
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png"/>
 
-<meta name="twitter:title" content="Using Azure Policy to configure your resources"/>
-<meta name="twitter:description" content="Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned."/>
+<meta name="referrer" content="no-referrer-when-downgrade" />
 
+  
+  <link href="/style.min.css" rel="stylesheet">
 
+  
+  <link href="/syntax.min.css" rel="stylesheet">
 
+  
 
-    <meta property="og:title" content="Using Azure Policy to configure your resources" />
-<meta property="og:description" content="Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://manbearpiet.github.io/posts/applying-guest-configuration-policy/" /><meta property="og:image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-08-25T08:07:31+01:00" />
-<meta property="article:modified_time" content="2021-08-25T08:07:31+01:00" /><meta property="og:site_name" content="Manbearpiet" />
+  
+</head>
 
+<body>
+  <header><a class="skip-link" href="#main-content">Skip to main content</a>
 
+<a href="/" class="title"><h1>Azure and DevOops</h1></a>
+<nav>
+  <a href="/">Home</a>
 
-
-
-
-
-    <meta property="article:published_time" content="2021-08-25 08:07:31 &#43;0100 &#43;0100" />
-
+  <a href="/posts/">Blog</a>
 
 
-
+<a href="/posts/index.xml">RSS</a>
 
 
 
 
-        
-    <script type="text/javascript">
-        !function(T,l,y){var S=T.location,u="script",k="instrumentationKey",D="ingestionendpoint",C="disableExceptionTracking",E="ai.device.",I="toLowerCase",b="crossOrigin",w="POST",e="appInsightsSDK",t=y.name||"appInsights";(y.name||T[e])&&(T[e]=t);var n=T[t]||function(d){var g=!1,f=!1,m={initialize:!0,queue:[],sv:"4",version:2,config:d};function v(e,t){var n={},a="Browser";return n[E+"id"]=a[I](),n[E+"type"]=a,n["ai.operation.name"]=S&&S.pathname||"_unknown_",n["ai.internal.sdkVersion"]="javascript:snippet_"+(m.sv||m.version),{time:function(){var e=new Date;function t(e){var t=""+e;return 1===t.length&&(t="0"+t),t}return e.getUTCFullYear()+"-"+t(1+e.getUTCMonth())+"-"+t(e.getUTCDate())+"T"+t(e.getUTCHours())+":"+t(e.getUTCMinutes())+":"+t(e.getUTCSeconds())+"."+((e.getUTCMilliseconds()/1e3).toFixed(3)+"").slice(2,5)+"Z"}(),iKey:e,name:"Microsoft.ApplicationInsights."+e.replace(/-/g,"")+"."+t,sampleRate:100,tags:n,data:{baseData:{ver:2}}}}var h=d.url||y.src;if(h){function a(e){var t,n,a,i,r,o,s,c,p,l,u;g=!0,m.queue=[],f||(f=!0,t=h,s=function(){var e={},t=d.connectionString;if(t)for(var n=t.split(";"),a=0;a<n.length;a++){var i=n[a].split("=");2===i.length&&(e[i[0][I]()]=i[1])}if(!e[D]){var r=e.endpointsuffix,o=r?e.location:null;e[D]="https://"+(o?o+".":"")+"dc."+(r||"services.visualstudio.com")}return e}(),c=s[k]||d[k]||"",p=s[D],l=p?p+"/v2/track":config.endpointUrl,(u=[]).push((n="SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details)",a=t,i=l,(o=(r=v(c,"Exception")).data).baseType="ExceptionData",o.baseData.exceptions=[{typeName:"SDKLoadFailed",message:n.replace(/\./g,"-"),hasFullStack:!1,stack:n+"\nSnippet failed to load ["+a+"] -- Telemetry is disabled\nHelp Link: https://go.microsoft.com/fwlink/?linkid=2128109\nHost: "+(S&&S.pathname||"_unknown_")+"\nEndpoint: "+i,parsedStack:[]}],r)),u.push(function(e,t,n,a){var i=v(c,"Message"),r=i.data;r.baseType="MessageData";var o=r.baseData;return o.message='AI (Internal): 99 message:"'+("SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details) ("+n+")").replace(/\"/g,"")+'"',o.properties={endpoint:a},i}(0,0,t,l)),function(e,t){if(JSON){var n=T.fetch;if(n&&!y.useXhr)n(t,{method:w,body:JSON.stringify(e),mode:"cors"});else if(XMLHttpRequest){var a=new XMLHttpRequest;a.open(w,t),a.setRequestHeader("Content-type","application/json"),a.send(JSON.stringify(e))}}}(u,l))}function i(e,t){f||setTimeout(function(){!t&&m.core||a()},500)}var e=function(){var n=l.createElement(u);n.src=h;var e=y[b];return!e&&""!==e||"undefined"==n[b]||(n[b]=e),n.onload=i,n.onerror=a,n.onreadystatechange=function(e,t){"loaded"!==n.readyState&&"complete"!==n.readyState||i(0,t)},n}();y.ld<0?l.getElementsByTagName("head")[0].appendChild(e):setTimeout(function(){l.getElementsByTagName(u)[0].parentNode.appendChild(e)},y.ld||0)}try{m.cookie=l.cookie}catch(p){}function t(e){for(;e.length;)!function(t){m[t]=function(){var e=arguments;g||m.queue.push(function(){m[t].apply(m,e)})}}(e.pop())}var n="track",r="TrackPage",o="TrackEvent";t([n+"Event",n+"PageView",n+"Exception",n+"Trace",n+"DependencyData",n+"Metric",n+"PageViewPerformance","start"+r,"stop"+r,"start"+o,"stop"+o,"addTelemetryInitializer","setAuthenticatedUserContext","clearAuthenticatedUserContext","flush"]),m.SeverityLevel={Verbose:0,Information:1,Warning:2,Error:3,Critical:4};var s=(d.extensionConfig||{}).ApplicationInsightsAnalytics||{};if(!0!==d[C]&&!0!==s[C]){method="onerror",t(["_"+method]);var c=T[method];T[method]=function(e,t,n,a,i){var r=c&&c(e,t,n,a,i);return!0!==r&&m["_"+method]({message:e,url:t,lineNumber:n,columnNumber:a,error:i}),r},d.autoExceptionInstrumented=!0}return m}(y.cfg);(T[t]=n).queue&&0===n.queue.length&&n.trackPageView({})}(window,document,{
-        src: "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js", 
-        
-        
-        
-        
-        cfg: { 
-            instrumentationKey: "c0304f97-eb9b-4f47-9c6b-4f2b08a2bad7"
-             
-        }});
-        </script>
-    
-        <meta property="og:title" content="Using Azure Policy to configure your resources" />
-<meta property="og:description" content="Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://manbearpiet.github.io/posts/applying-guest-configuration-policy/" /><meta property="og:image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-08-25T08:07:31+01:00" />
-<meta property="article:modified_time" content="2021-08-25T08:07:31+01:00" /><meta property="og:site_name" content="Manbearpiet" />
 
 
-        <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://manbearpiet.github.io/images/applying-guest-config/feature.png"/>
 
-<meta name="twitter:title" content="Using Azure Policy to configure your resources"/>
-<meta name="twitter:description" content="Azure Policy as a configuration engine?  Azure Policy Guest Configuration In a previous blog, I showed how to audit your GPO-contained settings inside Azure VM&rsquo;s using Azure Policy Guest Configuration. The packaging process is a bit too much for some, and in some cases, you only need to perform a few configuration settings. Luckily there are some settings you can already configure with built-in policies. In this blog, I will show you what Azure Policies are and how they are assigned."/>
-
-    </head>
-
-    
-        <body>
-    
-    
-        <div class="container">
-            <header class="header">
-    <span class="header__inner">
-        <a href="../../" style="text-decoration: none;">
-    <div class="logo">
-        
-            <span class="logo__mark">></span>
-            <span class="logo__text">PS</span>
-            <span class="logo__cursor" style=
-                  "
-                   
-                   ">
-            </span>
-        
-    </div>
-</a>
-
-
-        <span class="header__right">
-            
-                <nav class="menu">
-    <ul class="menu__inner"><li><a href="../../about/">About</a></li><li><a href="../../posts">Blog</a></li>
-    </ul>
 </nav>
-
-                <span class="menu-trigger">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                    </svg>
-                </span>
-            
-        </span>
-    </span>
 </header>
+  <main id="main-content">
 
-
-            <div class="content">
-                
-  <main class="post">
-
-    <div class="post-info">
-      <p>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        7 minutes
-
-        
-      </p>
-    </div>
-
-    <article>
-      <h1 class="post-title">
-        <a href="https://manbearpiet.github.io/posts/applying-guest-configuration-policy/">Using Azure Policy to configure your resources</a>
-      </h1>
-
-      
-
-      
-        <hr />
-        <aside id="toc">
-          <div class="toc-title">Table of Contents</div>
-          <nav id="TableOfContents">
-  <ul>
-    <li><a href="#azure-policy-guest-configuration">Azure Policy Guest Configuration</a></li>
-    <li><a href="#assigning-policies-and-policy-initiatives">Assigning policies and policy initiatives</a>
-      <ul>
-        <li><a href="#azure-policy">Azure Policy</a></li>
-        <li><a href="#azure-policy-definition-id">Azure Policy Definition ID</a></li>
-      </ul>
-    </li>
-    <li><a href="#assigning-azure-policies">Assigning Azure Policies</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-      </ul>
-    </li>
-    <li><a href="#assigning-policies">Assigning policies</a>
-      <ul>
-        <li><a href="#audit">Audit</a></li>
-        <li><a href="#deployifnotexists">DeployIfNotExists</a></li>
-      </ul>
-    </li>
-    <li><a href="#conclusion-and-next-steps">Conclusion and next steps</a></li>
-  </ul>
-</nav>
-        </aside>
-        <hr />
-
-      <div class="post-content">
-        <h1 id="azure-policy-as-a-configuration-engine">Azure Policy as a configuration engine?</h1>
+<h1>Using Azure Policy to configure your resources</h1>
 <p>
-    <img src="../../images/applying-guest-config/feature.png"  alt="Azure Policy"  class="left"  style="border-radius: 8px;"  />
+  <i>
+    <time datetime='2021-08-25' pubdate>
+      2021-08-25
+    </time>
+  </i>
+</p>
 
+<content>
+  <h1 id="azure-policy-as-a-configuration-engine">Azure Policy as a configuration engine?</h1>
+<p><figure><img src="/images/applying-guest-config/feature.png"
+         alt="Azure Policy"/>
+</figure>
 <br>
  </p>
 <h2 id="azure-policy-guest-configuration">Azure Policy Guest Configuration</h2>
@@ -233,9 +124,9 @@ found at <a href="https://docs.microsoft.com/en-us/azure/governance/policy/conce
 <h3 id="azure-policy-definition-id">Azure Policy Definition ID</h3>
 <p>As mentioned earlier, policy definitions are referenced by their id. You can
 search for policy- and initiative definitions, using their ID or display name on the Azure Portal.</p>
-
-    <img src="../../images/applying-guest-config/searchdefinition.png"  alt="Search Azure Policy Definitions"  class="left"  style="border-radius: 8px;"  />
-
+<figure><img src="/images/applying-guest-config/searchdefinition.png"
+         alt="Search Azure Policy Definitions"/>
+</figure>
 
 <p>Azure <strong>built-in</strong> policies can be referenced at each level with the same id
 (subscription and Management Group), so the definition id will always be the
@@ -245,28 +136,28 @@ are stored at the object and level you create them. So if you&rsquo;ve created a
 custom policy definition at a Management Group scope, you can apply that to
 that MG or resources scopes beneath the MG, but not in other scopes (not
 contained beneath that MG).</p>
-<p>
-    <img src="../../images/applying-guest-config/assignment.png"  alt="Azure Policy Assignment"  class="left"  style="border-radius: 8px;"  />
-
+<p><figure><img src="/images/applying-guest-config/assignment.png"
+         alt="Azure Policy Assignment"/>
+</figure>
 <br>
  </p>
 <p>Another gotcha from the custom policies is that their policy definition id&rsquo;s
 differ from built-in policy definitions. The policy definition id of a custom
 policy has a reference to the resource scope where the policy definition is stored.</p>
 <p>Built in policy definition id&rsquo;s look like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/providers/Microsoft.Authorization/policyDefinitions/6141c932-9384-44c6-a395-59e4c057d7c9
-</code></pre></div><p>vs. custom policy definitions id&rsquo;s</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="ln">1</span><span class="cl">/providers/Microsoft.Authorization/policyDefinitions/6141c932-9384-44c6-a395-59e4c057d7c9
+</span></span></code></pre></div><p>vs. custom policy definitions id&rsquo;s</p>
 <p>Custom policy definition (id) stored in a Management group:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/providers/Microsoft.Management/managementGroups/MGNAME/providers/Microsoft.Authorization/policyDefinitions/0d030380-eff5-415c-8ea0-b4bb4af4bd20
-</code></pre></div><p>Custom policy definition (id) stored in a subscription:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017/providers/Microsoft.Authorization/policyDefinitions/15f09619-2135-47c9-8af6-1f6a271b8f0d
-</code></pre></div><p>Azure Policy Initiatives have a similar definition id, but just a small
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="ln">1</span><span class="cl">/providers/Microsoft.Management/managementGroups/MGNAME/providers/Microsoft.Authorization/policyDefinitions/0d030380-eff5-415c-8ea0-b4bb4af4bd20
+</span></span></code></pre></div><p>Custom policy definition (id) stored in a subscription:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="ln">1</span><span class="cl">/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017/providers/Microsoft.Authorization/policyDefinitions/15f09619-2135-47c9-8af6-1f6a271b8f0d
+</span></span></code></pre></div><p>Azure Policy Initiatives have a similar definition id, but just a small
 difference (policySetDefinitions instead of policyDefinitions):</p>
 <p>Built-in:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/providers/Microsoft.Authorization/policySetDefinitions/75714362-cae7-409e-9b99-a8e5075b7fad
-</code></pre></div><p>vs. custom</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">/providers/Microsoft.Management/managementGroups/MGNAME/providers/Microsoft.Authorization/policySetDefinitions/84317eb8115a47af90ab703c
-</code></pre></div><h2 id="assigning-azure-policies">Assigning Azure Policies</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="ln">1</span><span class="cl">/providers/Microsoft.Authorization/policySetDefinitions/75714362-cae7-409e-9b99-a8e5075b7fad
+</span></span></code></pre></div><p>vs. custom</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="ln">1</span><span class="cl">/providers/Microsoft.Management/managementGroups/MGNAME/providers/Microsoft.Authorization/policySetDefinitions/84317eb8115a47af90ab703c
+</span></span></code></pre></div><h2 id="assigning-azure-policies">Assigning Azure Policies</h2>
 <p>While Azure Policy Definitions are a tool to reach a state, the policy requires
 a target resource scope to be applied. The Azure Policy assignment is a
 configuration item which contains the following:</p>
@@ -335,19 +226,19 @@ Azure Guest Configuration Policy. It&rsquo;s policy definition ID is:
 In the <a href="https://github.com/Azure/azure-policy/blob/master/built-in-policies/policyDefinitions/Guest%20Configuration/GuestConfiguration_WindowsTimeZone_AINE.json">policy definition</a> the policy parameter timeZone is referenced, but it has no defaultValue. So we&rsquo;re required to supply the parameter when assigning this policy. Assigning the policy will create another unique ID, containing the scope of the assignment and the assignment name (<code>{scope}/providers/Microsoft.Authorization/policyAssignments/{policyAssignmentName}</code>).</p>
 <h3 id="audit">Audit</h3>
 <p>We start with an Azure Policy that audits the setting on the machine. We&rsquo;ll perform the policy assignment with:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">$DefinitionId = <span style="color:#e6db74">&#34;/providers/Microsoft.Authorization/policyDefinitions/c633f6a2-7f8b-4d9e-9456-02f0f04f5505&#34;</span>
-
-$splat = @{
-  Name = <span style="color:#e6db74">&#39;Audit Windows machines - Timezone - Test&#39;</span>
-  Scope = <span style="color:#e6db74">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017&#34;</span>
-  PolicyParameterObject = @{
-    timeZone= <span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>
-    }
-  PolicyDefinition = Get-AzPolicyDefinition -Builtin | Where-Object PolicyDefinitionId <span style="color:#f92672">-eq</span> $DefinitionId
-}
-
-New-AzPolicyAssignment @splat
-</code></pre></div><h3 id="deployifnotexists">DeployIfNotExists</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$DefinitionId</span> <span class="p">=</span> <span class="s2">&#34;/providers/Microsoft.Authorization/policyDefinitions/c633f6a2-7f8b-4d9e-9456-02f0f04f5505&#34;</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="nv">$splat</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="n">Name</span> <span class="p">=</span> <span class="s1">&#39;Audit Windows machines - Timezone - Test&#39;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="n">Scope</span> <span class="p">=</span> <span class="s2">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017&#34;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="n">PolicyParameterObject</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="n">timeZone</span><span class="p">=</span> <span class="s2">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="n">PolicyDefinition</span> <span class="p">=</span> <span class="nb">Get-AzPolicyDefinition</span> <span class="n">-Builtin</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">PolicyDefinitionId</span> <span class="o">-eq</span> <span class="nv">$DefinitionId</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="nb">New-AzPolicyAssignment</span> <span class="nv">@splat</span>
+</span></span></code></pre></div><h3 id="deployifnotexists">DeployIfNotExists</h3>
 <p>The policy we assigned in the previous example has <code>AuditIfNotExists</code> as a policy effect. However, we&rsquo;re interested in configuring
 Windows Configuration via Azure Policies, instead of auditing.</p>
 <p>Some policies can deploy resources or modify existing resources to automate the
@@ -359,137 +250,50 @@ This has a roleDefinition property in the policy definition:</p>
 <p><code>/providers/microsoft.authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c</code></p>
 <p>In the <a href="https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles">built-in roles reference</a> we can see that <code>b24988ac-6180-42a0-ab88-20f7382dd24c</code>, maps to Contributor resource role. The role is assigned to a special type of service principal called a managed identity <a href="https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview">(Microsoft Docs page about managed identities)</a>.</p>
 <p>Assigning the policy with a DeployIfNotExists policy, with the -AssignIdentity switch will create the Identity and assign the Contributor role to the Identity. Do mind that you need the proper authorizations to perform this assignment. Otherwise the remediation actions won&rsquo;t be performed.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">$DefinitionId =  <span style="color:#e6db74">&#34;/providers/Microsoft.Authorization/policyDefinitions/6141c932-9384-44c6-a395-59e4c057d7c9&#34;</span>
-
-$splat = @{
-  Name = New-Guid
-  DisplayName = <span style="color:#e6db74">&#39;Configure time zone on Windows machines - test&#39;</span>
-  Scope = <span style="color:#e6db74">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017&#34;</span>
-  PolicyParameterObject = @{
-    timeZone=<span style="color:#e6db74">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>
-    }
-  PolicyDefinition = Get-AzPolicyDefinition -Builtin | Where-Object PolicyDefinitionId <span style="color:#f92672">-eq</span> $DefinitionId
-  Location = <span style="color:#e6db74">&#39;westeurope&#39;</span>
-}
-
-New-AzPolicyAssignment @splat -AssignIdentity
-</code></pre></div><p>After assigning the policy, the same principles apply as with the previous blogpost. Monitoring policy compliance is done with the <code>Compliance</code>-view in the <code>Policy</code>-management blade:</p>
-<p>
-    <img src="../../images/applying-guest-config/compliance.png"  alt="Azure Policy"  class="left"  style="border-radius: 8px;"  />
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nv">$DefinitionId</span> <span class="p">=</span>  <span class="s2">&#34;/providers/Microsoft.Authorization/policyDefinitions/6141c932-9384-44c6-a395-59e4c057d7c9&#34;</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="nv">$splat</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="n">Name</span> <span class="p">=</span> <span class="nb">New-Guid</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="n">DisplayName</span> <span class="p">=</span> <span class="s1">&#39;Configure time zone on Windows machines - test&#39;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="n">Scope</span> <span class="p">=</span> <span class="s2">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017&#34;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="n">PolicyParameterObject</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="n">timeZone</span><span class="p">=</span><span class="s2">&#34;(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna&#34;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="n">PolicyDefinition</span> <span class="p">=</span> <span class="nb">Get-AzPolicyDefinition</span> <span class="n">-Builtin</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">PolicyDefinitionId</span> <span class="o">-eq</span> <span class="nv">$DefinitionId</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="n">Location</span> <span class="p">=</span> <span class="s1">&#39;westeurope&#39;</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nb">New-AzPolicyAssignment</span> <span class="nv">@splat</span> <span class="n">-AssignIdentity</span>
+</span></span></code></pre></div><p>After assigning the policy, the same principles apply as with the previous blogpost. Monitoring policy compliance is done with the <code>Compliance</code>-view in the <code>Policy</code>-management blade:</p>
+<p><figure><img src="/images/applying-guest-config/compliance.png"
+         alt="Azure Policy"/>
+</figure>
 <br>
  </p>
 <p>Non-compliant resources will not be remediated until a remediation action is performed, a resource deployment is done (including a tag deployment). So don&rsquo;t forget to perform a remediation action or trigger a policy evaluation by adjusting a resource property.</p>
 <p>In this case the assignment is done on an Azure Subscription. To remediate non-compliant resources of an assignment, using a remediation task, you have two options. You can remediate per-resource or remediate all the non-compliant resources for the whole assignment.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Start-AzPolicyRemediation -Name <span style="color:#e6db74">&#34;RemediationAction&#34;</span> -PolicyAssignmentId <span style="color:#e6db74">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017/providers/Microsoft.Authorization/policyAssignments/b0b59220-dcfa-4dc2-9638-bda2133ed7b4&#34;</span>
-</code></pre></div><p>Using the name we supplied we can view the changes in the <code>Remediation</code>-view in the <code>Policy</code>-blade. Under the <code>Remediation Tasks</code> we can see the progress of the remediation task. After a few minutes if remediation succeeded, the compliance will show that the previously non-compliant items are remediated. This can take up to 30 minutes. If remediation failed you can check the task and it&rsquo;s deployments (remediation actions use regular resource deployments to change configuration to be compliant).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Start-AzPolicyRemediation</span> <span class="n">-Name</span> <span class="s2">&#34;RemediationAction&#34;</span> <span class="n">-PolicyAssignmentId</span> <span class="s2">&#34;/subscriptions/0192d01f-1632-4c36-a89e-807d825b5017/providers/Microsoft.Authorization/policyAssignments/b0b59220-dcfa-4dc2-9638-bda2133ed7b4&#34;</span>
+</span></span></code></pre></div><p>Using the name we supplied we can view the changes in the <code>Remediation</code>-view in the <code>Policy</code>-blade. Under the <code>Remediation Tasks</code> we can see the progress of the remediation task. After a few minutes if remediation succeeded, the compliance will show that the previously non-compliant items are remediated. This can take up to 30 minutes. If remediation failed you can check the task and it&rsquo;s deployments (remediation actions use regular resource deployments to change configuration to be compliant).</p>
 <h2 id="conclusion-and-next-steps">Conclusion and next steps</h2>
 <p>In this blog I&rsquo;ve explained what Azure Policies definitions and assignments are. I&rsquo;ve shown the differences in assigning the policies using Azure PowerShell with the policy actions Audit and DeployIfNotExists. I also showed how you can initiate Remediate Tasks using Azure PowerShell.</p>
 
-      </div>
-    </article>
-
-    <hr />
-
-    <div class="post-info">
-      
-    <p>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
-
-        <span class="tag"><a href="https://manbearpiet.github.io/tags/azure-guest-configuration/">Azure Guest Configuration</a></span>
-        <span class="tag"><a href="https://manbearpiet.github.io/tags/azure-policy/">Azure Policy</a></span>
-        <span class="tag"><a href="https://manbearpiet.github.io/tags/assigning-azure-policies/">Assigning Azure policies</a></span>
-        
-    </p>
-
-      
-
-      <p>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-          <polyline points="10 9 9 9 8 9"></polyline>
-        </svg>
-        1484 Words
-      </p>
-
-      <p>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-        
-          2021-08-25 09:07
-        
-
-         
-          
-        
-      </p>
-    </div>
-
-    
-      <div class="pagination">
-        <div class="pagination__title">
-          <span class="pagination__title-h">Read other posts</span>
-          <hr />
-        </div>
-
-        <div class="pagination__buttons">
-          
-
-          
-            <span class="button next">
-              <a href="https://manbearpiet.github.io/posts/azurefrontdoor/">
-                <span class="button__text">Deliver your apps using Azure Front Door</span>
-                <span class="button__icon">→</span>
-              </a>
-            </span>
-          
-        </div>
-      </div>
-    
-
-
-    
-
-    
+</content>
+<p>
+  
+    <a class="blog-tags" href="https://manbearpiet.github.io/tags/azure-guest-configuration/">#Azure Guest Configuration</a>&nbsp;&nbsp;
+  
+    <a class="blog-tags" href="https://manbearpiet.github.io/tags/azure-policy/">#Azure Policy</a>&nbsp;&nbsp;
+  
+    <a class="blog-tags" href="https://manbearpiet.github.io/tags/assigning-azure-policies/">#Assigning Azure policies</a>&nbsp;&nbsp;
+  
+</p>
 
   </main>
+  <footer><small>
+  Christian Piet (CC BY 4.0) | Made with <a href="https://github.com/clente/hugo-bearcub">Bear Cub</a>
+</small></footer>
 
-            </div>
+    
+</body>
 
-            
-                <footer class="footer">
-    <div class="footer__inner">
-        <div class="footer__content">
-            <span>&copy; 2022</span>
-            
-            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span><span><a href="https://manbearpiet.github.io/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
-        </div>
-    </div>
-    <div class="footer__inner">
-        <div class="footer__content">
-            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
-            <span>Made with &#10084; by <a href="https://github.com/rhazdon">Djordje Atlialp</a></span>
-          </div>
-    </div>
-</footer>
-
-            
-        </div>
-
-        
-
-
-
-<script type="text/javascript" src="../../bundle.min.2ce64ea6ea44a72b13dd812fc2eb5cca3efe878cce258a47c137c17edf46e0602a05e422b618a5b80b5939c731b7a293351c2f2222a21f6ee27e54a8448dd20e.js" integrity="sha512-LOZOpupEpysT3YEvwutcyj7&#43;h4zOJYpHwTfBft9G4GAqBeQithiluAtZOccxt6KTNRwvIiKiH27iflSoRI3SDg=="></script>
-
-
-
-    </body>
 </html>
