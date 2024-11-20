@@ -5,11 +5,14 @@
   <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="shortcut icon" href="/images/favicon-32x32.png" />
+<link rel="shortcut icon" href="https://manbearpiet.github.io/images/favicon-32x32.png" />
 <title>Auditing GPOs with Azure Guest Configuration Policy | Azure and DevOops</title>
 <meta name="title" content="Auditing GPOs with Azure Guest Configuration Policy" />
-<meta name="description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
-Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure." />
+<meta name="description" content="OS-hardening security auditing
+What?
+I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure. Servers which reside in this network segment are exposed so they are not joined to the domain. But especially these servers do need to be checked on security controls. So there we have our puzzle. How to audit virtual machines on Azure for custom security configurations." />
+<meta name="author" content="" />
 <meta name="keywords" content="Azure Guest Configuration,Azure Policy,GPO,DSC," />
 
 
@@ -18,39 +21,52 @@ Group Policy Objects are frequently used within a windows server domain to push 
 
 
   
-  <meta property="og:title" content="Auditing GPOs with Azure Guest Configuration Policy" />
-<meta property="og:description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
-Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://manbearpiet.github.io/posts/guest-configuration-policy/" /><meta property="og:image" content="https://manbearpiet.github.io/images/code.png"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-02-02T08:07:31+01:00" />
-<meta property="article:modified_time" content="2021-02-02T08:07:31+01:00" /><meta property="og:site_name" content="Azure and DevOops" />
+  <meta property="og:url" content="https://manbearpiet.github.io/posts/guest-configuration-policy/">
+  <meta property="og:site_name" content="Azure and DevOops">
+  <meta property="og:title" content="Auditing GPOs with Azure Guest Configuration Policy">
+  <meta property="og:description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO’s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ’s) in Azure. Servers which reside in this network segment are exposed so they are not joined to the domain. But especially these servers do need to be checked on security controls. So there we have our puzzle. How to audit virtual machines on Azure for custom security configurations.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-02-02T08:07:31+01:00">
+    <meta property="article:modified_time" content="2021-02-02T08:07:31+01:00">
+    <meta property="article:tag" content="Azure Guest Configuration">
+    <meta property="article:tag" content="Azure Policy">
+    <meta property="article:tag" content="GPO">
+    <meta property="article:tag" content="DSC">
+    <meta property="og:image" content="https://manbearpiet.github.io/images/code.png">
 
 
   
-  <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://manbearpiet.github.io/images/code.png"/>
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://manbearpiet.github.io/images/code.png">
+  <meta name="twitter:title" content="Auditing GPOs with Azure Guest Configuration Policy">
+  <meta name="twitter:description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO’s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ’s) in Azure. Servers which reside in this network segment are exposed so they are not joined to the domain. But especially these servers do need to be checked on security controls. So there we have our puzzle. How to audit virtual machines on Azure for custom security configurations.">
 
-<meta name="twitter:title" content="Auditing GPOs with Azure Guest Configuration Policy"/>
-<meta name="twitter:description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
-Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure."/>
 
-
+  
   
   <meta itemprop="name" content="Auditing GPOs with Azure Guest Configuration Policy">
-<meta itemprop="description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO&rsquo;s.
-Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ&rsquo;s) in Azure."><meta itemprop="datePublished" content="2021-02-02T08:07:31+01:00" />
-<meta itemprop="dateModified" content="2021-02-02T08:07:31+01:00" />
-<meta itemprop="wordCount" content="2290"><meta itemprop="image" content="https://manbearpiet.github.io/images/code.png"/>
-<meta itemprop="keywords" content="Azure Guest Configuration,Azure Policy,GPO,DSC," />
+  <meta itemprop="description" content="OS-hardening security auditing What? I wanted to check compliance of a security baseline on Azure without first applying it via DSC. My primary goal was to check out how to validate our own internal security controls without using GPO’s.
+Group Policy Objects are frequently used within a windows server domain to push settings, like security controls, and validate/reapply them to prevent configuration drift. My challenge was how to audit these settings, while knowing some customers also use Demilitarized Zones (DMZ’s) in Azure. Servers which reside in this network segment are exposed so they are not joined to the domain. But especially these servers do need to be checked on security controls. So there we have our puzzle. How to audit virtual machines on Azure for custom security configurations.">
+  <meta itemprop="datePublished" content="2021-02-02T08:07:31+01:00">
+  <meta itemprop="dateModified" content="2021-02-02T08:07:31+01:00">
+  <meta itemprop="wordCount" content="2280">
+  <meta itemprop="image" content="https://manbearpiet.github.io/images/code.png">
+  <meta itemprop="keywords" content="Azure Guest Configuration,Azure Policy,GPO,DSC">
 
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
   
-  <link href="/style.min.css" rel="stylesheet">
+  <link href="/original.min.css" rel="stylesheet">
 
   
-  <link href="/syntax.min.css" rel="stylesheet">
+    
+    <link href="/syntax.min.css" rel="stylesheet">
+  
 
   
 
@@ -66,8 +82,7 @@ Group Policy Objects are frequently used within a windows server domain to push 
 
   <a href="/posts/">Blog</a>
 
-
-<a href="/posts/index.xml">RSS</a>
+<a href='https://manbearpiet.github.io/index.xml'>RSS</a>
 
 
 
@@ -80,12 +95,11 @@ Group Policy Objects are frequently used within a windows server domain to push 
   <main id="main-content">
 
 <h1>Auditing GPOs with Azure Guest Configuration Policy</h1>
-<p>
-  <i>
-    <time datetime='2021-02-02' pubdate>
-      2021-02-02
-    </time>
-  </i>
+<p class="byline">
+  <time datetime='2021-02-02' pubdate>
+    2021-02-02
+  </time>
+  
 </p>
 
 <content>
@@ -126,6 +140,11 @@ Azure Policy Guest Configuration uses a .MOF-file and modules to validate local 
 That way you&rsquo;d check your hardening for each server OS-version.</p>
 <h3 id="1-creating-a-mof-file">1. Creating a MOF-file</h3>
 <p>If you have an exported GPO then you can skip this part to the codeblock with <code>ConvertFrom-GPO</code></p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
 </span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm">  All the download links found for Windows Security baselines
 </span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">  Download each zip via it&#39;s link to the current working directory and replace the whitespace-character %20 in the foldername with a space
@@ -141,16 +160,24 @@ That way you&rsquo;d check your hardening for each server OS-version.</p>
 </span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="s2">&#34;https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/Windows%2010%20Version%202004%20and%20Windows%20Server%20Version%202004%20Security%20Baseline.zip&#34;</span>
 </span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">)</span> <span class="p">|</span> <span class="nb">Foreach-Object</span> <span class="p">{</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nb">Invoke-Webrequest</span> <span class="n">-URI</span> <span class="nv">$_</span> <span class="n">-OutFile</span> <span class="p">(</span><span class="nv">$_</span><span class="p">.</span><span class="py">split</span><span class="p">(</span><span class="s2">&#34;/&#34;</span><span class="p">)[</span><span class="mf">-1</span><span class="p">].</span><span class="py">replace</span><span class="p">(</span><span class="s1">&#39;%20&#39;</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="p">}</span>
-</span></span></code></pre></div><p>I&rsquo;m primairly focussed on the <code>Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip</code> so I did:</p>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="p">}</span></span></span></code></pre></div><p>I&rsquo;m primairly focussed on the <code>Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip</code> so I did:</p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="c"># Focus on the zip file and unzip the content in the working directory</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nb">Get-ChildItem</span> <span class="s2">&#34;.\Windows 10 Version 2004 and Windows Server Version 2004 Security Baseline.zip&#34;</span> <span class="p">|</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nb">Expand-archive</span>
-</span></span></code></pre></div><p>Inside the unzipped folder another theres another folder, which contains a <code>GPOs</code> folder. That&rsquo;s what we&rsquo;re looking for!
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nb">Expand-archive</span></span></span></code></pre></div><p>Inside the unzipped folder another theres another folder, which contains a <code>GPOs</code> folder. That&rsquo;s what we&rsquo;re looking for!
 Now I was a bit bugged, because I had no idea which folder contains what inside the GPO folder (I don&rsquo;t speak GUID). Luckily there&rsquo;s an XML with the correct information.</p>
 <figure><img src="/images/guest-configuration-policy/guid.png"
-         alt="GUID to GPO"/>
+    alt="GUID to GPO">
 </figure>
+
+
+
+
+
 
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="c"># Create an XML-variable object</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="p">[</span><span class="no">xml</span><span class="p">]</span><span class="nv">$xml</span> <span class="p">=</span> <span class="nb">Get-Content</span> <span class="p">.\</span><span class="n">manifest</span><span class="p">.</span><span class="py">xml</span>
@@ -158,14 +185,18 @@ Now I was a bit bugged, because I had no idea which folder contains what inside 
 </span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="nv">$guidtogpo</span> <span class="p">=</span> <span class="nv">$xml</span><span class="p">.</span><span class="py">Backups</span><span class="p">.</span><span class="py">BackupInst</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="vm">@</span><span class="p">(</span>
 </span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">n</span><span class="p">=</span><span class="s1">&#39;ID&#39;</span><span class="p">;</span> <span class="n">e</span><span class="p">={</span> <span class="nv">$_</span><span class="p">.</span><span class="py">ID</span><span class="p">.</span><span class="s1">&#39;#cdata-section&#39;</span> <span class="p">}}</span>
 </span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">n</span><span class="p">=</span><span class="s1">&#39;DisplayName&#39;</span><span class="p">;</span> <span class="n">e</span><span class="p">={</span> <span class="nv">$_</span><span class="p">.</span><span class="py">GPOdisplayname</span><span class="p">.</span><span class="s1">&#39;#cdata-section&#39;</span> <span class="p">}}</span>
-</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">)</span>
-</span></span></code></pre></div><p>Thanks to help from the PowerShell discord I was able to unraffle the above, I was looking in the wrong direction (<code>Select-XML</code>).</p>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="p">)</span></span></span></code></pre></div><p>Thanks to help from the PowerShell discord I was able to unraffle the above, I was looking in the wrong direction (<code>Select-XML</code>).</p>
 <p><strong>Matching GPO-ID to Displayname</strong></p>
 <figure><img src="/images/guest-configuration-policy/guid-to-gpo.png"
-         alt="GUID to GPO"/>
+    alt="GUID to GPO">
 </figure>
 
 <p>Configuration names can only contain alphanumerical characters and underscores, so knowing that I want to use the GPO <code>MSFT Windows Server 2004 - Member Server</code> I replaced the spaces with underscores (for the configurationname) and are going to convert the GPO to a MOF-file.</p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="c"># Using a regex search replace the spaces and - characters with an underscore</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="s2">&#34;MSFT Windows Server 2004 - Member Server&#34;</span> <span class="o">-replace</span> <span class="s1">&#39;[\s-]&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">MSFT_Windows_Server_2004_-_Member_Server</span>
@@ -174,15 +205,14 @@ Now I was a bit bugged, because I had no idea which folder contains what inside 
 </span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nb">ConvertFrom-GPO</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="n">-Path</span> <span class="s1">&#39;.\{A57A9BF8-C5CC-4CBE-AC7D-A1D0746523FE}\&#39;</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="n">-ConfigName</span> <span class="s2">&#34;MSFT_Windows_Server_2004_Member_Server&#34;</span> <span class="p">`</span>
-</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="n">-OutputConfigurationScript</span>
-</span></span></code></pre></div><p>This conversion operation creates an Output folder by default, which contains:</p>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="n">-OutputConfigurationScript</span></span></span></code></pre></div><p>This conversion operation creates an Output folder by default, which contains:</p>
 <ul>
 <li>a configuration .ps1 (this can be used to apply your GPO-settings with Azure Automation DSC !!)</li>
 <li>Managed Object Format (MOF) file (this compiled configuration is used to check the settings)</li>
 </ul>
 <p><strong>.MOF-file</strong></p>
 <figure><img src="/images/guest-configuration-policy/mof.png"
-         alt="Policy Compliance"/>
+    alt="Policy Compliance">
 </figure>
 
 <p>Yay we can finally start with setting up our Policy deployment!</p>
@@ -199,21 +229,29 @@ Now I was a bit bugged, because I had no idea which folder contains what inside 
 <h3 id="3-make-a-guest-configuration-package">3. Make a guest configuration package</h3>
 <p>This is pretty straight forward, we need to create a package with the .MOF-file we created in step 1 and give our Guest Configuration policy a name.
 <strong>Note</strong> that you can&rsquo;t have spaces in the name of your packages (this kept me busy for a few weeks).</p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">New-GuestConfigurationPackage</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="n">-Name</span> <span class="s2">&#34;MSFT_Windows_Server_2004_Member_Server&#34;</span> <span class="p">`</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">-Configuration</span> <span class="p">.\</span><span class="n">localhost</span><span class="p">.</span><span class="py">mof</span>
-</span></span></code></pre></div><p>This creates a package which has the name as set above and a folder with the contents of the package called <code>unzippedPackage</code> it contains all the prerequisites required to perform the audit if step 2 was performed correctly.</p>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">-Configuration</span> <span class="p">.\</span><span class="n">localhost</span><span class="p">.</span><span class="n">mof</span></span></span></code></pre></div><p>This creates a package which has the name as set above and a folder with the contents of the package called <code>unzippedPackage</code> it contains all the prerequisites required to perform the audit if step 2 was performed correctly.</p>
 <figure><img src="/images/guest-configuration-policy/package.png"
-         alt="Policy Compliance"/>
+    alt="Policy Compliance">
 </figure>
 
 <h3 id="4-test-configuration-package">4. Test Configuration Package</h3>
 <p>This step is not mandatory, but can be nice to test your converted GPO if it contains all the checks you need. I&rsquo;d mostly use a machine on which you&rsquo;d want audit anyway. I bound the results of a test to a variable so results can be revisited easily:</p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$hank</span> <span class="p">=</span> <span class="nb">Test-GuestConfigurationPackage</span> <span class="p">`</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="n">-Path</span> <span class="s1">&#39;.\MSFT_Windows_Server_2004_Member_Server.zip&#39;</span>
-</span></span></code></pre></div><p><strong>$hank</strong></p>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="n">-Path</span> <span class="s1">&#39;.\MSFT_Windows_Server_2004_Member_Server.zip&#39;</span></span></span></code></pre></div><p><strong>$hank</strong></p>
 <figure><img src="/images/guest-configuration-policy/output.png"
-         alt="Policy Compliance"/>
+    alt="Policy Compliance">
 </figure>
 
 <p>The outputted results arent&rsquo;t what&rsquo;s so nice, the value is in the <code>$hank.resources</code>.</p>
@@ -221,31 +259,44 @@ Now I was a bit bugged, because I had no idea which folder contains what inside 
 <p><strong>Out-Gridview</strong></p>
 <p>Results from <code>Out-Gridview $hank.resources</code></p>
 <figure><img src="/images/guest-configuration-policy/ogv.png"
-         alt="Policy Compliance"/>
+    alt="Policy Compliance">
 </figure>
 
 <p>This shows that we can succesfully audit the settings with the .MOF on one machine manually!
 But I&rsquo;m lazy and want to make Azure Policy do the heavy lifting for me.</p>
 <h3 id="5-publish-the-configuration-package-to-a-storage-container-and-produce-a-sharing-link">5. Publish the configuration package to a storage container and produce a sharing link</h3>
 <p>This step initially was a bit confusing in the documentation. In the Microsoft Docs it states:</p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Publish-GuestConfigurationPackage</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="n">-Path</span> <span class="p">./</span><span class="n">AuditBitlocker</span><span class="p">.</span><span class="py">zip</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">-ResourceGroupName</span>  <span class="n">myResourceGroupName</span> <span class="p">`</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">-StorageAccountName</span> <span class="n">myStorageAccountName</span>
-</span></span></code></pre></div><p>Filling in my information I received errors which stated:</p>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">-StorageAccountName</span> <span class="n">myStorageAccountName</span></span></span></code></pre></div><p>Filling in my information I received errors which stated:</p>
 <ul>
 <li>The specified container does not exist.</li>
 </ul>
 <p>I wasn&rsquo;t sure which container it couldn&rsquo;t find. One look in the .psm1 file and I found that the storageaccount container by default is named <code>guestcontainer</code>. Later I thought why bother looking there if <code>Get-Help</code> also would suffice, doh!</p>
 <p>I went the easy way out and just created a storage container named <code>guestcontainer</code>, but you can name it anyway you want,<code>Publish-GuestConfigurationPackage</code> has an argument <code>-StorageContainerName</code>. This allows you to be creative and give an own name to your storage container.</p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Publish-GuestConfigurationPackage</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="n">-Path</span> <span class="s1">&#39;.\MSFT Windows Server 2004 - Member Server.zip&#39;</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">-ResourceGroupName</span> <span class="nb">christian-rsg</span> <span class="p">`</span>
 </span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">-StorageAccountName</span> <span class="p">&lt;</span><span class="n">name</span> <span class="n">of</span> <span class="n">my</span> <span class="n">storageaccount</span><span class="p">&gt;</span> <span class="p">`</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">-StorageContainerName</span> <span class="n">guestconfiguration</span>
-</span></span></code></pre></div><p>This returns a sharing link with SAS-token, keep it close you&rsquo;ll need it later!</p>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">-StorageContainerName</span> <span class="n">guestconfiguration</span></span></span></code></pre></div><p>This returns a sharing link with SAS-token, keep it close you&rsquo;ll need it later!</p>
 <h3 id="6-create-an-azure-policy">6. Create an Azure Policy</h3>
 <p>We&rsquo;re going to use the link + sas token, a displayname, a description, platform specifion and potentially a tag filter, and create an Azure Policy with <code>New-GuestConfigurationPolicy</code>.</p>
+
+
+
+
+
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"> <span class="nv">$NewGuestConfigurationPolicySplat</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
 </span></span><span class="line"><span class="ln">2</span><span class="cl">     <span class="n">ContentUri</span> <span class="p">=</span> <span class="s1">&#39;&lt;fill in your sharing link&gt;&#39;</span>
 </span></span><span class="line"><span class="ln">3</span><span class="cl">     <span class="n">DisplayName</span> <span class="p">=</span> <span class="s1">&#39;MSFT Windows Server 2004 - Member Server&#39;</span>
@@ -253,31 +304,34 @@ But I&rsquo;m lazy and want to make Azure Policy do the heavy lifting for me.</p
 </span></span><span class="line"><span class="ln">5</span><span class="cl">     <span class="n">Path</span> <span class="p">=</span> <span class="s1">&#39;./policyDefinitions&#39;</span>
 </span></span><span class="line"><span class="ln">6</span><span class="cl">     <span class="n">Platform</span> <span class="p">=</span> <span class="s2">&#34;Windows&#34;</span>
 </span></span><span class="line"><span class="ln">7</span><span class="cl">     <span class="p">}</span>
-</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="nb">New-GuestConfigurationPolicy</span> <span class="nv">@NewGuestConfigurationPolicySplat</span>
-</span></span></code></pre></div><p>This creates a JSON-file (<code>AuditIfNotExists.json</code>) in the <code>Path</code> supplied in the splat. The contents of the file is the long awaited Azure Policy template!</p>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="nb">New-GuestConfigurationPolicy</span> <span class="nv">@NewGuestConfigurationPolicySplat</span></span></span></code></pre></div><p>This creates a JSON-file (<code>AuditIfNotExists.json</code>) in the <code>Path</code> supplied in the splat. The contents of the file is the long awaited Azure Policy template!</p>
 <p><strong>AuditIfNotExists.json</strong></p>
 <figure><img src="/images/guest-configuration-policy/auditifnotexists.png"
-         alt="Policy Compliance"/>
+    alt="Policy Compliance">
 </figure>
 
 <p>You can also immediately publish the Azure Policy, by doing <code>New-GuestConfigurationPolicy @NewGuestConfigurationPolicySplat</code>
 But we didn&rsquo;t do that so we have to Publish the policy the policy by hand.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Publish-GuestConfigurationPolicy</span> <span class="n">-Path</span> <span class="s1">&#39;.\policyDefinitions&#39;</span>
-</span></span></code></pre></div><p>I received the output below and saw it in the Azure Policy blade, awesome!!</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Publish-GuestConfigurationPolicy</span> <span class="n">-Path</span> <span class="s1">&#39;.\policyDefinitions&#39;</span></span></span></code></pre></div><p>I received the output below and saw it in the Azure Policy blade, awesome!!</p>
 <p><strong>Policy</strong></p>
 <figure><img src="/images/guest-configuration-policy/policy.png"
-         alt="VM Compliance"/>
+    alt="VM Compliance">
 </figure>
 
 <p>This command stores the policy definition in the current PowerShell-scope (subscription, with azcontext), you could also publish the policy definition to a different scope/policy-store (maybe a Management Group).</p>
 <figure><img src="/images/guest-configuration-policy/policystore.png"
-         alt="Policy Store"/>
+    alt="Policy Store">
 </figure>
 
 <p><strong>Policy Assignment</strong></p>
 <p>The custom policy is available in the store, we assign the policy to a specific resource-scope, where can differentiate in assignment names (to specify scopes) and input our parameters. In this case we can chose to audit Azure Arc machines, but this is currently not relevant for our purpose.</p>
 <figure><img src="/images/guest-configuration-policy/assignment.png"
-         alt="Policy Assignment"/>
+    alt="Policy Assignment">
 </figure>
 
 <p>It took a while for all VM&rsquo;s to be processed, it stated for a long time:</p>
@@ -290,17 +344,17 @@ No related resources match the effect details in the policy definition.</em></p>
 <p>This gives the nice overview over all VM&rsquo;s with a drilldown on settings, this is exactly what I needed and what I&rsquo;d expect from an integrated tool to assess compliance of each setting. I really like it, it ticks all the boxes for the said challenge.</p>
 <p><strong>Policy Compliance</strong></p>
 <figure><img src="/images/guest-configuration-policy/policycomplianceoverviewnew.png"
-         alt="Policy Compliance"/>
+    alt="Policy Compliance">
 </figure>
 
 <p><strong>VM Compliance details overview</strong></p>
 <figure><img src="/images/guest-configuration-policy/vmdetailsnew.png"
-         alt="VM Compliance"/>
+    alt="VM Compliance">
 </figure>
 
 <p><strong>VM Compliance</strong></p>
 <figure><img src="/images/guest-configuration-policy/vmcompliance.png"
-         alt="VM Compliance"/>
+    alt="VM Compliance">
 </figure>
 
 <h2 id="conclusion-and-next-steps">Conclusion and next steps</h2>
@@ -312,15 +366,18 @@ Next steps are automating deployment to customers with tag filtering and creatin
 </content>
 <p>
   
-    <a class="blog-tags" href="https://manbearpiet.github.io/tags/azure-guest-configuration/">#Azure Guest Configuration</a>&nbsp;&nbsp;
+    <a class="blog-tags" href="/tags/azure-guest-configuration/">#azure guest configuration</a>
   
-    <a class="blog-tags" href="https://manbearpiet.github.io/tags/azure-policy/">#Azure Policy</a>&nbsp;&nbsp;
+    <a class="blog-tags" href="/tags/azure-policy/">#azure policy</a>
   
-    <a class="blog-tags" href="https://manbearpiet.github.io/tags/gpo/">#GPO</a>&nbsp;&nbsp;
+    <a class="blog-tags" href="/tags/gpo/">#gpo</a>
   
-    <a class="blog-tags" href="https://manbearpiet.github.io/tags/dsc/">#DSC</a>&nbsp;&nbsp;
+    <a class="blog-tags" href="/tags/dsc/">#dsc</a>
   
 </p>
+
+
+
 
   </main>
   <footer><small>

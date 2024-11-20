@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Azure Front Door on Azure and DevOops</title>
     <link>https://manbearpiet.github.io/tags/azure-front-door/</link>
@@ -7,15 +7,397 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
-    <lastBuildDate>Wed, 04 Aug 2021 19:31:39 +0200</lastBuildDate><atom:link href="https://manbearpiet.github.io/tags/azure-front-door/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 04 Aug 2021 19:31:39 +0200</lastBuildDate>
+    <atom:link href="https://manbearpiet.github.io/tags/azure-front-door/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Deliver your apps using Azure Front Door</title>
       <link>https://manbearpiet.github.io/posts/azurefrontdoor/</link>
       <pubDate>Wed, 04 Aug 2021 19:31:39 +0200</pubDate>
-      
       <guid>https://manbearpiet.github.io/posts/azurefrontdoor/</guid>
-      <description>Azure Front Door Frequently I speak to cloud admins and consultants who&amp;rsquo;ve heard about Azure Front Door, but are not sure about what it does or havent interacted with it. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &amp;ldquo;It&amp;rsquo;s a thing that does something with application delivery, right?&amp;rdquo;. In the near future I want pursue on the AZ-700 certification, so I thought a win-win in blogging about!</description>
+      <description>&lt;h1 id=&#34;azure-front-door&#34;&gt;Azure Front Door&lt;/h1&gt;&#xA;&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://manbearpiet.github.io/images/front-door/feature.png&#34;&#xA;    alt=&#34;HTTP Settings&#34;&gt;&#xA;&lt;/figure&gt;&#xA;&lt;br&gt;&#xA; &lt;/p&gt;&#xA;&lt;p&gt;Frequently I speak to cloud admins and consultants who&amp;rsquo;ve heard about Azure Front Door, but are not sure about what it does or havent interacted with it. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &amp;ldquo;It&amp;rsquo;s a thing that does something with application delivery, right?&amp;rdquo;. In the near future I want pursue on the AZ-700 certification, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&amp;rsquo;s.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="azure-front-door">Azure Front Door</h1>
+<p><figure><img src="/images/front-door/feature.png"
+    alt="HTTP Settings">
+</figure>
+<br>
+ </p>
+<p>Frequently I speak to cloud admins and consultants who&rsquo;ve heard about Azure Front Door, but are not sure about what it does or havent interacted with it. I have some experience deploying and managing Front Door instances of customers. Most heard comment is: &ldquo;It&rsquo;s a thing that does something with application delivery, right?&rdquo;. In the near future I want pursue on the AZ-700 certification, so I thought a win-win in blogging about! With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&rsquo;s.</p>
+<p>At the end of this article hopefully you&rsquo;ll be able to answer these questions:</p>
+<ul>
+<li>Where can I configure free valid certificates for my Front Door hosted site/app?</li>
+<li>Where can I configure Front Door load balancing for the hosts I&rsquo;m routing/redirecting traffic toward to?</li>
+<li>Where can I control which requests are forwarded/redirected to which hosts?</li>
+<li>How does Front Door deliver webtraffic to my users?</li>
+</ul>
+<h2 id="overview">Overview</h2>
+<h3 id="another-load-balancer-service">Another Load Balancer service?</h3>
+<p>Before we dive in some background information is relevant. Because Azure Front Door takes a specific role in the Azure Load Balancing options. There are several load balancers in the Azure native portfolio:</p>
+<ul>
+<li>For global DNS loadbalancing scenario&rsquo;s, Azure Traffic Manager can be used.</li>
+<li>For load balancing network (HTTP(S) and non-HTTP(S))traffic to Virtual Machines or Virtual Machine scale sets, Azure Load Balancer is a fine choice.</li>
+<li>For regional HTTP/HTTPS load balancing, TLS-offload and Web Application Firewall functionalities Azure Application Gateway is a great option.</li>
+</ul>
+<p><a href="https://docs.microsoft.com/en-us/azure/architecture/guide/technology-choices/load-balancing-overview">This Microsoft Docs article</a> provides an excellent overview of the portfolio of Azure Load Balancing options.</p>
+<h3 id="components">Components</h3>
+<p>Front Door provides the following functionalities:</p>
+<ul>
+<li>Forwarding/redirecting requests to backends/urls as a reverse proxy and load balance HTTP-requests.</li>
+<li>Shape or rewrite the request url, body or headers.</li>
+<li>Layer 7 HTTP(S) Web-Application Firewall scanning of traffic.</li>
+<li>Provide a cached version of content to the user by providing CDN-functionality.</li>
+</ul>
+<p>There are more vendors that provide similar functionality, however Front Door&rsquo; strong points lie in the tight integration with Azure resources and above all the fact that it&rsquo;s deployed in each Azure POP, which makes it a globally scaleable service. With the caching options and WAF you can deliver apps fast and safe to all users across the world. And it&rsquo;s all manageable via the Azure Portal, not via another internal management panel on a Network Virtual Appliance.</p>
+<h3 id="reverse-proxy">Reverse Proxy</h3>
+<p><code>In computer networks, a reverse proxy is a type of proxy server where the servers return resources to the client where it would appear to the network that it originated from the reverse proxy server itself. It is mainly used to balance load.</code></p>
+<p>From: <a href="https://en.wikipedia.org/wiki/Reverse_proxy">https://en.wikipedia.org/wiki/Reverse_proxy</a></p>
+<p>In the case of Front Door this means that requests to url&rsquo;s will be sent to Front Door and the Front Door forwards the traffic to the backend.</p>
+<p>The reverse proxy functionality is the most important function of the service. With the reverse proxy all traffic flows through the Front Door. This paves the way for monitoring options, allows you to scan traffic with the Web Application Traffic, but also allows you to provide cached versions of your content. Traffic routing has 3 main components within Azure Front Door:</p>
+<ul>
+<li>Frontend Domains</li>
+<li>Backend Pools</li>
+<li>Routing Rules</li>
+</ul>
+<h2 id="frontend-domains">Frontend Domains</h2>
+<p>The frontend domain is the component with which you can start to define your customer experience before they&rsquo;ve even loaded your website. It can be an asset in your branding, but also become a convenient tool (who likes remembering servernames right?). Typing in the frontend domain is usually the only user interaction most users have with the url. The rest is mostly the system administrator and webmasters concern.</p>
+<p>In Azure Front Door the frontend domain configuration panel is also the spot where you: onboard your custom domains, configure certificate settings for your custom domains, and configure session affinity for your backend hosts.</p>
+<h3 id="onboarding-domains">Onboarding Domains</h3>
+<p>By default the name of your Azure Front Door is used to provide you with a fresh start i.e. [{name of the Front Door}.azurefd.net]. Onboarding of domains is done via CNAME records, root/apex/naked domains are also supported via alias&rsquo;s via Azure DNS.</p>
+<p>Subdomains are onboarded using CNAME records, where you reference your subdomain as the source domain and point to the frontend host(name) of your Front Door [{name of the Front Door}.azurefd.net] as the destination. After verification the domainname is available in Azure Front Door. You don&rsquo;t have to directly CNAME your domain initially, you can do the onboarding with <code>afdverify.{customdomain}</code> i.e. <code>afdverify.www.my90ieswebsite.tk</code>.</p>
+<p>Onboarding root domains is documented at <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-how-to-onboard-apex-domain">Microsoft Docs: Onboard a root or apex domain on your Front Door</a>.<br>
+ </p>
+<p><figure><img src="/images/front-door/domain.png"
+    alt="HTTP Settings">
+</figure>
+<br>
+ </p>
+<h3 id="custom-domain-https">Custom domain HTTPS</h3>
+<p>To facilitate safe browsing to your website/app you can enable HTTPS to your custom domain. There is a toggle to select a minimum TLS versions with options for 1.0 and 1.2. There is no support for TLS 1.3 yet.</p>
+<p>One of the cool features of Azure Front Door are free Front Door Managed Certificates for your custom domains. With this option you don&rsquo;t have to worry about where to save your certificates or to make sure your order and replace them before they expire.</p>
+<p>If this is not an option due to regulatory compliance, custom certificates are also an options with Azure Key Vault integration. There are two requirements for this:</p>
+<ul>
+<li>Register Azure Front Door Service as an app in your Azure Active Directory (AAD) via PowerShell
+<ul>
+<li>Do so by using this command:</li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">New-AzADServicePrincipal</span> <span class="n">-ApplicationId</span> <span class="s2">&#34;ad0e1c7e-6d38-4ba4-9efd-0bc77ba9f037&#34;</span></span></span></code></pre></div><ul>
+<li>Grant Azure Front Door Service the permission to access the secrets in your Key vault.
+<ul>
+<li>Go to “Access policies” from your Key vault to add a new policy, then grant “Microsoft.Azure.Frontdoor” service principal a “get-secret” permission</li>
+</ul>
+</li>
+</ul>
+<p>After which you can select a keyvault, a secret and a secret version (<code>Latest</code> is an option), making replacement of certificates a breeze. Do be aware it can take a while for the certificate to be published at each POP.
+<br>
+<br>
+<figure><img src="/images/front-door/https.png"
+    alt="HTTP Settings">
+</figure>
+<br>
+ </p>
+<h3 id="session-affinity">Session Affinity</h3>
+<p>To make sure your users aren&rsquo;t routed to a different backend(host) with consecutive calls to your stateful webapplication, (cookie based) session affinity is supported by Azure Front Door. This is configured at the frontend domain.
+<br>
+<br>
+<figure><img src="/images/front-door/sa.png"
+    alt="Session Affinity">
+</figure>
+</p>
+<p>Session timeouts are configurable in the Settings tab. This is the number of seconds before a forwarded send or receive request times out. When a timeout occurs the request fails and the connection terminates.</p>
+<figure><img src="/images/front-door/timeout.png"
+    alt="Timeouts">
+</figure>
+
+<h2 id="backend-pools">Backend Pools</h2>
+<p>Backends in Azure Front Door are the references to endpoints which host your server or webapp. Since it&rsquo;s the component hosting your website/app, you want to make sure your customers reach the right app/server.</p>
+<p>It might be bit confusing, but the backend in case of the Azure Front Door is your web-frontend (hosting your site/app). Backends are grouped in backend pools. Backends usually host the same content at each backend host in the backend pool. Backends in Azure Front Door can be any public endpoint.</p>
+<h3 id="setting-up-backends">Setting up backends</h3>
+<p>There are some Azure services which can be configered as backends using Azure suggested settings, after selecting your resource. This integration is provided with the following Azure services:</p>
+<ul>
+<li>Azure App Services</li>
+<li>Cloud Services</li>
+<li>Storage Account (for Static websites), classic is also supported</li>
+<li>Application Gateway</li>
+<li>API Management</li>
+<li>Public IP Address</li>
+<li>Traffic Manager</li>
+</ul>
+<p><br>
+Selecting one of the options above prefills the fields required to register a backend in the backend pool. If your backendtype is not mentioned in the options above, or you want to set it up yourself, then you can use the <code>Custom Host</code> option. Required options are shown in the image below:
+<br>
+<br>
+<figure><img src="/images/front-door/backend.png"
+    alt="Adding a Backend">
+</figure>
+
+ </p>
+<p>You also have the option to disable backends in your backend pool, doing so traffic will be routed to different backends. If there are no backends available in the pool, requests will throw a recognizable Front Door white error screen with an error code.</p>
+<h3 id="backend-traffic-routing-options">Backend traffic routing options</h3>
+<p>The load balancing functionality of Azure Front Door is found in the fact that it can load balance between multiple backends within a backend pool. Priority and Weight in the image shown at <a href="/posts/azurefrontdoor/#backend-pools">Backend Pools</a> resp. provide functionality for priority based traffic-routing and weighted based traffic-routing.</p>
+<h4 id="priority">Priority</h4>
+<p>Priority on a backend is configurable from 1 to 5, where 1 is the first priority where traffic will be routed to. When the backends with priority 1 are down the backends with priority 2 are used et cetera.</p>
+<h4 id="weighted">Weighted</h4>
+<p>Weighted traffic routing is performed by configuring a weight (from 1 to 1000), the default is 50. It&rsquo;s ratio-based, so the higher the weight of a backend, the more traffic it will receive.
+<br>
+ </p>
+<h3 id="health-probing">Health probing</h3>
+<p>Front Door can be configured to assess the health of the backends in your backendpool by polling with HTTP(S) requests with a configurable health probe. The health probes can be configured to use both a <code>HEAD</code> and <code>GET</code> method on a specified path.</p>
+<p><figure><img src="/images/front-door/probe.png"
+    alt="Adding a health probe">
+</figure>
+
+<br>
+The health probe expects a valid HTTP 200 answer from the backend on a provided path. In case HTTPS probing is used, the server should present itself with a valid certificate containing the entire certificate chain. If the backend host doesn&rsquo;t provide a certificate from a wellknown CA, traffic is not forwarded.
+Whenever a backendhost is not responding with HTTP 200, it&rsquo;s deemed unhealthy. If all hosts in the backend are unhealthy Front Door throws a white error screen showing an error id. This error id can be used to find the corresponding log in Log Analytics.
+<br>
+<br>
+<figure><img src="/images/front-door/lb.png"
+    alt="Adding a health probe">
+</figure>
+
+<br>
+For HTTPS traffic there&rsquo;s also an option available to disable enforcement of certificate namechecks. This option which is <code>Enabled</code> by default, it ensures that the backend host presents with a certificate where the hostname is contained in the subject of the certificate. Certificates must be issued by a <a href="https://ccadb-public.secure.force.com/microsoft/IncludedCACertificateReportForMSFT">valid certificate authority</a>, it must contain the complete certificate chain.
+<br>
+<figure><img src="/images/front-door/certcheck.png"
+    alt="Certificate Checks">
+</figure>
+
+ </p>
+<h2 id="routing-rules">Routing Rules</h2>
+<p>With configured domains and backends to host our web(apps), the last and in my opinion most challenging topic are the so called <code>Routing rules</code>. These rules can be configured to forward traffic to backends, based on the front-end domain, a backend pool and the requested path. The decision how this is rule application performed is done with path pattern matching.</p>
+<p>You can create multiple routing rules per frontend domain and add multiple domains per routing rule. There are some gotcha&rsquo;s though, these are adressed at the respective topics.</p>
+<h3 id="frontend-domains-1">Frontend domains</h3>
+<p>When creating a rule you must first you must name the rule and select the frontend(s) you want to route traffic for, then you select which protocol is accepted for that frontend(s).
+<br>
+<figure><img src="/images/front-door/rulename.png"
+    alt="Adding a rule">
+</figure>
+
+ </p>
+<h3 id="pattern-matching">Pattern Matching</h3>
+<p>To determine which rule will be applied pattern matching is applied to the requested url path ie. <code>https://manbearpiet.github.io/posts/</code>. In case multiple rules are applicable, the most specific rule will be applied.
+In case none of the rules is matched a 404 error will be thrown.</p>
+<p>The most simple way to route traffic to backends is to use a catch-all wildcard, <code>/*</code>.
+This will account for anything, but aware that you can only create one rule with a wildcard for a frontend domain.</p>
+<p>For example:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Rule</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+      <tr>
+          <th>URL</th>
+          <th>Match</th>
+          <th>Matched Rule</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+      <tr>
+          <th>Rule</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+      <tr>
+          <th>URL</th>
+          <th>Match</th>
+          <th>Matched pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+      <tr>
+          <th>Rule</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td><code>/contact</code></td>
+      </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+      <tr>
+          <th>URL</th>
+          <th>Match</th>
+          <th>Matched pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
+          <td>3</td>
+          <td><code>/contact</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="rules-engine">Rules Engine</h3>
+<p>After being matched there is an option to perform granular adjustments to the request before it&rsquo;s redirected or forwarded  or to drop it entirely.
+In example for adding headers, doing HTTP to HTTPS redirect et cetera. Options for this is too extensive for this blog, this will be featured in a seperate blog.</p>
+<h3 id="route-details">Route Details</h3>
+<p>After being matched to a routing rule it can have two generic outcomes, a forward to a backend or a HTTP redirect.
+With a routing rules which performs a forward you&rsquo;re forwarding to a specific backend. With a HTTP redirecting you&rsquo;re redirecting the request to a different host, path or query string.</p>
+<h3 id="forwarding-to-backends">Forwarding to backends</h3>
+<h4 id="backend-pool">Backend pool</h4>
+<p>You can select only one backendpool per forwarding rule, also as mentioned earlier it&rsquo;s possible to supply only one catch all pattern per frontend domain, so be mindful when setting up. Especially when binding multiple frontend domains to 1 routingrule (to 1 backend).</p>
+<h4 id="forwarded-protocol">Forwarded protocol</h4>
+<p>With the forwarded protocol configuration you can select which protocol (HTTP/HTTPS or choose to match the request&rsquo; protocol) the request is forwarded with to the backend.It&rsquo;s possible to use HTTPS for the users connection to Front Door and use http for backend calls if necessary.</p>
+<h4 id="caching-options">Caching options</h4>
+<p>There are also some caching options with forwarding, these will be adressed in an upcoming blog.</p>
+<h3 id="http-redirection">HTTP redirection</h3>
+<p>When you&rsquo;re setting up a redirect routing rule you can choose one or a combination of the following, preserving/replacing:</p>
+<ul>
+<li>The destination host
+<ul>
+<li>https://<strong><a href="https://www.example.com">www.example.com</a></strong>/whatdoesmarcelluswallacelooklike?a=switch</li>
+</ul>
+</li>
+<li>The destination path
+<ul>
+<li><a href="https://www.example.com/">https://www.example.com/</a><strong>whatdoesmarcelluswallacelooklike</strong>?a=switch</li>
+</ul>
+</li>
+<li>The query string
+<ul>
+<li><a href="https://www.example.com/whatdoesmarcelluswallacelooklike">https://www.example.com/whatdoesmarcelluswallacelooklike</a>?<strong>a=switch</strong></li>
+</ul>
+</li>
+</ul>
+<p>For more information about URL redirection,the <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-url-redirect">Azure Front Door Documentation</a> is really good. It contains good information about the redirect types,</p>
+<h4 id="destination-fragment">Destination Fragment</h4>
+<p>There also is an option for a URL destination fragment, this is used to navigate to a specific page section. You might recognize this from a direct link in a section to i.e. Microsoft Docs for example:</p>
+<ul>
+<li><a href="https://docs.microsoft.com/en-us/dotnet/core/introduction#cross-platform">https://docs.microsoft.com/en-us/dotnet/core/introduction#cross-platform</a> , the last segment (#cross-platform), is the destination fragment.</li>
+</ul>
+<p>When redirecting you can add a specific destination fragment to add to the redirect URL.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>This was my overview of the Azure Front Door service. I hope you enjoyed reading and learned enough about the inners of Front Door. This article became a bit longer than I hoped for, but more is coming up. Other topics that will be featured in seperate future articles are:</p>
+<ul>
+<li>Example setups</li>
+<li>Architectural considerations</li>
+<li>Deployment</li>
+<li>Rules Engine for Routing rules</li>
+<li>Content Delivery Network (CDN)</li>
+<li>Web Application Firewall (WAF)</li>
+</ul>
+]]></content:encoded>
     </item>
-    
   </channel>
 </rss>

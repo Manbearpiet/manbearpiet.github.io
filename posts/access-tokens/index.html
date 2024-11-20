@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="http://localhost:1313/images/favicon-32x32.png" />
+<title>Access Tokens, access tokens everywhere | Azure and DevOops</title>
+<meta name="title" content="Access Tokens, access tokens everywhere" />
+<meta name="description" content="Short introduction on access tokens" />
+<meta name="author" content="Christian Piet" />
+<meta name="keywords" content="Access tokens,Entra ID,GitHub," />
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="Access Tokens, access tokens everywhere" />
+<meta property="og:description" content="Short introduction on access tokens" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/access-tokens/" />
+
+<meta property="og:image" content="http://localhost:1313/images/social_card_bg_hu3778350728760529507.webp"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-10-04T17:52:10+02:00" />
+<meta property="article:modified_time" content="2023-10-04T17:52:10+02:00" /><meta property="og:site_name" content="Azure and DevOops" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://localhost:1313/images/social_card_bg_hu3778350728760529507.webp"/>
+<meta name="twitter:title" content="Access Tokens, access tokens everywhere"/>
+<meta name="twitter:description" content="Short introduction on access tokens"/>
+
+
+
+<meta itemprop="name" content="Access Tokens, access tokens everywhere">
+<meta itemprop="description" content="Short introduction on access tokens"><meta itemprop="datePublished" content="2023-10-04T17:52:10+02:00" />
+<meta itemprop="dateModified" content="2023-10-04T17:52:10+02:00" />
+<meta itemprop="wordCount" content="1710">
+
+<meta itemprop="image" content="http://localhost:1313/images/social_card_bg_hu3778350728760529507.webp"/>
+
+
+<meta itemprop="keywords" content="Access tokens,Entra ID,GitHub," />
+
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  
+  <link href="/original.min.css" rel="stylesheet">
+
+  
+    
+    <link href="/syntax.min.css" rel="stylesheet">
+  
+
+  
+
+  
+</head>
+
+<body>
+  <header><a class="skip-link" href="#main-content">Skip to main content</a>
+
+<a href="/" class="title"><h1>Azure and DevOops</h1></a>
+<nav>
+  <a href="/">Home</a>
+
+  <a href="/posts/">Blog</a>
+
+<a href='http://localhost:1313/index.xml'>RSS</a>
+
+
+
+
+
+
+
+</nav>
+</header>
+  <main id="main-content">
+
+<h1>Access Tokens, access tokens everywhere</h1>
+<p class="byline">
+  <time datetime='2023-10-04' pubdate>
+    2023-10-04
+  </time>
+  · Christian Piet
+</p>
+
+<content>
+  <p>Identities in a cloud world, we all have to deal with them whether we love or hate them.
+If you&rsquo;ve created automated actions to interact with Azure or MSGraph you&rsquo;ll probably have requested an access token, or maybe you&rsquo;ve used the Azure Portal or an e-mail-client like Outlook. Each of these rely on concepts called OIDC and OAuth, used for authentication and authorisation respectively. In this blog I&rsquo;ll explain what a access token is and how they are used in a Microsoft Entra ID context.</p>
+<h2 id="relevance">Relevance</h2>
+<p>Nowadays as a user I don&rsquo;t have to login seperately in my Outlook, SharePoint, Teams etc. on my workstation each time my temporary access to the application is expired. Also I&rsquo;m used to the fact that my Teams app can view my calendar info and show me files from my OneDrive or the company SharePoint. By implementing technologies like single-sign-on and federation, we&rsquo;re able to click on-and-on within and cross-application, without realizing what cool technology makes this possible.</p>
+<p>All of this data is served via Web-APIs via HTTPS on resource servers (a server hosting Exchange data, a SharePoint server etc.), some of these API&rsquo;s are public, but for the ones that are not, access tokens are a means to prove authentication to these Web-APIs. With public in this case I mean unauthenticated, not public or private networking.</p>
+<p>The authentication protocol OpenID-Connect (how we prove who we are) and authorisation protocol OAuth (access info without giving your password) were created to safely operate in a public routable world, because we can&rsquo;t rely on everything to always be behind the &lsquo;safe&rsquo; private network with the big firewall in front of it and our precious Active Directory to prove who who we are. Nor can we federate all the things using ADFS.</p>
+<p>So by integrating applications with OAuth we can access applications safely with the use of access tokens, without having to pass your password to each app.</p>
+<h2 id="access-tokens">Access Tokens</h2>
+<p>Access tokens in the Microsoft Identity Platform are JSON Web Tokens (JWT).</p>
+<p>Each time you use client apps, that integrate with Entra ID using OAuth, to access data (on behalf of you), made available via Web APIs, access tokens are exchanged to access these Web APIs securely.
+Client Apps use access tokens to access data, that we (probably) own, on behalf of us, via API&rsquo;s on a resource server.</p>
+<p>One way I like to put the below picture in practice is by thinking of the resource-owner (the user) as myself. I&rsquo;ve provided evidence (password or passwordless) to the identity platform (Entra-ID) to proof who I claim to be, by logging into <code>https://login.microsoftonline.com</code>.</p>
+<p>The client-app on the left I&rsquo;m using to view my calendar, can be Outlook or Teams (both can access calendar data). The resource server as as an Microsoft Exchange Online server serving my calendar data in response to authenticated requests (using Access tokens).</p>
+<figure><img src="/images/access-tokens/oauth2.png"
+    alt="Microsoft Identity Platform">
+</figure>
+
+<h2 id="access-tokens-1">Access Tokens</h2>
+<p>I&rsquo;ve mentioned Access Tokens several times now without explaining what they actually are.
+Access tokens with regards to Entra ID are implementations of JWTs. Access tokens or bearer tokens are valid for around 1 hour. In the abstract of <a href="https://datatracker.ietf.org/doc/html/rfc7519">RFC 7519</a> there&rsquo;s an excellent introduction of JWTs:</p>
+<blockquote>
+<p>JSON Web Token (JWT) is a compact, URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is used as the payload of a JSON Web Signature (JWS) structure or as the plaintext of a JSON Web Encryption (JWE) structure, enabling the claims to be digitally signed or integrity protected with a Message Authentication Code (MAC) and/or encrypted.</p>
+</blockquote>
+<p>In the abstract above it&rsquo;s mentioned that a JWT is an encoded JSON object, this means we can decode it if we know what it&rsquo;s decoded with.
+On Microsoft Learn, there is excellent guidance and examples of access tokens I found <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/access-tokens">here</a></p>
+
+
+
+
+
+<pre tabindex="0"><code>eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Imk2bEdrM0ZaenhSY1ViMkMzbkVRN3N5SEpsWSJ9.eyJhdWQiOiI2ZTc0MTcyYi1iZTU2LTQ4NDMtOWZmNC1lNjZhMzliYjEyZTMiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3L3YyLjAiLCJpYXQiOjE1MzcyMzEwNDgsIm5iZiI6MTUzNzIzMTA0OCwiZXhwIjoxNTM3MjM0OTQ4LCJhaW8iOiJBWFFBaS84SUFBQUF0QWFaTG8zQ2hNaWY2S09udHRSQjdlQnE0L0RjY1F6amNKR3hQWXkvQzNqRGFOR3hYZDZ3TklJVkdSZ2hOUm53SjFsT2NBbk5aY2p2a295ckZ4Q3R0djMzMTQwUmlvT0ZKNGJDQ0dWdW9DYWcxdU9UVDIyMjIyZ0h3TFBZUS91Zjc5UVgrMEtJaWpkcm1wNjlSY3R6bVE9PSIsImF6cCI6IjZlNzQxNzJiLWJlNTYtNDg0My05ZmY0LWU2NmEzOWJiMTJlMyIsImF6cGFjciI6IjAiLCJuYW1lIjoiQWJlIExpbmNvbG4iLCJvaWQiOiI2OTAyMjJiZS1mZjFhLTRkNTYtYWJkMS03ZTRmN2QzOGU0NzQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhYmVsaUBtaWNyb3NvZnQuY29tIiwicmgiOiJJIiwic2NwIjoiYWNjZXNzX2FzX3VzZXIiLCJzdWIiOiJIS1pwZmFIeVdhZGVPb3VZbGl0anJJLUtmZlRtMjIyWDVyclYzeERxZktRIiwidGlkIjoiNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3IiwidXRpIjoiZnFpQnFYTFBqMGVRYTgyUy1JWUZBQSIsInZlciI6IjIuMCJ9.pj4N-w_3Us9DrBLfpCt</code></pre><p>Microsoft has a JavaScript based website which can decode an access token locally <a href="https://jwt.ms/">jwt.ms</a>.
+If we pasted our example access token in there, we can see colored highlighting on 3 different sections and a decoded version with corresponding higlighting.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;typ&#34;</span><span class="p">:</span> <span class="s2">&#34;JWT&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;alg&#34;</span><span class="p">:</span> <span class="s2">&#34;RS256&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;kid&#34;</span><span class="p">:</span> <span class="s2">&#34;i6lGk3FZzxRcUb2C3nEQ7syHJlY&#34;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span><span class="err">.</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;aud&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;iss&#34;</span><span class="p">:</span> <span class="s2">&#34;https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nt">&#34;iat&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="nt">&#34;nbf&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nt">&#34;exp&#34;</span><span class="p">:</span> <span class="mi">1537234948</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="nt">&#34;aio&#34;</span><span class="p">:</span> <span class="s2">&#34;AXQAi/8IAAAAtAaZLo3ChMif6KOnttRB7eBq4/DccQzjcJGxPYy/C3jDaNGxXd6wNIIVGRghNRnwJ1lOcAnNZcjvkoyrFxCttv33140RioOFJ4bCCGVuoCag1uOTT22222gHwLPYQ/uf79QX+0KIijdrmp69RctzmQ==&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nt">&#34;azp&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="nt">&#34;azpacr&#34;</span><span class="p">:</span> <span class="s2">&#34;0&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Abe Lincoln&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nt">&#34;oid&#34;</span><span class="p">:</span> <span class="s2">&#34;690222be-ff1a-4d56-abd1-7e4f7d38e474&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nt">&#34;preferred_username&#34;</span><span class="p">:</span> <span class="s2">&#34;abeli@microsoft.com&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">  <span class="nt">&#34;rh&#34;</span><span class="p">:</span> <span class="s2">&#34;I&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">  <span class="nt">&#34;scp&#34;</span><span class="p">:</span> <span class="s2">&#34;access_as_user&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="nt">&#34;sub&#34;</span><span class="p">:</span> <span class="s2">&#34;HKZpfaHyWadeOouYlitjrI-KffTm222X5rrV3xDqfKQ&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="nt">&#34;tid&#34;</span><span class="p">:</span> <span class="s2">&#34;72f988bf-86f1-41af-91ab-2d7cd011db47&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="nt">&#34;uti&#34;</span><span class="p">:</span> <span class="s2">&#34;fqiBqXLPj0eQa82S-IYFAA&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">  <span class="nt">&#34;ver&#34;</span><span class="p">:</span> <span class="s2">&#34;2.0&#34;</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span><span class="err">.</span><span class="p">[</span><span class="err">Signature</span><span class="p">]</span></span></span></code></pre></div><p>If you look closely it&rsquo;s not a single object, but three seperate objects.
+A header, a body and a signature.</p>
+<blockquote>
+<p>If you&rsquo;ve looked carefully you can see that the JSON objects are &lsquo;glued&rsquo; together with <code>.</code>-characters.
+For GitHub I had to make my own access tokens and I forgot to add the last dot, doh!</p>
+</blockquote>
+<h3 id="header">Header</h3>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;typ&#34;</span><span class="p">:</span> <span class="s2">&#34;JWT&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;alg&#34;</span><span class="p">:</span> <span class="s2">&#34;RS256&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;kid&#34;</span><span class="p">:</span> <span class="s2">&#34;i6lGk3FZzxRcUb2C3nEQ7syHJlY&#34;</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span><span class="err">.</span></span></span></code></pre></div><p>The first JSON object in this decoded token is the (JOSE) Header of the JWT.
+The <a href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.9"><code>typ</code></a>-key defines it is a JWT and <a href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.1"><code>alg</code></a> that in this case the JWT is MAC&rsquo;d with the HMC SHA-256 algorithm. Message Authentication Code (MAC) support is integrated be able to validate authenticity of a JWT using a signature. Lastly the <a href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.4"><code>kid</code></a> identifies the key with which the MAC operation.</p>
+<h2 id="body">Body</h2>
+<p>After the header and a seperating dot-character, jwt.ms it it&rsquo;s decoded form shows a JSON-body. This body contains claims. In the RFC7519 claims are defined as:</p>
+<blockquote>
+<p>Claim: A piece of information asserted about a subject. A claim is represented as a name/value pair consisting of a Claim Name and a Claim Value.</p>
+</blockquote>
+<p>These claims represent information on the token, for instance:</p>
+<ul>
+<li>What resource is the meant token meant for</li>
+<li>Who issued the token</li>
+<li>How long is it valid for</li>
+</ul>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;aud&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;iss&#34;</span><span class="p">:</span> <span class="s2">&#34;https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;iat&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nt">&#34;nbf&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;exp&#34;</span><span class="p">:</span> <span class="mi">1537234948</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;aio&#34;</span><span class="p">:</span> <span class="s2">&#34;AXQAi/8IAAAAtAaZLo3ChMif6KOnttRB7eBq4/DccQzjcJGxPYy/C3jDaNGxXd6wNIIVGRghNRnwJ1lOcAnNZcjvkoyrFxCttv33140RioOFJ4bCCGVuoCag1uOTT22222gHwLPYQ/uf79QX+0KIijdrmp69RctzmQ==&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nt">&#34;azp&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="nt">&#34;azpacr&#34;</span><span class="p">:</span> <span class="s2">&#34;0&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Abe Lincoln&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="nt">&#34;oid&#34;</span><span class="p">:</span> <span class="s2">&#34;690222be-ff1a-4d56-abd1-7e4f7d38e474&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nt">&#34;preferred_username&#34;</span><span class="p">:</span> <span class="s2">&#34;abeli@microsoft.com&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="nt">&#34;rh&#34;</span><span class="p">:</span> <span class="s2">&#34;I&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nt">&#34;scp&#34;</span><span class="p">:</span> <span class="s2">&#34;access_as_user&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nt">&#34;sub&#34;</span><span class="p">:</span> <span class="s2">&#34;HKZpfaHyWadeOouYlitjrI-KffTm222X5rrV3xDqfKQ&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nt">&#34;tid&#34;</span><span class="p">:</span> <span class="s2">&#34;72f988bf-86f1-41af-91ab-2d7cd011db47&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">  <span class="nt">&#34;uti&#34;</span><span class="p">:</span> <span class="s2">&#34;fqiBqXLPj0eQa82S-IYFAA&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">  <span class="nt">&#34;ver&#34;</span><span class="p">:</span> <span class="s2">&#34;2.0&#34;</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}</span><span class="err">.</span></span></span></code></pre></div><p>In the RFC there&rsquo;s a section that references claims names for JWT&rsquo;s can be divided up into 3 classes:</p>
+<ul>
+<li>Registered Claim Names, IANA registered interoperable claims;</li>
+<li>Public Claim Names, a collision resistant public name;</li>
+<li>Private Claim Names, neither IANA Registered claim nor collision resistant;</li>
+</ul>
+<p>So not every JWT for every service will look the same, luckily we have services like <a href="https://jwt.io/">jwt.io</a> and <a href="https://jwt.ms/">jwt.ms</a> to decode it.</p>
+<p>Do notice that the registered claims <code>iat</code>, <code>nbf</code> and <code>exp</code> their values are in a specific numerical format we don&rsquo;t see often in a Windows world.
+This is called Epoch time or Unix time,which you can read more about in <a href="https://en.wikipedia.org/wiki/Unix_time">wikipedia</a>
+In this case it&rsquo;s seconds since the Epoch to which you can convert to with PowerShell using <code>Get-Date -UFormat %s</code>.</p>
+<h1 id="token-issuance">Token Issuance</h1>
+<p>There are multiple flows how token issuance/flows/grants occur, this has to do with several factors.
+But the end goal of all of them is getting a token to access the resource.</p>
+<h2 id="daemon-appspipelines">Daemon apps/pipelines</h2>
+<p>Firstly who &lsquo;owns&rsquo; the resource, or can grant access to the resource.</p>
+<p>If you build a daemon app that fetches data that it owns, the resource owner is the same as the client (the client will have the credentials). This will use a flow called client credentials to retrieve a token (in an authentication request it&rsquo;ll use app-id/secret).</p>
+<p>Differently phrased if an app acts on behalf of the resource owner, it is not the same party as the resource owner. These are not the apps you interact with as a regular user, they just do it&rsquo;s own thing. If you build scheduled scripts, this will probably be the authentication flow you&rsquo;ll probably use. Simply said the client will request a token for itself to the authorisation server.
+All of the other flows are flows that retrieve tokens in a on-behalf-of flow, because the client doesn&rsquo;t own the resource.</p>
+<h2 id="web-apps">Web apps</h2>
+<p>The second factor is where is the client/app running, if it&rsquo;s a webapp you&rsquo;d want the access token not to be exposed through your machine/browser, it should flow directly from the authorisation endpoint to the webserver. If your app is running on your machine you shouldn&rsquo;t use this flow.</p>
+<blockquote>
+<p>We assume the app is known in the authorisation server and the user is allowed to use the app.</p>
+</blockquote>
+<p>Before this app can access data on-behalf-of you at the resource server, it can ask for your consent. After you did so it will receive an authorization code (from the authorisation server) and the app will use it&rsquo;s own credentials and the authorisation code to request an access token at the token server, to access your data. This flow is called Authorisation Code flow.</p>
+<p>If you keep it to just these steps for authorisation code, there will be two flaws you might have spotted.
+Since an access token has a default lifetime of an hour, you&rsquo;ll have to do this whole authorisation dance again, which isn&rsquo;t particularly user-friendly.</p>
+<p>To temporarily fix this there&rsquo;s another token (yay), called a refresh token. A refresh token is a token with a longer lifetime, which during it&rsquo;s lifetime can be used to directly request an access token to the token server (without bothering user with another allow this app to view my &ldquo;X&rdquo; and &ldquo;Y&rdquo;).</p>
+<p>Once the refresh token expires the app can request another access token and will get both an access token and a new refresh token. And it&rsquo;ll continue to show you your precious data/e-mails/calendar appointments.</p>
+<h2 id="ropc">ROPC</h2>
+<p>Some apps just don&rsquo;t support redirects, but do have to get data on-behalf-of the customer. Apps can use the Resource Owner Password Credentials flow to request tokens (and potentially refresh tokens), to access data on your behalf.</p>
+<p>This is similar to the client-credentials flow, but different in the case that the client (app) isn&rsquo;t the same party as the resource-owner (you). Differently phrased these apps need your username/password to get a token (and potentially a refresh token), to access your data. But since you&rsquo;ve already sent your username + password, you must be asolutely sure this app processed the credentials properly. When I read this it sounded like oldschool accounts everywhere (20 years ago) and hope that the app doesn&rsquo;t get hacked and your credentials get exposed.</p>
+
+</content>
+<p>
+  
+    <a class="blog-tags" href="/tags/access-tokens/">#access tokens</a>
+  
+    <a class="blog-tags" href="/tags/entra-id/">#entra id</a>
+  
+    <a class="blog-tags" href="/tags/github/">#github</a>
+  
+</p>
+
+
+
+
+  </main>
+  <footer><small>
+  Christian Piet (CC BY 4.0) | Made with <a href="https://github.com/clente/hugo-bearcub">Bear Cub</a>
+</small></footer>
+
+    
+</body>
+
+</html>

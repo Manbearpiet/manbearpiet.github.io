@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>OAuth on Azure and DevOops</title>
+    <link>http://localhost:1313/tags/oauth/</link>
+    <description>Recent content in OAuth on Azure and DevOops</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <copyright>Christian Piet (CC BY 4.0)</copyright>
+    <lastBuildDate>Wed, 14 Feb 2024 19:41:37 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/oauth/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OAuth: Recipe for access</title>
+      <link>http://localhost:1313/posts/tokens/</link>
+      <pubDate>Wed, 14 Feb 2024 19:41:37 +0100</pubDate>
+      <guid>http://localhost:1313/posts/tokens/</guid>
+      <description>&lt;h1 id=&#34;tokens&#34;&gt;Tokens&lt;/h1&gt;&#xA;&lt;p&gt;If you&amp;rsquo;ve automated against products like Entra ID, Azure ARM or Azure DevOps you&amp;rsquo;ve might run into tokens like access tokens or OAuth.&lt;/p&gt;&#xA;&lt;p&gt;Several of my former colleagues were already using them to access stuff like our ITSM or Azure and I had no idea what they were and how to use them.&#xA;In this blog I hope to give you the insights I was looking for with what they are, how they are generated, how you can use them.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="tokens">Tokens</h1>
+<p>If you&rsquo;ve automated against products like Entra ID, Azure ARM or Azure DevOps you&rsquo;ve might run into tokens like access tokens or OAuth.</p>
+<p>Several of my former colleagues were already using them to access stuff like our ITSM or Azure and I had no idea what they were and how to use them.
+In this blog I hope to give you the insights I was looking for with what they are, how they are generated, how you can use them.</p>
+<p>My main focus is on the Entra ID platform, but most concepts apply on other Identity providers too.</p>
+<h2 id="oldschool-situation">Oldschool situation</h2>
+<p>A puzzle when you&rsquo;re developing software is that you need to know for sure who is using your software, to be able to give the user the best experience. You might want to give them tailored views and access to the user or admin functionality.</p>
+<p>In oldschool IT we used to have a big fortress behind a firewall that had identity services in Active Directory (AD), from the point of view of an application server you can see all the users and the AD groups they&rsquo;re member of.
+The Domain Controller servers would verify that users can prove that they are who they claim to be (Authentication) and host the groups and their membershipss, facilitating Authorization (access delegation, what you are (not) allowed to access).
+If a piece of software supported role-based access control (RBAC), you&rsquo;d create an AD group for the role and add users to the group. The appserver could access the Active Directory and in that way check if someone should have access and what role they should have.</p>
+<p>In some cases you&rsquo;d need continous network access to application servers hosted on a remote location, in the same domain, and you or your network administrator was kind of enough to facilitate a site-to-site VPN. Thus creating a line-of-sight from your domain controllers (hosting your users and groups) and the app-servers.</p>
+<p>However you can&rsquo;t always make VPN&rsquo;s to each supplier, and last 20 years more and more software is hosted on public internet. This is a movement from the older setup in which each server could verify who you claim to be and what you can access. But you don&rsquo;t want a seperate logon-account for each piece of software, maintaining seperate passwords, duplicate group setups et cetera. There is software which extends the trust-boundary from your on-premises Active Directory to suppliers called Federated Services, but I find management complicated which doesn&rsquo;t make it more secure.</p>
+<h2 id="oauth">OAuth</h2>
+<p>The struggle of knowing who someone is and what they should be able to access isn&rsquo;t only a problem in our on-premises world, but also in consumer situations. We used to have a username and password for each seperate service and they&rsquo;d store the details. This would become a tiresome dance of resetting password and password reuse until the service got hacked and you&rsquo;d have to think of a new password.
+To solve this accounts everywhere situation OAuth was developed. It centralizes identity (you just have 1 account/login) and that handles Authentication and Authorization.</p>
+<p>This open standard allows users to have a single useraccount (identity) and for themselves to decide when they want to share what data with which external service (you can logon with your Google/Facebook account to a lot of websites). Third party websites/services can state what data they need from you to operate and as a consumer you can allow or decline this access. You wouldn&rsquo;t want to share your google account logon details to use an external service, just the data it needs to operate. A taxi app should have access to my name, mailaddress, maybe my profile picture but not access to all my mail or contacts.</p>
+<p>For the origin story there is an <a href="https://en.wikipedia.org/wiki/OAuth#History">excellent Wikipedia article about it</a>.</p>
+<p>The architecture of the OAuth standard describes:</p>
+<ul>
+<li>A protected resource (data hosted somewhere and offered via an API)</li>
+<li>a resource owner (someone/something who owns the data),</li>
+<li>a client (an app that consumes the data)</li>
+<li>an authorisation server (that grants access to the data)</li>
+</ul>
+<h3 id="to-do-app">To do app</h3>
+<h1 id="voeg-stukje-toe-over-delegaten-van-toegang">VOEG STUKJE TOE OVER DELEGATEN VAN TOEGANG</h1>
+<p>An example I like to make to visualize this is, I frequently use a third party (non-google) to-do app which can schedule events in my Google Calendar. This app (client) doesn&rsquo;t own my calendar data (protected resource), but I do like to use it to schedule events in my calendar.</p>
+<p>When I first logged into the to-do app, I pushed a big &ldquo;Logon with Google&rdquo;-button, which redirected me to a logon screen from Google, after a successful logon Google showed an enumeration which data of me the app required to operate. After I confirmed at Google the app was allowed to access the data, I was redirected back to the app and could start using it.</p>
+<p>To access my protected calendar data at server from Google, the app requests an access tokens for my data at the authorisation server of Google. Google double checks if I added it to my used apps (so it knows it exists and it can request metadata about me) and if it&rsquo;s allowed to the requested calendar data. If so it returns an access token to the client.</p>
+<p>With this access token, the to-do app can go to the API-server hosting my calendar data and asks what calendar events I have scheduled, show me these events or even submit new events to my calendar. Awesome!, without sharing my password it can do just what I ask it to, yus!</p>
+<h2 id="access-tokens">Access tokens</h2>
+<h1 id="check-voor-self-contained-tokens-httpswwwoauthcomoauth2-serversaccess-tokensself-encoded-access-tokens">Check voor self-contained tokens: <a href="https://www.oauth.com/oauth2-servers/access-tokens/self-encoded-access-tokens/">https://www.oauth.com/oauth2-servers/access-tokens/self-encoded-access-tokens/</a></h1>
+<p>Access tokens play a central role in the OAuth standard, they contain information about which client app requested access, to who&rsquo;ms data and what data it can access or change and service as an access pass at the protected resource. The protected resource just serves the data, after verifying that the token is meant for them and the clientapp is allowed to access the data.</p>
+<p>Access tokens are also called JWT&rsquo;s (JSON Web Tokens) and are described in <a href="https://www.rfc-editor.org/rfc/rfc7519">RFC7519</a>. Access tokens in OAuth are Base64 URL encoded JSON-objects. The Base 64 URL encoding allows for embedding of tokens in a URL, without breaking URL&rsquo;s because of amibigous characters. JSON is an object structure which is easy to work with.</p>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc5849">OAuth version 1</a> worked great within browsers, but it had some issues in native and mobile apps. The author of the spec Eran Hammer wrote an <a href="http://hueniverse.com/2010/05/15/introducing-oauth-2-0/">awesome blog</a> introducing OAuth 2, the version commonly used now. I&rsquo;ll briefly summarize it but, it&rsquo;s a nice read. There also is a nice <a href="https://www.oauth.com/oauth2-servers/differences-between-oauth-1-2/">article</a> from OAuth about it, with more in-depth readable examples.</p>
+<p>OAuth 1 required that the protected resource had access to the client credentials to validate the request. Which meant that the to-do app has to share it&rsquo;s credentials with the google calendar API server, ha the irony. Also it had a single flow, which didn&rsquo;t support a lot of scenario&rsquo;s. The tokens were valid for a long periods of time. And the  authorisation server wasn&rsquo;t explicitly split from the protected resource server.</p>
+<p>The OAuth version 2 introduced a lot of improvements:</p>
+<ul>
+<li>New auth flows (new types of clients are supported)</li>
+<li>Bearer token support (the token itself became a secret that could be used to authenticate)</li>
+<li>Simpler token signatures</li>
+<li>Implementation of the refresh token concept (short living access tokens and long lived authorisations)</li>
+<li>Seperation of authorization server and protected resource server</li>
+</ul>
+<p>This centralization of identity is awesome, but the start of this blog focused around IT-management of users,not consumers their own accounts and their data.
+In our IT-environments we don&rsquo;t manage just a single account, but all of the accounts of all the users. It helps that you just have to manage a single of a useridentity, however you&rsquo;d want to manage access to your users their data on scale not setup access on a per user basis. All of these accounts have data stored in services (mail data, calendar data etc.), to scale this efficiently this all needs to be managed centrally.</p>
+<h2 id="enterprise-implementations">Enterprise implementations</h2>
+<p>OAuth 2 is a big change in how we grant access to data. As a company you&rsquo;re (hopefully) protective of your data and of your users. All your users interact with data via client-apps, some mails or appointments you really don&rsquo;t want to expose to competitors or the public.</p>
+<p>If we go back to the fundaments of the standard, it means we have a lot of protected resources with data we need to make sure we need to protect. We&rsquo;d also want have grip on which client-apps interact with which data of users, are these secure. And lastly which users have access to which clientapps.</p>
+<p>The same fundamental principles still apply on enterprise identities too.
+Enter the modern cloud identity IAM&rsquo;s like Microsoft Entra ID, in which we manage users, client-apps and delegate clients to access API&rsquo;s providing raw data access. The users are using a single identity which they sign-on (single sign-on), and they can .</p>
+<p>When a user wants to login with their account to a portal/client app to use the app with their data, the app has to have access their data. Initially new clientapps are not known at the identity server (my apps) yet and are untrusted. Or maybe the app has no permission to access data of this user. What&rsquo;ll happen?</p>
+<p>In the case that the app isn&rsquo;t known yet the user will be forwared to their identity provider and faced with a table similar to that of consumers stating, this clientapp wants to access this data, is this ok?</p>
+<p>As an admin you&rsquo;re sometimes crying on what people (users and admins alike) click &ldquo;Yes&rdquo;, &ldquo;Okay&rdquo;, &ldquo;Confirm&rdquo; on, in these cases you&rsquo;d want to be extra careful, because you could grant a malicous &lsquo;free AI mega-cool&rsquo; app access to all emails of the user. To make sure that these situations not happen, there are luckily settings to disallow users to add applications to the authorisation server. But check your cloud identity provider if you&rsquo;re allowing users to add new client apps. And make sure to talk with your it-staff with admin access that they understand what they click yes on.</p>
+<p>You don&rsquo;t want to confront users each week with the question, hey can this app still access your data? To prevent that the longer-living refresh token was introduced in OAuth 2, with which a short lived access token can be requested. This creates a situation in which the short living access token is used to retrieve the data and is refreshed when expired. But you also don&rsquo;t want your new users to have to click their first day through all of the &lsquo;can this app access this data on your behalf?&rsquo; messages. So as an admin there&rsquo;s usually an option to acknowledge that the app can be used (at the authorisation server) and this app can access the users data from the protected resource on their behalf.</p>
+<h2 id="daemon-apps">Daemon apps</h2>
+<p>My previous examples are all reasoned from a point of view of which you&rsquo;d delegate a client app to access protected data on the users behalf (on behalf of, OBO). But in some cases you might want to grant access to an &lsquo;daemon&rsquo; app that should act on it&rsquo;s own on all email data or without a user in between it telling it what to do. In oldschool IT, we&rsquo;d have a service account to do these actions. It&rsquo;s an entity that acts on its own and not on behalf of.</p>
+<p>In the OAuth 2 standard there&rsquo;s are seperate roles for the resource owner (user), the client (app), the authorisation server and the protected resource (API).
+In a daemon app scenario these steps aren&rsquo;t the same as in a OBO-user flow. The client and the resource owner are the same entity, it has it&rsquo;s own login and requests the data for itself to consume, therefore daemon apps will request an access token at the authorisation server for the resource directly.</p>
+<h2 id="open-id-connect">Open ID Connect</h2>
+<p>While OAuth 2 could do Authentication and Authorisation, for authentication a different open standard is used by many cloud identity providers called <a href="https://openid.net/">Open ID Connect (OIDC)</a>. They have <a href="https://openid.net/developers/how-connect-works/">excellent documentation</a> on the functionality of the standard.</p>
+<p>Open ID Connect is an authentication protocol based on the OAuth 2 standard. It creates a more simple solution to the question &ldquo;What is the identity of the person currently using the browser or mobile app that is connected?&rdquo;</p>
+<p>A paraphrased version of the steps documented on the documentation:</p>
+<ol>
+<li>A user navigates to a website or app (client)</li>
+<li>The user clicks sign-in and types in username/password</li>
+<li>The client app sends a request to Open ID Provider</li>
+<li>The provider authenticates the user, and fetches their authorisations</li>
+<li>The provider then responds back with an identity (ID) token and usually an access token</li>
+<li>The</li>
+</ol>
+<h2 id="end">End</h2>
+<p>I could</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>

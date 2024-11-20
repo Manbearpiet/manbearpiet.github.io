@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Parameters on Azure and DevOops</title>
+    <link>https://manbearpiet.github.io/tags/parameters/</link>
+    <description>Recent content in Parameters on Azure and DevOops</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <copyright>Christian Piet (CC BY 4.0)</copyright>
+    <lastBuildDate>Wed, 20 Nov 2024 13:00:00 +0100</lastBuildDate>
+    <atom:link href="https://manbearpiet.github.io/tags/parameters/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Complete your resource groups and resource parameter values like Azure PowerShell</title>
+      <link>https://manbearpiet.github.io/posts/azureargumentcompleters/</link>
+      <pubDate>Wed, 20 Nov 2024 13:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/posts/azureargumentcompleters/</guid>
+      <description>&lt;p&gt;This week I was busy with some module development, and I was wondering how the user experience could be more user-friendly.  When you use the Azure PowerShell modules you get nice autocompletion on resource groups and resources, so I was wondering if I could give the same comfort to my module and script users.&#xA;With this blog post I will show you, how I implement Azure PowerShell their argument completers, to give users of my scripts and modules this same experience with my parameters.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>This week I was busy with some module development, and I was wondering how the user experience could be more user-friendly.  When you use the Azure PowerShell modules you get nice autocompletion on resource groups and resources, so I was wondering if I could give the same comfort to my module and script users.
+With this blog post I will show you, how I implement Azure PowerShell their argument completers, to give users of my scripts and modules this same experience with my parameters.</p>
+<h2 id="argument-completers">Argument Completers?</h2>
+<p>If our users interact with your script or module (outside the context of a pipeline), it can be convenient to give them relevant tab completion results on parameters.</p>
+<p>I&rsquo;ve dealt with custom argument completers for parameter arguments before, I read the excellent <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_argument_completion?view=powershell-7.4">about_Functions_Argument_Completion article</a> and thought I could do this the dumb way or the lazy way.
+In the Learn article it&rsquo;s explained that you can either hardcode the options in a <code>ValidateSet</code>/<code>ArgumentCompletions</code> attribute decorator, use an argument completer/scriptblock to gather the autocomplete options, or use a class-based argument completer.</p>
+<h3 id="source">Source</h3>
+<p>The first option is not feasible since we don&rsquo;t know which resource exist where for each user, so that option is out. The sub-optimal way would be calling <code>Get-AzResource</code> in a scriptblock on everything and then offering the result as tab completion options. But the lazy way would be to just use the already made argument completers made by Azure PowerShell. The argument completers used in Azure PowerShell are functional - we all use them every day!</p>
+<p>The resource argument completers are stored in the Azure PowerShell modules source code at <a href="https://github.com/Azure/azure-powershell-common/tree/main/src/ResourceManager/Version2016_09_01/ArgumentCompleters">the GitHub repo</a>. I asked for some help on why this works on the PowerShell discord, join us at <a href="https://aka.ms/PSDiscord">https://aka.ms/PSDiscord</a>, and I learned that the Azure PowerShell modules implemented these in public types, so if we load the correct module(s) we should be able to use these.<br>
+If you do implement argument completion it using these existing completers, mind that this feature is depending on the fact the types in the Azure Powershell Module are scoped to public for now, but Microsoft may decide otherwise in the future.</p>
+<p>The directory has the following files containing argument completer classes:</p>
+<ul>
+<li>LocationCompleter.cs
+<ul>
+<li>The <code>LocationCompleter</code> attribute will allow the user to autocomplete the -Location parameter of a cmdlet with valid locations (as determined by the list of ResourceTypes given)</li>
+</ul>
+</li>
+<li>ResourceGroupCompleter.cs
+<ul>
+<li>The <code>ResourceGroupCompleter</code> attribute will allow the user to autocomplete the <code>-ResourceGroup</code> parameter of a cmdlet with valid resource groups</li>
+</ul>
+</li>
+<li>ResourceIdCompleter.cs
+<ul>
+<li>The <code>ResourceIdCompleter</code> attribute will allow the user to autocomplete the <code>-ResourceId</code> parameter of a cmdlet with valid resource identifiers (as determined by the list of ResourceTypes given)</li>
+</ul>
+</li>
+<li>ResourceNameCompleter.cs
+<ul>
+<li>The <code>ResourceNameCompleter</code> attribute will allow the user to autocomplete the <code>-Location</code> parameter of a cmdlet with valid resource names (as determined by the list of ResourceTypes given)</li>
+</ul>
+</li>
+<li>ResourceTypeCompleter.cs
+<ul>
+<li>The <code>ResourceTypeCompleter</code> attribute will allow the user to autocomplete the <code>-ResourceType</code> parameter of a cmdlet with valid resource types</li>
+</ul>
+</li>
+<li>ScopeCompleter.cs
+<ul>
+<li>The <code>ScopeCompleter</code> class will provide a list of scopes that are available to the user. This will then be available to the user to tab through.</li>
+</ul>
+</li>
+</ul>
+<h2 id="lets-implement">Let&rsquo;s implement</h2>
+<p>In the following section I&rsquo;ll give some examples, only the <code>Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters.*</code> attributes and the names of the parameters in these sections are relevant. Tab completion will work if you paste in these code sections and try it for yourself.</p>
+<p>I do want to mention, <strong>never blindly copy-paste code you find</strong>, always read and understand it before you do, you never know what it might do.</p>
+<p>The code below requires you to already have Azure PowerShell modules imported, like <code>Az.Accounts</code>, and you have a signed in session (which requires the former).</p>
+<h3 id="resource-group-names">Resource Group names</h3>
+<p>The simplest example using is the completer from <code>ResourceGroupCompleter.cs</code>. If you want to provide the option to give tab-completion to users for the resource group names you can do:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Get-ResourceGroup</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="c"># This attribute will allow the user to autocomplete with valid resource groups</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ResourceGroupCompleterAttribute</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nv">$ResourceGroupName</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><figure><img src="/images/azureargumentcompleters/rsg.png"
+    alt="Tab completion for Resource Group names">
+</figure>
+
+<p>The resource group completer is the simplest implementation, since it doesn&rsquo;t require any additional arguments. It just works when you press tab to show all options, or if you type the start of a resource group name and it&rsquo;ll autocomplete.</p>
+<h3 id="resource-types">Resource types</h3>
+<p>This example show autocompletion for resource types available, it isn&rsquo;t context aware of what resource types you&rsquo;ve implemented:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Get-ResourceTypes</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="c"># This attribute will allow the user to autocomplete with valid resource types</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ResourceTypeCompleterAttribute</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nv">$ResourceType</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><figure><img src="/images/azureargumentcompleters/alltypes.png"
+    alt="Tab completion for Resource types">
+</figure>
+
+<p>So if we try to autocomplete the <code>ResourceType</code>-parameter for the resourcetypes ending with <code>Microsoft.Web/s</code> it&rsquo;ll bring up the following options if we press <code>&lt;TAB&gt;</code> twice.
+I trimmed the output, but you get the idea.</p>
+<figure><img src="/images/azureargumentcompleters/webtypes.png"
+    alt="Tab completion for types starting with microsoft.web/s">
+</figure>
+
+<h3 id="scopes">Scopes</h3>
+<p>Scopes is also a cool one to enumerate all the scopes available in the current context (subscription).</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Get-AzureResourceScopes</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="c"># This attribute will allow the user to autocomplete with valid scopes in current context</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ScopeCompleterAttribute</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nv">$Scope</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>If you want to know what options are available, without pressing tab, you can press <code>CTRL</code> + <code>SPACEBAR</code>.
+That way it&rsquo;ll show all the options, it does not work with many options.</p>
+<figure><img src="/images/azureargumentcompleters/scopes.png"
+    alt="Tab completion for deployment scopes">
+</figure>
+
+<h3 id="resource-names">Resource names</h3>
+<p>The resource names completer requires additional arguments specified in the <code>ResourceNameCompleter.cs</code>-file. you must supply the Azure resource type you&rsquo;re looking for and <code>ResourceGroupName</code> it works like a breeze. I was wondering how the parameter is aware of the value of another parameter it&rsquo;s value, and then I learned about the <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_argument_completion?view=powershell-7.4#argumentcompleter-script-block">FakeBoundParameters</a> and relearned about <code>PSBoundParameters</code>.</p>
+<p>The code below shows you how you could fetch your Log Analytics workspaces. You could alter this to any resourcetype.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Get-ResourceNames</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="c"># This attribute will allow the user to autocomplete with valid resource groups</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ResourceGroupCompleterAttribute</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="nv">$ResourceGroupName</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="c"># This attribute will allow the user to autocomplete resourcenames within the supplied resourcegroups</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ResourceNameCompleterAttribute</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="s2">&#34;Microsoft.OperationalInsights/workspaces&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="s2">&#34;ResourceGroupName&#34;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">)]</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="nv">$WorkspaceName</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p><figure><img src="/images/azureargumentcompleters/names.png"
+    alt="Tab completion for resource names">
+</figure>
+
+<figure><img src="/images/azureargumentcompleters/rsgscopedname.png"
+    alt="Tab completion for resource names">
+</figure>
+</p>
+<h3 id="resource-id-completer">Resource Id completer</h3>
+<p>This one was one I find really cool, you can autocomplete resource-ids of a specified type.
+In many cases you want to have the full resource-id of an Azure resource, but tab completion is mostly offered to just the resource group or the resource name. Which means you&rsquo;d have to do another call to find the resource-id. With this completer you can just offer tabcompletion of the whole id, yay!</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Get-ResourceID</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="c"># This attribute will allow the user to autocomplete resource-ids for the specified resource type</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ResourceIdCompleter</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">            <span class="s2">&#34;Microsoft.OperationalInsights/workspaces&#34;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="p">)]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$ResourceId</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><figure><img src="/images/azureargumentcompleters/rid.png"
+    alt="Tab completion for resource ids">
+</figure>
+
+<blockquote>
+<p>Note: I&rsquo;ve discussed this post before publishing with the fantastic Mathias (@IISResetMe) from the PowerShell discord, he proofread the article, for which thanks again. Mathias added that the <code>Attribute</code> suffix in the typenames are automatically added by the PowerShell parser, when searching for typenames in syntactical contexts. So in this context, these will be handled the same:</p>
+</blockquote>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-pwsh" data-lang="pwsh"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ResourceNameCompleterAttribute</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="p">[</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">Azure</span><span class="p">.</span><span class="py">Commands</span><span class="p">.</span><span class="py">ResourceManager</span><span class="p">.</span><span class="py">Common</span><span class="p">.</span><span class="py">ArgumentCompleters</span><span class="p">.</span><span class="py">ResourceNameCompleter</span><span class="p">()]</span></span></span></code></pre></div><h1 id="conclusion">Conclusion</h1>
+<p>This is all there&rsquo;s to it. You do create a dependency on the Azure PowerShell modules and the fact that these are public types.
+But these argument completers can be a very nice comfort feature/easy win for your user experience - you just have to decorate a parameter with a single or two attributes.</p>
+<p>I hope you learned as much as I did and that your user may enjoy fancy tab completion.</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>

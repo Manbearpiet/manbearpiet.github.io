@@ -5,10 +5,11 @@
   <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="shortcut icon" href="/images/favicon-32x32.png" />
+<link rel="shortcut icon" href="https://manbearpiet.github.io/images/favicon-32x32.png" />
 <title>Deliver your apps using Azure Front Door | Azure and DevOops</title>
 <meta name="title" content="Deliver your apps using Azure Front Door" />
 <meta name="description" content="With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&#39;s." />
+<meta name="author" content="" />
 <meta name="keywords" content="Azure Front Door,Basic tour," />
 
 
@@ -17,36 +18,47 @@
 
 
   
-  <meta property="og:title" content="Deliver your apps using Azure Front Door" />
-<meta property="og:description" content="With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&#39;s." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://manbearpiet.github.io/posts/azurefrontdoor/" /><meta property="og:image" content="https://manbearpiet.github.io/images/front-door/feature.png" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-08-04T19:31:39+02:00" />
-<meta property="article:modified_time" content="2021-08-04T19:31:39+02:00" /><meta property="og:site_name" content="Azure and DevOops" />
+  <meta property="og:url" content="https://manbearpiet.github.io/posts/azurefrontdoor/">
+  <meta property="og:site_name" content="Azure and DevOops">
+  <meta property="og:title" content="Deliver your apps using Azure Front Door">
+  <meta property="og:description" content="With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&#39;s.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-08-04T19:31:39+02:00">
+    <meta property="article:modified_time" content="2021-08-04T19:31:39+02:00">
+    <meta property="article:tag" content="Azure Front Door">
+    <meta property="article:tag" content="Basic Tour">
+    <meta property="og:image" content="https://manbearpiet.github.io/images/front-door/feature.png">
 
 
   
-  <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://manbearpiet.github.io/images/front-door/feature.png"/>
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://manbearpiet.github.io/images/front-door/feature.png">
+  <meta name="twitter:title" content="Deliver your apps using Azure Front Door">
+  <meta name="twitter:description" content="With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&#39;s.">
 
-<meta name="twitter:title" content="Deliver your apps using Azure Front Door"/>
-<meta name="twitter:description" content="With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&#39;s."/>
 
-
+  
   
   <meta itemprop="name" content="Deliver your apps using Azure Front Door">
-<meta itemprop="description" content="With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&#39;s."><meta itemprop="datePublished" content="2021-08-04T19:31:39+02:00" />
-<meta itemprop="dateModified" content="2021-08-04T19:31:39+02:00" />
-<meta itemprop="wordCount" content="2303"><meta itemprop="image" content="https://manbearpiet.github.io/images/front-door/feature.png">
-<meta itemprop="keywords" content="Azure Front Door,Basic tour," />
+  <meta itemprop="description" content="With this blog I want to show what Azure Front Door is, what the components are and make sure to mention a few gotcha&#39;s.">
+  <meta itemprop="datePublished" content="2021-08-04T19:31:39+02:00">
+  <meta itemprop="dateModified" content="2021-08-04T19:31:39+02:00">
+  <meta itemprop="wordCount" content="2303">
+  <meta itemprop="image" content="https://manbearpiet.github.io/images/front-door/feature.png">
+  <meta itemprop="keywords" content="Azure Front Door,Basic Tour">
 
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
   
-  <link href="/style.min.css" rel="stylesheet">
+  <link href="/original.min.css" rel="stylesheet">
 
   
-  <link href="/syntax.min.css" rel="stylesheet">
+    
+    <link href="/syntax.min.css" rel="stylesheet">
+  
 
   
 
@@ -62,8 +74,7 @@
 
   <a href="/posts/">Blog</a>
 
-
-<a href="/posts/index.xml">RSS</a>
+<a href='https://manbearpiet.github.io/index.xml'>RSS</a>
 
 
 
@@ -76,18 +87,17 @@
   <main id="main-content">
 
 <h1>Deliver your apps using Azure Front Door</h1>
-<p>
-  <i>
-    <time datetime='2021-08-04' pubdate>
-      2021-08-04
-    </time>
-  </i>
+<p class="byline">
+  <time datetime='2021-08-04' pubdate>
+    2021-08-04
+  </time>
+  
 </p>
 
 <content>
   <h1 id="azure-front-door">Azure Front Door</h1>
 <p><figure><img src="/images/front-door/feature.png"
-         alt="HTTP Settings"/>
+    alt="HTTP Settings">
 </figure>
 <br>
  </p>
@@ -136,7 +146,7 @@
 <p>Onboarding root domains is documented at <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-how-to-onboard-apex-domain">Microsoft Docs: Onboard a root or apex domain on your Front Door</a>.<br>
  </p>
 <p><figure><img src="/images/front-door/domain.png"
-         alt="HTTP Settings"/>
+    alt="HTTP Settings">
 </figure>
 <br>
  </p>
@@ -151,8 +161,12 @@
 </ul>
 </li>
 </ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">New-AzADServicePrincipal</span> <span class="n">-ApplicationId</span> <span class="s2">&#34;ad0e1c7e-6d38-4ba4-9efd-0bc77ba9f037&#34;</span>
-</span></span></code></pre></div><ul>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">New-AzADServicePrincipal</span> <span class="n">-ApplicationId</span> <span class="s2">&#34;ad0e1c7e-6d38-4ba4-9efd-0bc77ba9f037&#34;</span></span></span></code></pre></div><ul>
 <li>Grant Azure Front Door Service the permission to access the secrets in your Key vault.
 <ul>
 <li>Go to “Access policies” from your Key vault to add a new policy, then grant “Microsoft.Azure.Frontdoor” service principal a “get-secret” permission</li>
@@ -163,7 +177,7 @@
 <br>
 <br>
 <figure><img src="/images/front-door/https.png"
-         alt="HTTP Settings"/>
+    alt="HTTP Settings">
 </figure>
 <br>
  </p>
@@ -172,12 +186,12 @@
 <br>
 <br>
 <figure><img src="/images/front-door/sa.png"
-         alt="Session Affinity"/>
+    alt="Session Affinity">
 </figure>
 </p>
 <p>Session timeouts are configurable in the Settings tab. This is the number of seconds before a forwarded send or receive request times out. When a timeout occurs the request fails and the connection terminates.</p>
 <figure><img src="/images/front-door/timeout.png"
-         alt="Timeouts"/>
+    alt="Timeouts">
 </figure>
 
 <h2 id="backend-pools">Backend Pools</h2>
@@ -199,13 +213,13 @@ Selecting one of the options above prefills the fields required to register a ba
 <br>
 <br>
 <figure><img src="/images/front-door/backend.png"
-         alt="Adding a Backend"/>
+    alt="Adding a Backend">
 </figure>
 
  </p>
 <p>You also have the option to disable backends in your backend pool, doing so traffic will be routed to different backends. If there are no backends available in the pool, requests will throw a recognizable Front Door white error screen with an error code.</p>
 <h3 id="backend-traffic-routing-options">Backend traffic routing options</h3>
-<p>The load balancing functionality of Azure Front Door is found in the fact that it can load balance between multiple backends within a backend pool. Priority and Weight in the image shown at <a href="#backend-pools">Backend Pools</a> resp. provide functionality for priority based traffic-routing and weighted based traffic-routing.</p>
+<p>The load balancing functionality of Azure Front Door is found in the fact that it can load balance between multiple backends within a backend pool. Priority and Weight in the image shown at <a href="/posts/azurefrontdoor/#backend-pools">Backend Pools</a> resp. provide functionality for priority based traffic-routing and weighted based traffic-routing.</p>
 <h4 id="priority">Priority</h4>
 <p>Priority on a backend is configurable from 1 to 5, where 1 is the first priority where traffic will be routed to. When the backends with priority 1 are down the backends with priority 2 are used et cetera.</p>
 <h4 id="weighted">Weighted</h4>
@@ -215,7 +229,7 @@ Selecting one of the options above prefills the fields required to register a ba
 <h3 id="health-probing">Health probing</h3>
 <p>Front Door can be configured to assess the health of the backends in your backendpool by polling with HTTP(S) requests with a configurable health probe. The health probes can be configured to use both a <code>HEAD</code> and <code>GET</code> method on a specified path.</p>
 <p><figure><img src="/images/front-door/probe.png"
-         alt="Adding a health probe"/>
+    alt="Adding a health probe">
 </figure>
 
 <br>
@@ -224,14 +238,14 @@ Whenever a backendhost is not responding with HTTP 200, it&rsquo;s deemed unheal
 <br>
 <br>
 <figure><img src="/images/front-door/lb.png"
-         alt="Adding a health probe"/>
+    alt="Adding a health probe">
 </figure>
 
 <br>
 For HTTPS traffic there&rsquo;s also an option available to disable enforcement of certificate namechecks. This option which is <code>Enabled</code> by default, it ensures that the backend host presents with a certificate where the hostname is contained in the subject of the certificate. Certificates must be issued by a <a href="https://ccadb-public.secure.force.com/microsoft/IncludedCACertificateReportForMSFT">valid certificate authority</a>, it must contain the complete certificate chain.
 <br>
 <figure><img src="/images/front-door/certcheck.png"
-         alt="Certificate Checks"/>
+    alt="Certificate Checks">
 </figure>
 
  </p>
@@ -242,7 +256,7 @@ For HTTPS traffic there&rsquo;s also an option available to disable enforcement 
 <p>When creating a rule you must first you must name the rule and select the frontend(s) you want to route traffic for, then you select which protocol is accepted for that frontend(s).
 <br>
 <figure><img src="/images/front-door/rulename.png"
-         alt="Adding a rule"/>
+    alt="Adding a rule">
 </figure>
 
  </p>
@@ -253,166 +267,166 @@ In case none of the rules is matched a 404 error will be thrown.</p>
 This will account for anything, but aware that you can only create one rule with a wildcard for a frontend domain.</p>
 <p>For example:</p>
 <table>
-<thead>
-<tr>
-<th>Rule</th>
-<th>Pattern</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Rule</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
 </table>
 <table>
-<thead>
-<tr>
-<th>URL</th>
-<th>Match</th>
-<th>Matched Rule</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>URL</th>
+          <th>Match</th>
+          <th>Matched Rule</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
 </table>
 <table>
-<thead>
-<tr>
-<th>Rule</th>
-<th>Pattern</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td>2</td>
-<td><code>/</code></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Rule</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+  </tbody>
 </table>
 <table>
-<thead>
-<tr>
-<th>URL</th>
-<th>Match</th>
-<th>Matched pattern</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
-<td>2</td>
-<td><code>/</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>URL</th>
+          <th>Match</th>
+          <th>Matched pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
 </table>
 <table>
-<thead>
-<tr>
-<th>Rule</th>
-<th>Pattern</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td>2</td>
-<td><code>/</code></td>
-</tr>
-<tr>
-<td>3</td>
-<td><code>/contact</code></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Rule</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td><code>/contact</code></td>
+      </tr>
+  </tbody>
 </table>
 <table>
-<thead>
-<tr>
-<th>URL</th>
-<th>Match</th>
-<th>Matched pattern</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
-<td>2</td>
-<td><code>/</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
-<td>3</td>
-<td><code>/contact</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-<tr>
-<td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
-<td>1</td>
-<td><code>/*</code></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>URL</th>
+          <th>Match</th>
+          <th>Matched pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/">https://manbearpiet.github.io/</a></td>
+          <td>2</td>
+          <td><code>/</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contact">https://manbearpiet.github.io/contact</a></td>
+          <td>3</td>
+          <td><code>/contact</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/contactyourlovedones">https://manbearpiet.github.io/contactyourlovedones</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/">https://manbearpiet.github.io/posts/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+      <tr>
+          <td><a href="https://manbearpiet.github.io/posts/my-first-post/">https://manbearpiet.github.io/posts/my-first-post/</a></td>
+          <td>1</td>
+          <td><code>/*</code></td>
+      </tr>
+  </tbody>
 </table>
 <h3 id="rules-engine">Rules Engine</h3>
 <p>After being matched there is an option to perform granular adjustments to the request before it&rsquo;s redirected or forwarded  or to drop it entirely.
@@ -467,11 +481,14 @@ With a routing rules which performs a forward you&rsquo;re forwarding to a speci
 </content>
 <p>
   
-    <a class="blog-tags" href="https://manbearpiet.github.io/tags/azure-front-door/">#Azure Front Door</a>&nbsp;&nbsp;
+    <a class="blog-tags" href="/tags/azure-front-door/">#azure front door</a>
   
-    <a class="blog-tags" href="https://manbearpiet.github.io/tags/basic-tour/">#Basic tour</a>&nbsp;&nbsp;
+    <a class="blog-tags" href="/tags/basic-tour/">#basic tour</a>
   
 </p>
+
+
+
 
   </main>
   <footer><small>

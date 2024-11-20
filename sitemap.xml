@@ -3,10 +3,25 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://manbearpiet.github.io/</loc>
-    <lastmod>2023-10-04T12:47:03+02:00</lastmod>
+    <lastmod>2024-11-20T13:00:00+01:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/posts/</loc>
-    <lastmod>2023-10-04T12:47:03+02:00</lastmod>
+    <lastmod>2024-11-20T13:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/argumentcompleters/</loc>
+    <lastmod>2024-11-20T13:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/azure-powershell/</loc>
+    <lastmod>2024-11-20T13:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/posts/azureargumentcompleters/</loc>
+    <lastmod>2024-11-20T13:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/parameters/</loc>
+    <lastmod>2024-11-20T13:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/</loc>
+    <lastmod>2024-11-20T13:00:00+01:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/necromancing/</loc>
     <lastmod>2023-10-04T12:47:03+02:00</lastmod>
@@ -15,9 +30,6 @@
     <lastmod>2023-10-04T12:47:03+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/restarting-blog/</loc>
-    <lastmod>2023-10-04T12:47:03+02:00</lastmod>
-  </url><url>
-    <loc>https://manbearpiet.github.io/tags/</loc>
     <lastmod>2023-10-04T12:47:03+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/assigning-azure-policies/</loc>
