@@ -7,8 +7,64 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
-    <lastBuildDate>Wed, 20 Nov 2024 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 20 Nov 2024 20:00:00 +0100</lastBuildDate>
     <atom:link href="https://manbearpiet.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>$PSCmdlet.ThrowTerminatingError()</title>
+      <link>https://manbearpiet.github.io/tags/pscmdlet.throwterminatingerror/</link>
+      <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/tags/pscmdlet.throwterminatingerror/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Error</title>
+      <link>https://manbearpiet.github.io/tags/error/</link>
+      <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/tags/error/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Exception</title>
+      <link>https://manbearpiet.github.io/tags/exception/</link>
+      <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/tags/exception/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Non-Terminating Error</title>
+      <link>https://manbearpiet.github.io/tags/non-terminating-error/</link>
+      <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/tags/non-terminating-error/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Terminating Error</title>
+      <link>https://manbearpiet.github.io/tags/terminating-error/</link>
+      <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/tags/terminating-error/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Throw</title>
+      <link>https://manbearpiet.github.io/tags/throw/</link>
+      <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/tags/throw/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Try/Catch</title>
+      <link>https://manbearpiet.github.io/tags/try/catch/</link>
+      <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
+      <guid>https://manbearpiet.github.io/tags/try/catch/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
     <item>
       <title>ArgumentCompleters</title>
       <link>https://manbearpiet.github.io/tags/argumentcompleters/</link>
