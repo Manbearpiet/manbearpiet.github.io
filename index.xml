@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
-    <lastBuildDate>Wed, 20 Nov 2024 20:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Tue, 21 Jan 2025 10:00:00 +0100</lastBuildDate>
     <atom:link href="https://manbearpiet.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>How to work with errors in PowerShell</title>
@@ -24,8 +24,7 @@ In this blog, I will share what I have learned on how to create errors, how to h
 <p>Errors are unexpected events that occur when executing code. For example, errors can happen when we fail to process objects. Luckily, you can anticipate errors. In PowerShell, everything is an object, so errors are objects, too. Errors contain the error message and a property called the exception.</p>
 <p>I borrowed the definition of an exception from a <a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-exceptions?view=powershell-7.4">Microsoft Learn page</a>, which adopted an article from Kevin Marquette his series &ldquo;Everything you want to know about *&rdquo;. In his post there is a pretty definition of an exception:</p>
 <blockquote>
-<p>An Exception is like an event that is created when normal error handling can&rsquo;t deal with the issue. Trying to divide a number by zero or running out of memory are examples of something that creates an exception. Sometimes the author of the code you&rsquo;re using creates exceptions for certain issues when they happen.</p>
-</blockquote>
+<p>An Exception is like an event that is created when normal error handling can&rsquo;t deal with the issue. Trying to divide a number by zero or running out of memory are examples of something that creates an exception. Sometimes the author of the code you&rsquo;re using creates exceptions for certain issues when they happen.</p></blockquote>
 <p>Exceptions are objects in PowerShell, too. In some cases they even have specific types. They contain which line PowerShell failed where, with which argument, and the whole call stack (the &lsquo;stack&rsquo; of commands called to get to that point). So, exception objects are precious because they can show you information on what went wrong.</p>
 <h2 id="error-types-">Error types 🆎</h2>
 <p>In PowerShell, there are two types of errors: <strong>terminating</strong> and <strong>non-terminating</strong> errors.
@@ -309,8 +308,7 @@ Alternatively, you can learn C# and create your own types of exceptions. Do note
 But they might require you to learn C# or do hacky things. Either way discuss with your team what suits your codebase best and how you handle these things. Or even better, tell us at the (<a href="https://aka.ms/PSDiscord">PowerShell Discord</a>) or your PowerShell user group.</p>
 <p>Applying these error techniques allows you to create PowerShell scripts that handle errors gracefully, provide meaningful feedback, and continue processing when appropriate, leading to more reliable and maintainable code.</p>
 <blockquote>
-<p>I couldn&rsquo;t have written this post without the guidance of the true pro&rsquo;s on the PowerShell discord through the years. Thank you all</p>
-</blockquote>
+<p>I couldn&rsquo;t have written this post without the guidance of the true pro&rsquo;s on the PowerShell discord through the years. Thank you all</p></blockquote>
 ]]></content:encoded>
     </item>
     <item>
@@ -491,8 +489,7 @@ In many cases you want to have the full resource-id of an Azure resource, but ta
 </figure>
 
 <blockquote>
-<p>Note: I&rsquo;ve discussed this post before publishing with the fantastic Mathias (@IISResetMe) from the PowerShell discord, he proofread the article, for which thanks again. Mathias added that the <code>Attribute</code> suffix in the typenames are automatically added by the PowerShell parser, when searching for typenames in syntactical contexts. So in this context, these will be handled the same:</p>
-</blockquote>
+<p>Note: I&rsquo;ve discussed this post before publishing with the fantastic Mathias (@IISResetMe) from the PowerShell discord, he proofread the article, for which thanks again. Mathias added that the <code>Attribute</code> suffix in the typenames are automatically added by the PowerShell parser, when searching for typenames in syntactical contexts. So in this context, these will be handled the same:</p></blockquote>
 
 
 
