@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Pester on Azure and DevOops</title>
+    <link>http://localhost:1313/tags/pester/</link>
+    <description>Recent content in Pester on Azure and DevOops</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <copyright>Christian Piet (CC BY 4.0)</copyright>
+    <lastBuildDate>Tue, 21 Jan 2025 10:00:00 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/pester/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Pester Crash course</title>
+      <link>http://localhost:1313/posts/pester/</link>
+      <pubDate>Tue, 21 Jan 2025 10:00:00 +0100</pubDate>
+      <guid>http://localhost:1313/posts/pester/</guid>
+      <description>&lt;p&gt;Most of the people writing code come to a point in which they can write code, more or less, fluently to get what they want/what is required, using their language of choice. Initially it usually starts with an idea, then you write code. Over time features are added and the codebase is expanded. When adding those features you always need to question yourself, does this change break functionality? Does it work as expected? To solve these questions testing frameworks like PowerShell Pester are created.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Most of the people writing code come to a point in which they can write code, more or less, fluently to get what they want/what is required, using their language of choice. Initially it usually starts with an idea, then you write code. Over time features are added and the codebase is expanded. When adding those features you always need to question yourself, does this change break functionality? Does it work as expected? To solve these questions testing frameworks like PowerShell Pester are created.</p>
+<p>In this blog I will give you an overview you what Pester is, how you can write your own tests, how you need to structure them and what it value it can bring into your development.</p>
+<h1 id="pester">Pester</h1>
+<p>I found this awesome description on the module&rsquo; description in the PowerShell Gallery</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Find-PSResource</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Name</span> <span class="n">Pester</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-ExpandProperty</span> <span class="n">Description</span></span></span></code></pre></div><blockquote>
+<p>Pester provides a framework for running BDD style Tests to execute and validate PowerShell commands inside of PowerShell and offers a powerful set of Mocking Functions that allow tests to mimic and mock the functionality of any command inside of a piece of PowerShell code being tested. Pester tests can execute any command or script that is accessible to a pester test file. This can include functions, Cmdlets, Modules and scripts. Pester can be run in ad hoc style in a console or it can be integrated into the Build scripts of a Continuous Integration system.</p>
+</blockquote>
+<p>So, Pester is a PowerShell module and can be used via it&rsquo;s own Domain Specific Language, so some notations are different or represent other things than in &rsquo;normal&rsquo; PowerShell. But you can use it to test almost anything PowerShell, and also beyond PowerShell, but more on that later.</p>
+<h2 id="pester-versions">Pester versions</h2>
+<p>Pester is included in Windows installations of Windows PowerShell, but that contains an outdated version (major version 4/4.<em>.</em>). There are breaking changes from that version to the latest. So make sure you get the latest version so you&rsquo;re not missing out on new cool features:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Find-PSResource</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Name</span> <span class="n">Pester</span> <span class="p">|</span> <span class="nb">Install-PSResource</span></span></span></code></pre></div><p>The current version while writing this blog is <strong>5.7.1</strong>, but do know that Pester 6 is <a href="https://github.com/pester/Pester/releases/tag/6.0.0-alpha1">in the making</a>, so new breaking changes are coming up. It will drop support for older versions of PowerShell, so make sure you get work with the latest stable version of PowerShell and Pester.</p>
+<h2 id="testing-code">Testing code</h2>
+<p>I started with Pester a few years ago and there were some fruit-emoji examples, those were a bit confusing to me. The current examples on <a href="https://pester.dev/docs/quick-start">the quick-start page</a> stick better with me.
+In the introduction I mentioned that writing code usually starts with an idea, a first concept/version is formed and when approved, stuff is added later on. To start we&rsquo;ll have to grasp understand the DSL and the idea of testing our code better.</p>
+<p>Pester tests are written in files with the <strong>.tests.ps1</strong>-extension. So a Pester test file example is &ldquo;function.tests.ps1&rdquo;. If you want to follow along, make sure you have <strong>.tests</strong> in front of the <strong>.ps1</strong>-extension.</p>
+<p>Consider the follow Pester file:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c"># example.tests.ps1</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="nb">Get-ToBeTestedOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">            <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">            <span class="nv">$Text</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="p">[</span><span class="no">Switch</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">            <span class="nv">$OutputSwitch</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$OutputSwitch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nv">$Text</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given no OutputSwitch-parameter, it outputs nothing&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>This file contains some setup in the <code>BeforeAll</code> scriptBlock, which runs once before all the tests. That <code>BeforeAll</code> contains a function, which is available in the actual tests.</p>
+<p>The file also has a <code>Describe</code> keyword, which is a mechanism to group tests, do mind the curly braces.</p>
+<p>Inside of the <code>Describe</code>-block is a single test, which are represented by <code>It</code>. The <code>It</code>-block has a title, which is a description of what testcase it tests for. Again mind the curly braces.</p>
+<p>Contained in the <code>It</code>-block, we see a single-line scriptblock which executes some code and is piped to an assertion, which you can recognize by the <code>Should</code>-keyword. If I use my dictionary: &ldquo;an assertion is a confident and forceful statement of fact or belief&rdquo;. So inside this It-block we execute code and we want to test for the assumption that our function with those arguments it&rsquo;s piped result is NullOrEmpty.</p>
+<p>When we want execute this Pester-file in VSCode we can do so via the IDE itself, via the &ldquo;Run Tests&rdquo;:
+<figure><img src="/images/pester/vscode.png"
+    alt="Debug Test and Run Test buttons in VSCode">
+</figure>
+
+Or we can do so via the terminal:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Invoke-Pester</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">1</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">10ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">[+]</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span> <span class="n">76ms</span> <span class="p">(</span><span class="n">19ms</span><span class="p">|</span><span class="n">48ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">77ms</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">1</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>The output shows Pester did test discovery, more on that later. Pester then ran the tests in the file and after completion it shows the results. The output is summarized to the results of the whole file, but I like a bit more verbose output to get a better grasp on what&rsquo;s going on.</p>
+<p>So if we</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>

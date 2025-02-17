@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="http://localhost:1313/images/favicon-32x32.png" />
+<title>Pester Crash course | Azure and DevOops</title>
+<meta name="title" content="Pester Crash course" />
+<meta name="description" content="A tour in PowerShell Pester, showing basics, structure and some usecases" />
+<meta name="author" content="Christian Piet" />
+<meta name="keywords" content="Pester,PowerShell,Unit testing,Testing Framework," />
+
+
+
+
+
+
+  
+  <meta property="og:url" content="http://localhost:1313/posts/pester/">
+  <meta property="og:site_name" content="Azure and DevOops">
+  <meta property="og:title" content="Pester Crash course">
+  <meta property="og:description" content="A tour in PowerShell Pester, showing basics, structure and some usecases">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-01-21T10:00:00+01:00">
+    <meta property="article:modified_time" content="2025-01-21T10:00:00+01:00">
+    <meta property="article:tag" content="Pester">
+    <meta property="article:tag" content="PowerShell">
+    <meta property="article:tag" content="Unit Testing">
+    <meta property="article:tag" content="Testing Framework">
+    <meta property="og:image" content="http://localhost:1313/images/code.png">
+
+
+  
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/images/code.png">
+  <meta name="twitter:title" content="Pester Crash course">
+  <meta name="twitter:description" content="A tour in PowerShell Pester, showing basics, structure and some usecases">
+
+
+  
+  
+  <meta itemprop="name" content="Pester Crash course">
+  <meta itemprop="description" content="A tour in PowerShell Pester, showing basics, structure and some usecases">
+  <meta itemprop="datePublished" content="2025-01-21T10:00:00+01:00">
+  <meta itemprop="dateModified" content="2025-01-21T10:00:00+01:00">
+  <meta itemprop="wordCount" content="1823">
+  <meta itemprop="image" content="http://localhost:1313/images/code.png">
+  <meta itemprop="keywords" content="Pester,PowerShell,Unit Testing,Testing Framework">
+
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  
+  <link href="/original.min.css" rel="stylesheet">
+
+  
+    
+    <link href="/syntax.min.css" rel="stylesheet">
+  
+
+  
+
+  
+</head>
+
+<body>
+  <header><a class="skip-link" href="#main-content">Skip to main content</a>
+
+<a href="/" class="title"><h1>Azure and DevOops</h1></a>
+<nav>
+  <a href="/">Home</a>
+
+  <a href="/posts/">Blog</a>
+
+<a href='http://localhost:1313/index.xml'>RSS</a>
+
+
+
+
+
+
+
+</nav>
+</header>
+  <main id="main-content">
+
+<h1>Pester Crash course</h1>
+<p class="byline">
+  <time datetime='2025-01-21' pubdate>
+    2025-01-21
+  </time>
+  · Christian Piet
+</p>
+
+<content>
+  <p>Most of the people writing code come to a point in which they can write code, more or less, fluently to get what they want/what is required, using their language of choice. Initially it usually starts with an idea, then you write code. Over time features are added and the codebase is expanded. When adding those features you always need to question yourself, does this change break functionality? Does it work as expected? To solve these questions testing frameworks like PowerShell Pester are created.</p>
+<p>In this blog I will give you an overview you what Pester is, how you can write your own tests, how you need to structure them and what it value it can bring into your development.</p>
+<h2 id="why">Why</h2>
+<p>You might think what are we actually doing, why are we testing? If you think of it in a very high abstraction, when we write code, we make logic that handles information or events in a way we want it to. So there&rsquo;s input and at the end we expect a certain result or output. By using a test-framework like Pester we can validate that our input results in the desired output.</p>
+<h1 id="pester">Pester</h1>
+<p>I found this awesome description on the module&rsquo; description in the PowerShell Gallery</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Find-PSResource</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Name</span> <span class="n">Pester</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-ExpandProperty</span> <span class="n">Description</span></span></span></code></pre></div><blockquote>
+<p>Pester provides a framework for running BDD style Tests to execute and validate PowerShell commands inside of PowerShell and offers a powerful set of Mocking Functions that allow tests to mimic and mock the functionality of any command inside of a piece of PowerShell code being tested. Pester tests can execute any command or script that is accessible to a pester test file. This can include functions, Cmdlets, Modules and scripts. Pester can be run in ad hoc style in a console or it can be integrated into the Build scripts of a Continuous Integration system.</p>
+</blockquote>
+<p>So, Pester is a PowerShell module and can be used via it&rsquo;s own Domain Specific Language, so some notations are different or represent other things than in &rsquo;normal&rsquo; PowerShell. But you can use it to test almost anything PowerShell, and also beyond PowerShell, but more on that later.</p>
+<h2 id="pester-versions">Pester versions</h2>
+<p>Pester is included in Windows installations of Windows PowerShell, but that contains an outdated version (major version 4/4.<em>.</em>). There are breaking changes from that version to the latest. So make sure you get the latest version so you&rsquo;re not missing out on new cool features:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Find-PSResource</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Name</span> <span class="n">Pester</span> <span class="p">|</span> <span class="nb">Install-PSResource</span></span></span></code></pre></div><p>The current version while writing this blog is <strong>5.7.1</strong>, but do know that Pester 6 is <a href="https://github.com/pester/Pester/releases/tag/6.0.0-alpha1">in the making</a>, so new breaking changes are coming up. It will drop support for older versions of PowerShell, so make sure you get work with the latest stable version of PowerShell and Pester.</p>
+<h2 id="structure">Structure</h2>
+<p>I started with Pester a few years ago and there were some fruit-emoji examples, those were a bit confusing to me. The current examples on <a href="https://pester.dev/docs/quick-start">the quick-start page</a> stick better with me.
+In the introduction I mentioned that writing code usually starts with an idea, a first concept/version is formed and when approved, stuff is added later on. To start we&rsquo;ll have to grasp understand the DSL and the idea of testing our code better.</p>
+<p>Pester tests are written in files with the <strong>.tests.ps1</strong>-extension. So a Pester test file example is &ldquo;function.tests.ps1&rdquo;. If you want to follow along, make sure you have <strong>.tests</strong> in front of the <strong>.ps1</strong>-extension.</p>
+<p>Consider the follow Pester file:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c"># example.tests.ps1</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="nb">Get-ToBeTestedOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">            <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">            <span class="nv">$Text</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="p">[</span><span class="no">Switch</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">            <span class="nv">$OutputSwitch</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$OutputSwitch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nv">$Text</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given no OutputSwitch-parameter, it outputs nothing&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>This file contains some setup in the <code>BeforeAll</code> scriptBlock, which runs once before all the tests. That <code>BeforeAll</code> contains a function, which is available in the actual tests.</p>
+<p>The file also has a <code>Describe</code> keyword, which is a mechanism to group tests, do mind the curly braces.</p>
+<p>Inside of the <code>Describe</code>-block is a single test, which are represented by <code>It</code>. The <code>It</code>-block has a title, which is a description of what testcase it tests for. Again mind the curly braces.</p>
+<p>Contained in the <code>It</code>-block, we see a single-line scriptblock which executes some code and is piped to an assertion, which you can recognize by the <code>Should</code>-keyword. If I use my dictionary: &ldquo;an assertion is a confident and forceful statement of fact or belief&rdquo;. So inside this It-block we execute code and we want to test for the assumption that our function with those arguments it&rsquo;s piped result is NullOrEmpty.</p>
+<h2 id="running-tests">Running tests</h2>
+<p>When we want execute this Pester-file in VSCode we can do so via the IDE itself, via the &ldquo;Run Tests&rdquo;:
+<figure><img src="/images/pester/vscode.png"
+    alt="Debug Test and Run Test buttons in VSCode">
+</figure>
+
+Or we can do so via the terminal:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Invoke-Pester</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">1</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">10ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">[+]</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span> <span class="n">76ms</span> <span class="p">(</span><span class="n">19ms</span><span class="p">|</span><span class="n">48ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">77ms</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">1</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><h2 id="output-verbosity">Output verbosity</h2>
+<p>The output shows Pester did test discovery, more on that later. Pester then ran the tests in the file and after completion it shows the results. The output is summarized to the results of the whole file, but I like a bit more verbose output to get a better grasp on what&rsquo;s going on. In VSCode we can click &ldquo;Debug Tests&rdquo; and in the terminal we can use the Output-parameter of Invoke-Pester and select the Detailed preference. More options on verbosity can be found on the module&rsquo; documentation website <a href="https://pester.dev/docs/usage/output">pester.dev - Output Page</a>.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">1</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">11ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span> <span class="n">from</span> <span class="s1">&#39;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/example.tests.ps1&#39;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="n">Describing</span> <span class="nb">Get-ToBeTestedOutput</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="p">[+]</span> <span class="n">Given</span> <span class="n">no</span> <span class="nb">OutputSwitch-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">nothing</span> <span class="n">3ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">2ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">89ms</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">1</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>In this output style we can see per test if it succeeded, yay we can test stuff!</p>
+<h2 id="expanding">Expanding</h2>
+<p>When we look at the function code we want to test, we did assert that it doesn&rsquo;t output if the switch isn&rsquo;t provided. However we didn&rsquo;t didn&rsquo;t test for the fact if we do provide it, does it output anything, and especially, does it output what we want.</p>
+<p>Let&rsquo;s add those in the mix:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c"># example.tests.ps1</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="nb">Get-ToBeTestedOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">        <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">            <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">            <span class="nv">$Text</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="p">[</span><span class="no">Switch</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">            <span class="nv">$OutputSwitch</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$OutputSwitch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nv">$Text</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given no OutputSwitch-parameter, it outputs nothing&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given OutputSwitch-parameter, it outputs the text&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given Text-parameter, it outputs the correct text&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s2">&#34;I am output, look at me&#34;</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>If you look closely, I changed the assertion on the second test to contain &lsquo;a&rsquo; result, by adding a negation <code>-Not</code> inverses the logic on the test and it test for any output if OutputSwitch-switch is provided.
+The third test is testing whether the output is exactly what we expect it to be, using the <code>-Be</code> assertion. If you&rsquo;ve created similar tests before you might&rsquo;ve spotted that the second test can be considered redundant, since the third test tests the same. If it has the result we want, it implictly has a result, and thus is not $null or empty. Let&rsquo;s run the test to validate our assertions:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Describing</span> <span class="nb">Get-ToBeTestedOutput</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="p">[+]</span> <span class="n">Given</span> <span class="n">no</span> <span class="nb">OutputSwitch-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">nothing</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="p">[+]</span> <span class="n">Given</span> <span class="nb">OutputSwitch-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">the</span> <span class="n">text</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="p">[+]</span> <span class="n">Given</span> <span class="nb">Text-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">text</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">30ms</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">3</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>You might think yay less code, let&rsquo;s shove that all in a single It-block, less code more time for us.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="nb">Get-ToBeTestedOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">            <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">            <span class="nv">$Text</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="p">[</span><span class="no">Switch</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="nv">$OutputSwitch</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$OutputSwitch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="nv">$Text</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Outputs what we want, nothing if we don&#39;&#39;t want it to and something if we need it to&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s2">&#34;I am output, look at me&#34;</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>If we run this:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Describing</span> <span class="nb">Get-ToBeTestedOutput</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="p">[+]</span> <span class="n">Outputs</span> <span class="n">what</span> <span class="n">we</span> <span class="n">want</span><span class="p">,</span> <span class="n">nothing</span> <span class="k">if</span> <span class="n">we</span> <span class="n">don</span><span class="err">&#39;</span><span class="n">t</span> <span class="n">want</span> <span class="n">it</span> <span class="n">to</span> <span class="n">and</span> <span class="n">something</span> <span class="k">if</span> <span class="n">we</span> <span class="n">need</span> <span class="n">it</span> <span class="n">to</span> <span class="n">18ms</span> <span class="p">(</span><span class="n">16ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">148ms</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">1</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>Pester code written this way can get hard to read in the output (if you/colleagues even take the time to make a decent description), it is not very friendly to read as test-code and annoying to maintain. <strong>So a good pointer is to stick to a single assertion per <code>It</code>-block.</strong> this keeps it easy to read, both in the output and the IDE. And if you need another test you can just add in another one at the bottom, you don&rsquo;t have to think about what happened to state in the earlier tests.</p>
+<h2 id="functions">Functions</h2>
+<p>To prevent us from repeating ourselves in code, PowerShell has the concept of functions. Functions are named scriptblocks, and can be reused throughout code. Functions can also contain parameters, which can tweak the function&rsquo; behavior based on information provided via parameters. So functions are a nice mechanism to flexibly give functionality to our users.</p>
+<p>To access the functions of our scripts, we&rsquo;d have to execute the whole script, meaning we&rsquo;d also apply the operations inside the script instead of asserting our code does what we want it to do. If you write a script to wipe a machine, you wouldn&rsquo;t want to execute the whole script. But you would want to know if it calls the right endpoints/external functions with the right information and handles input like you expect it to.</p>
+<p>If we want to test functions in scripts we need them to be seperate from the script logic, so in an external powershell file containing just the functions. By doing so you can use <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_operators?view=powershell-7.4#dot-sourcing-operator-"><code>dot-sourcing</code></a>, to make the functions available in your own scripts.</p>
+<p>Even better would to change the extension of the file containing your functions to <strong>.psm1</strong> making it a full fledged module. Be sure to give the directory and the script the same name. This way you can use Import-Module.</p>
+<h2 id="dot-sourcing-vs-inmodulescope">Dot-sourcing vs. InModuleScope</h2>
+
+</content>
+<p>
+  
+    <a class="blog-tags" href="/tags/pester/">#pester</a>
+  
+    <a class="blog-tags" href="/tags/powershell/">#powershell</a>
+  
+    <a class="blog-tags" href="/tags/unit-testing/">#unit testing</a>
+  
+    <a class="blog-tags" href="/tags/testing-framework/">#testing framework</a>
+  
+</p>
+
+
+
+
+  </main>
+  <footer><small>
+  Christian Piet (CC BY 4.0) | Made with <a href="https://github.com/clente/hugo-bearcub">Bear Cub</a>
+</small></footer>
+
+    
+</body>
+
+</html>
