@@ -113,8 +113,7 @@
 <p>I created an Azure Function and was puzzled. Am I going to use a Personal Access Token (PAT) and have every action attributed to my account, or do it in a more sophisticated way? In Azure DevOps, service accounts with PATs used to be an ugly workaround for the lack of SPN support.</p>
 <p>PATs are always user-account bound, sometimes scoped, and expire when you don&rsquo;t want them to. If I win the lottery someday, I hope my colleagues don&rsquo;t pull too hairs out on the search which PAT expired where. So I wanted something else for my new shiny project.</p>
 <blockquote>
-<p>Entra ID SPNs can now integrate with Azure DevOps since a few months ago, and it works excellent <a href="https://learn.microsoft.com/en-us/azure/devops/release-notes/2023/sprint-228-update#managed-identity-and-service-principal-support-for-azure-devops-now-in-general-availability-ga">Managed identity and service principal support for Azure DevOps now in general availability (GA)</a>. This video by John Savill explains it in detail: <a href="https://www.youtube.com/watch?v=saTUeR_U3lA">Azure DevOps Workload Identity Federation with Azure Overview. NO MORE SECRETS!</a></p>
-</blockquote>
+<p>Entra ID SPNs can now integrate with Azure DevOps since a few months ago, and it works excellent <a href="https://learn.microsoft.com/en-us/azure/devops/release-notes/2023/sprint-228-update#managed-identity-and-service-principal-support-for-azure-devops-now-in-general-availability-ga">Managed identity and service principal support for Azure DevOps now in general availability (GA)</a>. This video by John Savill explains it in detail: <a href="https://www.youtube.com/watch?v=saTUeR_U3lA">Azure DevOps Workload Identity Federation with Azure Overview. NO MORE SECRETS!</a></p></blockquote>
 <h2 id="github-app">GitHub App</h2>
 <p>I looked to see if GitHub supported an extension from Microsoft Entra ID, so I could invite/register an Entra ID SPN to do these actions instead of everything attributed to my GitHub user with a PAT. Unfortunately, the GitHub platform doesn&rsquo;t support Entra ID SPNs as an entity, but GitHub has its own SPN implementation on its platform called a GitHub App.</p>
 <p>I found documentation and started reading in on them at GitHub Apps overview - GitHub Docs. GitHub Apps are identities/apps that can act on it&rsquo;s own behalf or behalf of a user. This GitHub App can authenticate itself and call the REST API.
@@ -134,8 +133,7 @@ From there, we have a GitHub App. It was present in the GitHub Organization, and
 <blockquote>
 <p>To authenticate as itself, the app will use a JSON Web Token (JWT).
 Your app should authenticate as itself when it needs to generate an installation access token. An installation access token is required to authenticate as an app installation.
-Your app should also authenticate as itself when it needs to make API requests to manage resources related to the app.</p>
-</blockquote>
+Your app should also authenticate as itself when it needs to make API requests to manage resources related to the app.</p></blockquote>
 <p>So first, we need to write some code to generate a JWT; with that JWT, we can authenticate to GitHub, request an installation token, and then make API requests. However, I had yet to learn what an installation token is.
 I had to look it up, but your app&rsquo;s installed instance (at an organization) has an installation ID. The installation is the registration of the app in an organization. GitHub gives the following guidance to find the Installation ID:
 You can also use the REST API to find the installation ID for an installation of your app. For example, you can get an installation ID with the GET /users/{username}/installation, GET /repos/{owner}/{repo}/installation, GET /orgs/{org}/installation, or GET /app/installations endpoints.</p>
