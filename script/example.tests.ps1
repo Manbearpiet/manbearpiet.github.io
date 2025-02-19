@@ -1,5 +1,5 @@
-BeforeAll {
-    Import-Module -Name "/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/testModule" -Force -PassThru
+BeforeDiscovery {
+    Import-Module -Name "$PSScriptRoot/testModule" -Force
 }
 Describe 'Get-ToBeTestedOutput' {
     It 'Validates output of New-DummyOutput' {

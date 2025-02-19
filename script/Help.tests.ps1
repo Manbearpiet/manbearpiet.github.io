@@ -69,7 +69,7 @@ Describe "Test help for <_.Name>" -ForEach $commands {
         (Invoke-WebRequest -Uri $_ -UseBasicParsing).StatusCode | Should -Be '200'
     }
 
-    Context "Parameter <_.Name>" -Foreach $commandParameters {
+    Context "Parameter <_.Name>" -ForEach $commandParameters {
 
         BeforeAll {
             $parameter = $_
@@ -95,7 +95,7 @@ Describe "Test help for <_.Name>" -ForEach $commands {
         }
     }
 
-    Context "Test <_> help parameter help for <commandName>" -Foreach $helpParameterNames {
+    Context "Test <_> help parameter help for <commandName>" -ForEach $helpParameterNames {
 
         # Shouldn't find extra parameters in help.
         It "finds help parameter in code: <_>" {
