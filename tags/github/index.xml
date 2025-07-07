@@ -195,7 +195,7 @@ Fortunately, a PowerShell module author has already taken into account all of th
 
 
 
-<pre tabindex="0"><code class="language-base64" data-lang="base64">IyB0aGlzaXNwcml2YXRlCuKAnE9uZSBkb2VzIG5vdCBzaW1wbHkgYWNjZXNzIGEgcHJpdmF0ZSByZXBvIHdpdGhvdXQgYSB0b2tlbi7igJ0g4oCTIEJvcm9taXIK</code></pre><p>With this setup I can call my installations and retrieve a short-lived installation token. Using that I can access our repositories, start workflows et cetera. AWESOME!</p>
+<pre tabindex="0"><code class="language-base64" data-lang="base64">IyB0aGlzaXNwcml2YXRlCuKAnE9uZSBkb2VzIG5vdCBzaW1wbHkgYWNjZXNzIGEgcHJpdmF0ZSByZXBvIHdpdGhvdXQgYSB0b2tlbi7igJ0g4oCTIEJvcm9taXIK</code></pre><p>With this setup I can call my installations and retrieve a short-lived installation token. Using that I can access our repositories, start workflows et cetera. AWESOME! For convenience I added my code to a <a href="https://gist.github.com/Manbearpiet/1e91545353ab24013afeb54dc7a5bb3d">GitHub Gist</a>.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Using GitHub Apps, we have an identity that allows us to automate actions on the GitHub platform. After registering and installing a GitHub App, you can assign it access to repositories or the organization and access the REST API. By fetching and accessing the installation token, you can access your public and private repositories through GitHub REST APIs. So we can continue to automate all the things. That&rsquo;s my adventure with GitHub Apps. I hope someone can utilize this to do cool stuff with it. I certainly enjoyed tinkering with it.</p>
 ]]></content:encoded>
