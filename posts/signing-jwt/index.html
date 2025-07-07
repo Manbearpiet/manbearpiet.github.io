@@ -56,7 +56,7 @@ Azure KeyVault Since the Azure Functions host, in our scenario (HTTP-triggered),
 Azure KeyVault Since the Azure Functions host, in our scenario (HTTP-triggered), is a public web server, I strongly disliked storing my private key file locally on that host’s file system. We typically store our private keys in a Microsoft-hosted secret vault, specifically the Azure Key Vault service. I investigated whether I could use Azure Key Vault for this use case.">
   <meta itemprop="datePublished" content="2024-02-14T19:41:37+01:00">
   <meta itemprop="dateModified" content="2024-02-14T19:41:37+01:00">
-  <meta itemprop="wordCount" content="679">
+  <meta itemprop="wordCount" content="697">
   <meta itemprop="image" content="http://localhost:1313/images/sign-jwt/">
   <meta itemprop="keywords" content="GitHub,GitHub Apps,Tokens">
 
@@ -165,7 +165,7 @@ JWTs are just JSON&rsquo;s base64 URL encoded, so it&rsquo;s base64 with a few c
 </span></span><span class="line"><span class="ln">43</span><span class="cl">            <span class="p">[</span><span class="no">Convert</span><span class="p">]::</span><span class="n">ToBase64String</span><span class="p">([</span><span class="no">System.Text.UTF8Encoding</span><span class="p">]::</span><span class="n">UTF8</span><span class="p">.</span><span class="py">GetBytes</span><span class="p">(</span><span class="nv">$formattedPayload</span><span class="p">)).</span><span class="py">TrimEnd</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">).</span><span class="py">Replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">).</span><span class="py">Replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
 </span></span><span class="line"><span class="ln">44</span><span class="cl">        <span class="p">)</span>
 </span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>After much tinkering with Base64 URL-encoded strings and getting a last push over the hill with the hash, thanks again to Drew of the PowerShell Discord, I had a valid JWT signature using this code:</p>
+</span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>After much tinkering with Base64 URL-encoded strings and getting a last push over the hill with the hash, thanks again to Drew of the PowerShell Discord, I had a valid JWT signature using this code. Do make sure you&rsquo;re logged into Azure PowerShell, it&rsquo;s required to fetch the bearer token with the KeyVault scope.</p>
 
 
 
@@ -232,7 +232,7 @@ JWTs are just JSON&rsquo;s base64 URL encoded, so it&rsquo;s base64 with a few c
 </span></span><span class="line"><span class="ln">59</span><span class="cl">    <span class="n">JWT</span>               <span class="p">=</span> <span class="p">(</span><span class="nb">New-UnsignedJWT</span> <span class="n">-Payload</span> <span class="vm">@</span><span class="p">{</span><span class="n">iss</span> <span class="p">=</span> <span class="mf">1459729</span> <span class="p">})</span>
 </span></span><span class="line"><span class="ln">60</span><span class="cl">    <span class="n">KeyVaultName</span>      <span class="p">=</span> <span class="s1">&#39;mykeyvault&#39;</span>
 </span></span><span class="line"><span class="ln">61</span><span class="cl">    <span class="n">PrivateKeyName</span>    <span class="p">=</span> <span class="s1">&#39;mykey&#39;</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="n">PrivateKeyVersion</span> <span class="p">=</span> <span class="n">-PrivateKeyVersion</span>
+</span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="n">PrivateKeyVersion</span> <span class="p">=</span> 
 </span></span><span class="line"><span class="ln">63</span><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="ln">64</span><span class="cl">
 </span></span><span class="line"><span class="ln">65</span><span class="cl"><span class="nv">$JWT</span> <span class="p">=</span> <span class="nb">New-AZKVTokenSignature</span> <span class="nv">@newAZKVTokenSignatureSplat</span></span></span></code></pre></div><p>I could call my installations and retrieve a short-lived installation token. AWESOME!</p>
