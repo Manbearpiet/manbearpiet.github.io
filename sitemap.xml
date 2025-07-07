@@ -3,10 +3,25 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://manbearpiet.github.io/</loc>
-    <lastmod>2025-01-21T10:00:00+01:00</lastmod>
+    <lastmod>2025-07-07T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/posts/</loc>
-    <lastmod>2025-01-21T10:00:00+01:00</lastmod>
+    <lastmod>2025-07-07T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/posts/githubapp/</loc>
+    <lastmod>2025-07-07T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/github/</loc>
+    <lastmod>2025-07-07T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/github-apps/</loc>
+    <lastmod>2025-07-07T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/</loc>
+    <lastmod>2025-07-07T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/tokens/</loc>
+    <lastmod>2025-07-07T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/pester/</loc>
     <lastmod>2025-01-21T10:00:00+01:00</lastmod>
@@ -15,9 +30,6 @@
     <lastmod>2025-01-21T10:00:00+01:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/powershell/</loc>
-    <lastmod>2025-01-21T10:00:00+01:00</lastmod>
-  </url><url>
-    <loc>https://manbearpiet.github.io/tags/</loc>
     <lastmod>2025-01-21T10:00:00+01:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/testing-framework/</loc>
