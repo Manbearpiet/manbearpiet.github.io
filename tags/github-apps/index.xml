@@ -7,8 +7,240 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
-    <lastBuildDate>Mon, 07 Jul 2025 10:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 07 Jul 2025 12:30:00 +0200</lastBuildDate>
     <atom:link href="https://manbearpiet.github.io/tags/github-apps/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Signing your JWTs for your GitHub Apps using Azure KeyVault</title>
+      <link>https://manbearpiet.github.io/posts/signing-jwt/</link>
+      <pubDate>Mon, 07 Jul 2025 12:30:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/posts/signing-jwt/</guid>
+      <description>&lt;h1 id=&#34;github-apps&#34;&gt;GitHub Apps&lt;/h1&gt;&#xA;&lt;p&gt;In a previous post about GitHub Apps, I demonstrated how to use a PowerShell module to create your JWTs and interact with GitHub&amp;rsquo;s REST APIs. I don&amp;rsquo;t like storing the private key on the server, so in this post, I&amp;rsquo;ll show you how to use Azure Key Vault&amp;rsquo;s signing API to sign your JWT.&lt;/p&gt;&#xA;&lt;p&gt;We want to get the same results, but without the private key on our host locally.&#xA;&lt;figure&gt;&lt;img src=&#34;https://manbearpiet.github.io/images/github-apps/content.png&#34;&#xA;    alt=&#34;Getting content with a GitHub App&#34;&gt;&#xA;&lt;/figure&gt;&#xA;&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="github-apps">GitHub Apps</h1>
+<p>In a previous post about GitHub Apps, I demonstrated how to use a PowerShell module to create your JWTs and interact with GitHub&rsquo;s REST APIs. I don&rsquo;t like storing the private key on the server, so in this post, I&rsquo;ll show you how to use Azure Key Vault&rsquo;s signing API to sign your JWT.</p>
+<p>We want to get the same results, but without the private key on our host locally.
+<figure><img src="/images/github-apps/content.png"
+    alt="Getting content with a GitHub App">
+</figure>
+</p>
+<h3 id="azure-keyvault">Azure KeyVault</h3>
+<p>Since the Azure Functions host, in our scenario (HTTP-triggered), is a public web server, I strongly disliked storing my private key file locally on that host&rsquo;s file system. We typically store our private keys in a Microsoft-hosted secret vault, specifically the Azure Key Vault service. I investigated whether I could use Azure Key Vault for this use case.</p>
+<p>Unfortunately, PowerShell-JWT doesn&rsquo;t support creating an unsigned JWT, so we&rsquo;ll have to make our tokens ourselves.
+JWTs are just JSON&rsquo;s base64 URL encoded, so it&rsquo;s base64 with a few characters replaced.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">  1</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">New-UnsignedJWT</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">  2</span><span class="cl">       <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">(</span><span class="na">SupportsShouldProcess</span><span class="p">)]</span>
+</span></span><span class="line"><span class="ln">  3</span><span class="cl">       <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">  4</span><span class="cl">              <span class="c"># JWT Header (https://www.rfc-editor.org/rfc/rfc7519#page-11), always creates JWT typ and uses RS256 signing algorith.</span>
+</span></span><span class="line"><span class="ln">  5</span><span class="cl">              <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">  6</span><span class="cl">              <span class="p">[</span><span class="no">Hashtable</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">  7</span><span class="cl">              <span class="nv">$Headers</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">  8</span><span class="cl">              <span class="c"># Payload with the JWT claims (https://www.rfc-editor.org/rfc/rfc7519#page-8), always adds iat and exp by default.</span>
+</span></span><span class="line"><span class="ln">  9</span><span class="cl">              <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 10</span><span class="cl">              <span class="p">[</span><span class="no">Hashtable</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 11</span><span class="cl">              <span class="nv">$Payload</span>
+</span></span><span class="line"><span class="ln"> 12</span><span class="cl">       <span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 13</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 14</span><span class="cl">       <span class="k">if</span> <span class="p">(</span><span class="nv">$PSCmdlet</span><span class="p">.</span><span class="py">ShouldProcess</span><span class="p">(</span><span class="s1">&#39;New UnsignedJWT&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 15</span><span class="cl">              <span class="nv">$jwtHeader</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 16</span><span class="cl">                     <span class="n">alg</span> <span class="p">=</span> <span class="s1">&#39;RS256&#39;</span>
+</span></span><span class="line"><span class="ln"> 17</span><span class="cl">                     <span class="n">typ</span> <span class="p">=</span> <span class="s1">&#39;JWT&#39;</span>
+</span></span><span class="line"><span class="ln"> 18</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 19</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 20</span><span class="cl">              <span class="nv">$unformattedHeader</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$Headers</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 21</span><span class="cl">                     <span class="nv">$Headers</span> <span class="p">+</span> <span class="nv">$jwtHeader</span>
+</span></span><span class="line"><span class="ln"> 22</span><span class="cl">              <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 23</span><span class="cl">                     <span class="nv">$jwtHeader</span>
+</span></span><span class="line"><span class="ln"> 24</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 25</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 26</span><span class="cl">              <span class="nv">$formattedHeader</span> <span class="p">=</span> <span class="nv">$unformattedHeader</span> <span class="p">|</span> <span class="nb">ConvertTo-Json</span> <span class="n">-Compress</span>
+</span></span><span class="line"><span class="ln"> 27</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 28</span><span class="cl">              <span class="nv">$jwtPayload</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 29</span><span class="cl">                     <span class="s1">&#39;iat&#39;</span> <span class="p">=</span> <span class="p">[</span><span class="no">Int32</span><span class="p">](</span><span class="nb">Get-Date</span> <span class="n">-UFormat</span> <span class="k">%</span><span class="n">s</span><span class="p">)</span> <span class="p">-</span> <span class="mf">60</span>
+</span></span><span class="line"><span class="ln"> 30</span><span class="cl">                     <span class="s1">&#39;exp&#39;</span> <span class="p">=</span> <span class="p">[</span><span class="no">Int32</span><span class="p">](</span><span class="nb">Get-Date</span> <span class="p">(</span><span class="nb">Get-Date</span><span class="p">).</span><span class="py">AddMinutes</span><span class="p">(</span><span class="mf">8</span><span class="p">)</span> <span class="n">-UFormat</span> <span class="k">%</span><span class="n">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 31</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 32</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 33</span><span class="cl">              <span class="nv">$unformattedPayload</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$Payload</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 34</span><span class="cl">                     <span class="nv">$Payload</span> <span class="p">+</span> <span class="nv">$jwtPayload</span>
+</span></span><span class="line"><span class="ln"> 35</span><span class="cl">              <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 36</span><span class="cl">                     <span class="nv">$jwtPayload</span>
+</span></span><span class="line"><span class="ln"> 37</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 38</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 39</span><span class="cl">              <span class="nv">$formattedPayload</span> <span class="p">=</span> <span class="nv">$unformattedPayload</span> <span class="p">|</span> <span class="nb">ConvertTo-Json</span> <span class="n">-Compress</span> <span class="n">-Depth</span> <span class="mf">99</span>
+</span></span><span class="line"><span class="ln"> 40</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 41</span><span class="cl">              <span class="s1">&#39;{0}.{1}&#39;</span> <span class="o">-f</span> <span class="vm">@</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 42</span><span class="cl">                     <span class="p">[</span><span class="no">Convert</span><span class="p">]::</span><span class="n">ToBase64String</span><span class="p">([</span><span class="no">System.Text.UTF8Encoding</span><span class="p">]::</span><span class="n">UTF8</span><span class="p">.</span><span class="py">GetBytes</span><span class="p">(</span><span class="nv">$formattedHeader</span><span class="p">)).</span><span class="py">TrimEnd</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">).</span><span class="py">Replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">).</span><span class="py">Replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="ln"> 43</span><span class="cl">                     <span class="p">[</span><span class="no">Convert</span><span class="p">]::</span><span class="n">ToBase64String</span><span class="p">([</span><span class="no">System.Text.UTF8Encoding</span><span class="p">]::</span><span class="n">UTF8</span><span class="p">.</span><span class="py">GetBytes</span><span class="p">(</span><span class="nv">$formattedPayload</span><span class="p">)).</span><span class="py">TrimEnd</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">).</span><span class="py">Replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">).</span><span class="py">Replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 44</span><span class="cl">              <span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 45</span><span class="cl">       <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 46</span><span class="cl"><span class="p">}```</span>
+</span></span><span class="line"><span class="ln"> 47</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 48</span><span class="cl"><span class="n">After</span> <span class="n">much</span> <span class="n">tinkering</span> <span class="n">with</span> <span class="n">Base64</span> <span class="nb">URL-encoded</span> <span class="n">strings</span> <span class="n">and</span> <span class="k">finally</span> <span class="n">overcoming</span> <span class="n">the</span> <span class="n">last</span> <span class="n">hurdle</span> <span class="n">with</span> <span class="n">the</span> <span class="n">hash</span><span class="p">,</span> <span class="n">thanks</span> <span class="n">again</span> <span class="n">to</span> <span class="n">Drew</span> <span class="n">from</span> <span class="n">the</span> <span class="n">PowerShell</span> <span class="n">Discord</span><span class="p">,</span> <span class="n">I</span> <span class="n">generated</span> <span class="n">a</span> <span class="n">valid</span> <span class="n">JWT</span> <span class="n">signature</span> <span class="n">using</span> <span class="n">this</span> <span class="n">code</span><span class="p">.</span> <span class="n">Make</span> <span class="n">sure</span> <span class="n">you</span><span class="s1">&#39;re logged into Azure PowerShell and that the identity performing the script has the Key-signing permission on the key vault containing the private key.
+</span></span></span><span class="line"><span class="ln"> 49</span><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="ln"> 50</span><span class="cl"><span class="s1">```powershell
+</span></span></span><span class="line"><span class="ln"> 51</span><span class="cl"><span class="s1">function New-AZKVTokenSignature {
+</span></span></span><span class="line"><span class="ln"> 52</span><span class="cl"><span class="s1">       [CmdletBinding(SupportsShouldProcess)]
+</span></span></span><span class="line"><span class="ln"> 53</span><span class="cl"><span class="s1">       param (
+</span></span></span><span class="line"><span class="ln"> 54</span><span class="cl"><span class="s1">              [Parameter(Mandatory)]
+</span></span></span><span class="line"><span class="ln"> 55</span><span class="cl"><span class="s1">              [String]
+</span></span></span><span class="line"><span class="ln"> 56</span><span class="cl"><span class="s1">              $JWT,
+</span></span></span><span class="line"><span class="ln"> 57</span><span class="cl"><span class="s1">              [Parameter()]
+</span></span></span><span class="line"><span class="ln"> 58</span><span class="cl"><span class="s1">              [String]
+</span></span></span><span class="line"><span class="ln"> 59</span><span class="cl"><span class="s1">              $KeyVaultName,
+</span></span></span><span class="line"><span class="ln"> 60</span><span class="cl"><span class="s1">              [Parameter()]
+</span></span></span><span class="line"><span class="ln"> 61</span><span class="cl"><span class="s1">              [String]
+</span></span></span><span class="line"><span class="ln"> 62</span><span class="cl"><span class="s1">              $PrivateKeyName,
+</span></span></span><span class="line"><span class="ln"> 63</span><span class="cl"><span class="s1">              [Parameter()]
+</span></span></span><span class="line"><span class="ln"> 64</span><span class="cl"><span class="s1">              [String]
+</span></span></span><span class="line"><span class="ln"> 65</span><span class="cl"><span class="s1">              $PrivateKeyVersion
+</span></span></span><span class="line"><span class="ln"> 66</span><span class="cl"><span class="s1">       )
+</span></span></span><span class="line"><span class="ln"> 67</span><span class="cl"><span class="s1">       if ($PSCmdlet.ShouldProcess(&#39;</span><span class="n">Requesting</span> <span class="n">KeyVault</span> <span class="n">API</span> <span class="n">JWT</span> <span class="n">signature</span><span class="s1">&#39;)) {
+</span></span></span><span class="line"><span class="ln"> 68</span><span class="cl"><span class="s1">              try {
+</span></span></span><span class="line"><span class="ln"> 69</span><span class="cl"><span class="s1">                     $KeyVaultToken = Get-AzAccessToken -ResourceTypeName KeyVault
+</span></span></span><span class="line"><span class="ln"> 70</span><span class="cl"><span class="s1">                     if (!$KeyVaultToken) {
+</span></span></span><span class="line"><span class="ln"> 71</span><span class="cl"><span class="s1">                            throw &#39;</span><span class="n">Could</span> <span class="n">not</span> <span class="n">get</span> <span class="n">KeyVault</span> <span class="n">token</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln"> 72</span><span class="cl"><span class="s1">                     }
+</span></span></span><span class="line"><span class="ln"> 73</span><span class="cl"><span class="s1">              } catch {
+</span></span></span><span class="line"><span class="ln"> 74</span><span class="cl"><span class="s1">                     throw $_
+</span></span></span><span class="line"><span class="ln"> 75</span><span class="cl"><span class="s1">              }
+</span></span></span><span class="line"><span class="ln"> 76</span><span class="cl"><span class="s1">       }
+</span></span></span><span class="line"><span class="ln"> 77</span><span class="cl"><span class="s1">       $JwsResultAsByteArr = [System.Text.Encoding]::UTF8.GetBytes($JWT)
+</span></span></span><span class="line"><span class="ln"> 78</span><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="ln"> 79</span><span class="cl"><span class="s1">       # Signing requires the hash of the JWT at this point (which should include the header)
+</span></span></span><span class="line"><span class="ln"> 80</span><span class="cl"><span class="s1">       $hash = [System.Security.Cryptography.SHA256]::Create().ComputeHash($JwsResultAsByteArr)
+</span></span></span><span class="line"><span class="ln"> 81</span><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="ln"> 82</span><span class="cl"><span class="s1">       $hash64 = [Convert]::ToBase64String($hash)
+</span></span></span><span class="line"><span class="ln"> 83</span><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="ln"> 84</span><span class="cl"><span class="s1">       if ($PSCmdlet.ShouldProcess($KeyVaultName, &#34;Requesting JWT signing operation from KeyVault with $PrivateKeyName&#34;)) {
+</span></span></span><span class="line"><span class="ln"> 85</span><span class="cl"><span class="s1">              $irmSplat = @{
+</span></span></span><span class="line"><span class="ln"> 86</span><span class="cl"><span class="s1">                     Method         = &#39;</span><span class="n">Post</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln"> 87</span><span class="cl"><span class="s1">                     Authentication = &#39;</span><span class="n">Bearer</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln"> 88</span><span class="cl"><span class="s1">                     Token          = $KeyVaultToken.Token
+</span></span></span><span class="line"><span class="ln"> 89</span><span class="cl"><span class="s1">                     Body           = @{
+</span></span></span><span class="line"><span class="ln"> 90</span><span class="cl"><span class="s1">                            alg   = &#39;</span><span class="n">RS256</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln"> 91</span><span class="cl"><span class="s1">                            value = $hash64
+</span></span></span><span class="line"><span class="ln"> 92</span><span class="cl"><span class="s1">                     } | ConvertTo-Json
+</span></span></span><span class="line"><span class="ln"> 93</span><span class="cl"><span class="s1">                     ContentType    = &#39;</span><span class="n">application</span><span class="p">/</span><span class="n">json</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln"> 94</span><span class="cl"><span class="s1">                     Uri            = &#34;https://$KeyVaultName.vault.azure.net/keys/$PrivateKeyName/$PrivateKeyVersion/sign?api-version=7.4&#34;
+</span></span></span><span class="line"><span class="ln"> 95</span><span class="cl"><span class="s1">              }
+</span></span></span><span class="line"><span class="ln"> 96</span><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="ln"> 97</span><span class="cl"><span class="s1">              try {
+</span></span></span><span class="line"><span class="ln"> 98</span><span class="cl"><span class="s1">                     $signature = Invoke-RestMethod @irmSplat
+</span></span></span><span class="line"><span class="ln"> 99</span><span class="cl"><span class="s1">                     if (!$signature) {
+</span></span></span><span class="line"><span class="ln">100</span><span class="cl"><span class="s1">                            throw &#39;</span><span class="n">Could</span> <span class="n">not</span> <span class="n">get</span> <span class="n">signature</span> <span class="n">from</span> <span class="n">KeyVault</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln">101</span><span class="cl"><span class="s1">                     }
+</span></span></span><span class="line"><span class="ln">102</span><span class="cl"><span class="s1">              } catch {
+</span></span></span><span class="line"><span class="ln">103</span><span class="cl"><span class="s1">                     throw $_
+</span></span></span><span class="line"><span class="ln">104</span><span class="cl"><span class="s1">              }
+</span></span></span><span class="line"><span class="ln">105</span><span class="cl"><span class="s1">       }
+</span></span></span><span class="line"><span class="ln">106</span><span class="cl"><span class="s1">       &#39;</span><span class="p">{</span><span class="mf">0</span><span class="p">}.{</span><span class="mf">1</span><span class="p">}</span><span class="s1">&#39; -f $JWT, $signature.value
+</span></span></span><span class="line"><span class="ln">107</span><span class="cl"><span class="s1">}
+</span></span></span><span class="line"><span class="ln">108</span><span class="cl"><span class="s1">$newAZKVTokenSignatureSplat = @{
+</span></span></span><span class="line"><span class="ln">109</span><span class="cl"><span class="s1">       JWT               = (New-UnsignedJWT -Payload @{iss = 1459729 })
+</span></span></span><span class="line"><span class="ln">110</span><span class="cl"><span class="s1">       KeyVaultName      = &#39;</span><span class="n">d826699b15174c50b627616</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln">111</span><span class="cl"><span class="s1">       PrivateKeyName    = &#39;</span><span class="n">githubkey</span><span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln">112</span><span class="cl"><span class="s1">       PrivateKeyVersion = &#39;</span><span class="n">cf96e6ec6f104f71882b5309f718c6e2</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="ln">113</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">114</span><span class="cl">
+</span></span><span class="line"><span class="ln">115</span><span class="cl"><span class="nv">$JWT</span> <span class="p">=</span> <span class="nb">New-AZKVTokenSignature</span> <span class="nv">@newAZKVTokenSignatureSplat</span></span></span></code></pre></div><p>With this JWT I could call my installations and retrieve a short-lived installation token. AWESOME!</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">New-GHRepoToken</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">       <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">(</span><span class="na">SupportsShouldProcess</span><span class="p">)]</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">       <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">              <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">              <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">              <span class="nv">$JWT</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">       <span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">       <span class="k">if</span> <span class="p">(</span><span class="nv">$PSCmdlet</span><span class="p">.</span><span class="py">ShouldProcess</span><span class="p">(</span><span class="s1">&#39;Requesting GitHub App Installations using Signed JWT Token&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">
+</span></span><span class="line"><span class="ln">11</span><span class="cl">              <span class="nv">$invokeRestMethodSplat</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">                     <span class="n">Uri</span>     <span class="p">=</span> <span class="s1">&#39;https://api.github.com/app/installations&#39;</span> <span class="c"># This gets all installations and should just be used cross organizations.</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">                     <span class="n">Headers</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">                            <span class="n">Accept</span>                 <span class="p">=</span> <span class="s1">&#39;application/vnd.github+json&#39;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">                            <span class="n">Authorization</span>          <span class="p">=</span> <span class="s2">&#34;Bearer </span><span class="nv">$JWT</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">                            <span class="s1">&#39;X-GitHub-Api-Version&#39;</span> <span class="p">=</span> <span class="s1">&#39;2022-11-28&#39;</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">                     <span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">              <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">                     <span class="nv">$Installations</span> <span class="p">=</span> <span class="nb">Invoke-RestMethod</span> <span class="nv">@invokeRestMethodSplat</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">                     <span class="k">if</span> <span class="p">(!</span><span class="nv">$Installations</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">                            <span class="k">throw</span> <span class="s1">&#39;Could not get installations with JWT&#39;</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">                     <span class="p">}</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">              <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">                     <span class="nv">$PSCmdlet</span><span class="p">.</span><span class="py">ThrowTerminatingError</span><span class="p">(</span><span class="nv">$_</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">       <span class="p">}</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">
+</span></span><span class="line"><span class="ln">29</span><span class="cl">       <span class="nv">$AccessTokensUrl</span> <span class="p">=</span> <span class="p">(</span><span class="nv">$Installations</span><span class="p">).</span><span class="py">access_tokens_url</span> <span class="c"># This assumes there is only 1 installation</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">
+</span></span><span class="line"><span class="ln">31</span><span class="cl">       <span class="k">if</span> <span class="p">(</span><span class="nv">$PSCmdlet</span><span class="p">.</span><span class="py">ShouldProcess</span><span class="p">(</span><span class="s1">&#39;Requesting GitHub Repo token using JWT&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">
+</span></span><span class="line"><span class="ln">33</span><span class="cl">              <span class="nv">$irmSplat</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">                     <span class="n">Uri</span>     <span class="p">=</span> <span class="nv">$AccessTokensUrl</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">                     <span class="n">Method</span>  <span class="p">=</span> <span class="s1">&#39;Post&#39;</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">                     <span class="n">Headers</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl">                            <span class="n">Accept</span>                 <span class="p">=</span> <span class="s1">&#39;application/vnd.github+json&#39;</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl">                            <span class="n">Authorization</span>          <span class="p">=</span> <span class="s2">&#34;Bearer </span><span class="nv">$JWT</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl">                            <span class="s1">&#39;X-GitHub-Api-Version&#39;</span> <span class="p">=</span> <span class="s1">&#39;2022-11-28&#39;</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl">                     <span class="p">}</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl">              <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">                     <span class="nv">$outputtoken</span> <span class="p">=</span> <span class="nb">Invoke-RestMethod</span> <span class="nv">@irmSplat</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl">                     <span class="k">if</span> <span class="p">(!</span><span class="nv">$outputtoken</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl">                            <span class="k">throw</span> <span class="s1">&#39;Could not get GitHub Repo token&#39;</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl">                     <span class="p">}</span>
+</span></span><span class="line"><span class="ln">47</span><span class="cl">              <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">48</span><span class="cl">                     <span class="nv">$PSCmdlet</span><span class="p">.</span><span class="py">ThrowTerminatingError</span><span class="p">(</span><span class="nv">$_</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">49</span><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="ln">50</span><span class="cl">       <span class="p">}</span>
+</span></span><span class="line"><span class="ln">51</span><span class="cl">       <span class="nv">$outputtoken</span> <span class="c"># for reflection, this has the token as plaintext as a property</span>
+</span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">53</span><span class="cl">
+</span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="nv">$installationToken</span> <span class="p">=</span> <span class="nb">New-GHRepoToken</span> <span class="n">-JWT</span> <span class="nv">$JWT</span>
+</span></span><span class="line"><span class="ln">55</span><span class="cl">
+</span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="nv">$Organization</span> <span class="p">=</span> <span class="s1">&#39;Manbearpiet&#39;</span>
+</span></span><span class="line"><span class="ln">57</span><span class="cl"><span class="nv">$RepositoryName</span> <span class="p">=</span> <span class="s1">&#39;Manbearpiet&#39;</span> <span class="c"># Public repo</span>
+</span></span><span class="line"><span class="ln">58</span><span class="cl"><span class="nv">$Path</span> <span class="p">=</span> <span class="s1">&#39;README.md&#39;</span>
+</span></span><span class="line"><span class="ln">59</span><span class="cl">
+</span></span><span class="line"><span class="ln">60</span><span class="cl"><span class="nv">$file</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">61</span><span class="cl">       <span class="n">Uri</span>     <span class="p">=</span> <span class="s2">&#34;https://api.github.com/repos/</span><span class="nv">$Organization</span><span class="s2">/</span><span class="nv">$RepositoryName</span><span class="s2">/contents/</span><span class="nv">$Path</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">62</span><span class="cl">       <span class="n">Method</span>  <span class="p">=</span> <span class="s1">&#39;Get&#39;</span>
+</span></span><span class="line"><span class="ln">63</span><span class="cl">       <span class="n">Headers</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">64</span><span class="cl">              <span class="n">Accept</span>                 <span class="p">=</span> <span class="s1">&#39;application/vnd.github+json&#39;</span>
+</span></span><span class="line"><span class="ln">65</span><span class="cl">              <span class="n">Authorization</span>          <span class="p">=</span> <span class="s2">&#34;Bearer </span><span class="p">$(</span><span class="nv">$installationToken</span><span class="p">.</span><span class="n">token</span><span class="p">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">66</span><span class="cl">              <span class="s1">&#39;X-GitHub-Api-Version&#39;</span> <span class="p">=</span> <span class="s1">&#39;2022-11-28&#39;</span>
+</span></span><span class="line"><span class="ln">67</span><span class="cl">       <span class="p">}</span>
+</span></span><span class="line"><span class="ln">68</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">69</span><span class="cl"><span class="nb">Invoke-RestMethod</span> <span class="nv">@file</span>
+</span></span><span class="line"><span class="ln">70</span><span class="cl">
+</span></span><span class="line"><span class="ln">71</span><span class="cl"><span class="nv">$Organization</span> <span class="p">=</span> <span class="s1">&#39;Manbearpiet&#39;</span>
+</span></span><span class="line"><span class="ln">72</span><span class="cl"><span class="nv">$RepositoryName</span> <span class="p">=</span> <span class="s1">&#39;ManbearpietPrivate&#39;</span> <span class="c"># Private repo</span>
+</span></span><span class="line"><span class="ln">73</span><span class="cl"><span class="nv">$file</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">74</span><span class="cl">       <span class="n">Uri</span>     <span class="p">=</span> <span class="s2">&#34;https://api.github.com/repos/</span><span class="nv">$Organization</span><span class="s2">/</span><span class="nv">$RepositoryName</span><span class="s2">/contents/</span><span class="nv">$Path</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">75</span><span class="cl">       <span class="n">Method</span>  <span class="p">=</span> <span class="s1">&#39;Get&#39;</span>
+</span></span><span class="line"><span class="ln">76</span><span class="cl">       <span class="n">Headers</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">77</span><span class="cl">              <span class="n">Accept</span>                 <span class="p">=</span> <span class="s1">&#39;application/vnd.github+json&#39;</span>
+</span></span><span class="line"><span class="ln">78</span><span class="cl">              <span class="n">Authorization</span>          <span class="p">=</span> <span class="s2">&#34;Bearer </span><span class="p">$(</span><span class="nv">$installationToken</span><span class="p">.</span><span class="n">token</span><span class="p">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">79</span><span class="cl">              <span class="s1">&#39;X-GitHub-Api-Version&#39;</span> <span class="p">=</span> <span class="s1">&#39;2022-11-28&#39;</span>
+</span></span><span class="line"><span class="ln">80</span><span class="cl">       <span class="p">}</span>
+</span></span><span class="line"><span class="ln">81</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">82</span><span class="cl">
+</span></span><span class="line"><span class="ln">83</span><span class="cl"><span class="nb">Invoke-RestMethod</span> <span class="nv">@file</span></span></span></code></pre></div><figure><img src="/images/signing-jwt/result.png"
+    alt="A successful get of the repository content using the Azure Key Vault Signed JWT">
+</figure>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Using GitHub Apps, we have an identity that allows us to automate actions on the GitHub platform. Because we&rsquo;re using Azure Functions as a platform, I don&rsquo;t feel comfortable storing the private key of my GitHub App on the Azure Functions Host. Therefore, I used the Key Vault Signing REST API, and I can sleep better at night. It&rsquo;ll make implementations for GitHub Apps or other identity platforms with JWT signing more secure.</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Automating GitHub operations using GitHub Apps</title>
       <link>https://manbearpiet.github.io/posts/githubapp/</link>
