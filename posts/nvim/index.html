@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="https://manbearpiet.github.io/images/favicon-32x32.png" />
+<title>Basics of Vim/Neovim | Azure and DevOops</title>
+<meta name="title" content="Basics of Vim/Neovim" />
+<meta name="description" content="An introduction to the basics of Vim/Neovim, including modes, navigation, operators, and essential commands to get started with this powerful text editor." />
+<meta name="author" content="Christian Piet" />
+<meta name="keywords" content="Neovim,Vim,Basics," />
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="Basics of Vim/Neovim" />
+<meta property="og:description" content="An introduction to the basics of Vim/Neovim, including modes, navigation, operators, and essential commands to get started with this powerful text editor." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://manbearpiet.github.io/posts/nvim/" />
+
+<meta property="og:image" content="https://manbearpiet.github.io/images/social_card_bg_hu_d3535ded7381468d.webp"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2025-09-12T10:00:00+02:00" />
+<meta property="article:modified_time" content="2025-09-12T10:00:00+02:00" /><meta property="og:site_name" content="Azure and DevOops" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://manbearpiet.github.io/images/social_card_bg_hu_d3535ded7381468d.webp"/>
+<meta name="twitter:title" content="Basics of Vim/Neovim"/>
+<meta name="twitter:description" content="An introduction to the basics of Vim/Neovim, including modes, navigation, operators, and essential commands to get started with this powerful text editor."/>
+
+
+
+<meta itemprop="name" content="Basics of Vim/Neovim">
+<meta itemprop="description" content="An introduction to the basics of Vim/Neovim, including modes, navigation, operators, and essential commands to get started with this powerful text editor."><meta itemprop="datePublished" content="2025-09-12T10:00:00+02:00" />
+<meta itemprop="dateModified" content="2025-09-12T10:00:00+02:00" />
+<meta itemprop="wordCount" content="2042">
+
+<meta itemprop="image" content="https://manbearpiet.github.io/images/social_card_bg_hu_d3535ded7381468d.webp"/>
+
+
+<meta itemprop="keywords" content="Neovim,Vim,Basics," />
+
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  
+  <link href="/original.min.css" rel="stylesheet">
+
+  
+
+  
+
+  
+</head>
+
+<body>
+  <header><a class="skip-link" href="#main-content">Skip to main content</a>
+
+<a href="/" class="title"><h1>Azure and DevOops</h1></a>
+<nav>
+  <a href="/">Home</a>
+
+  <a href="/posts/">Blog</a>
+
+<a href='https://manbearpiet.github.io/index.xml'>RSS</a>
+
+
+
+
+
+
+
+</nav>
+</header>
+  <main id="main-content">
+
+<h1>Basics of Vim/Neovim</h1>
+<p class="byline">
+  <time datetime='2025-09-12' pubdate>
+    2025-09-12
+  </time>
+  · Christian Piet
+</p>
+
+<content>
+  <h1 id="neowhat">Neowhat?</h1>
+<p>It was the end of May 2025. A friend and former colleague of mine sent me a link about a YouTuber called ThePrimagen. In his videos, he featured some funny takes on tech news and had some sassy remarks, but what sparked my interest was his IDE. He used a terminal in which he was editing text, but it didn&rsquo;t look like old-school Vi. It had rich support for languages, an uncluttered interface, and I never saw a mouse cursor. I was interested, so I viewed some more videos, and my Neovim journey began. I&rsquo;ve a deep interest in how technology works, and I wanted a deeper understanding of how VSCode works and how it helps me with code editing. What better way than to check out the competition? This, plus a desire to become more able with editors like Vi, made it a clear choice to invest time to better understand this editor.</p>
+<p>If you&rsquo;re unfamiliar with Vim or Neovim, or if you&rsquo;re interested in the topic, this blog post will provide a brief overview of my understanding of how to navigate text in Vim/Neovim. In later posts, I&rsquo;ll dive deeper into more advanced topics and how to extend Neovim to make it a full-fledged IDE.</p>
+<h2 id="neovim">Neovim</h2>
+<p>Vim is the scary editor in your terminal where noobies die because they can&rsquo;t get out. However, it isn&rsquo;t as frightening as it looks. You do, however, need to understand why it works differently from other editors. Neovim is a fork of Vim, so it shares many similarities with Vim and offers added value beyond it. It provides speed, extensibility, and is a fun timesink.</p>
+<h2 id="installing">Installing</h2>
+<p>I&rsquo;m a macOS user, so I installed using <code>brew install neovim</code>. After doing so, you have to type <code>nvim</code> in your terminal, and you&rsquo;re in the editor. It is a strange editor if you&rsquo;re used to clicking on all the things, because where are the buttons? The central idea is that your buttons are on your keyboard, and you use shortcuts/keymaps to perform your actions.
+An Integrated Developer Environment is a rich text editor first, so I did some baby steps in trying to edit, and I wasn&rsquo;t really successful. I had to read a bit and view some Vim for Dummies videos, because all Neovim getting-started videos are about extending functionality, but not about how to edit text.
+I could&rsquo;ve saved myself a lot of time at this point by first reading the documentation, which is the first thing the editor shows you, d&rsquo;oh! When it launches, you can type <code>:help neovim</code> and read the help. Although you do need to know how to navigate text to do so.</p>
+<h2 id="modes">Modes</h2>
+<p>Neovim uses <strong>modes</strong> to change between functionalities.
+When using a text editor, we&rsquo;re used to clicking on the position we want to edit, typing what we want, and then scrolling. Regular text editing is done in the <strong>Insert</strong>-mode, by default, the editor is launched in the <strong>Normal</strong> mode, in which you can navigate the text.
+Every time I tried to use Vim via a terminal on a remote machine, I was intimidated and ended up installing the nano editor. But no more! If you press <code>i</code>, the editor enters <strong>Insert</strong> mode, and you can type as you&rsquo;re used to. This all worked fine, but when I needed to navigate to a different line, things got scary again. Luckily, <code>Esc</code> brings our editor back to <strong>Normal</strong>-mode.
+But now I was faced with the scariest part: how do you exit the darn editor? When not in <strong>Insert</strong>-mode, you can press <code>:</code>, to enter <strong>Command</strong> mode. This command mode allows us to <code>:write</code> the text in our current editor and <code>:quit</code> the editor, but this being a fast editor, you can also just type <code>:w</code> and <code>:q</code> or <code>:wq</code>.
+Quitting a help or any vim tab also works via <code>:q</code>, so if you&rsquo;ve a help open, this way you can exit that too. You can read more about modes by reading the help on modes with <code>:help vim-modes</code>.
+<figure><img src="/images/nvim/exit.jpg"
+    alt="Exit Vim meme">
+</figure>
+</p>
+<h2 id="navigating">Navigating</h2>
+<p>So far so good, but this wasn&rsquo;t more than a extremely simple &ldquo;Hello World&rdquo;-like example. The normal mode isn&rsquo;t a shortcut to the command mode, it&rsquo;s so much more!
+In the <strong>Normal</strong> mode you can navigate your cursor in the editor, manipulate text relative to your cursor and a lot more. But it all start with navigating your cursor across the editor. In all the videos they talked about the <strong>home row</strong>, this means the row your fingers hopefully land on when you touch a keyboard.</p>
+<p>The most important fact you have to understand is, you have no mouse, and no arrow-keys they just don&rsquo;t exist anymore from this point on.</p>
+<figure><img src="/images/nvim/meme.png"
+    alt="Drake meme, don&#39;t use a mouse, use your keyboard">
+</figure>
+
+<p>On your home-row the most import keys are located in the portion of your right hand, the <code>hjkl</code> section.</p>
+<p>The barebones:</p>
+<ul>
+<li><code>h</code> moves the cursor one character left</li>
+<li><code>j</code> moves the cursor one line down</li>
+<li><code>k</code> moves the cursor one line up</li>
+<li><code>l</code> moves the cursor one character right</li>
+</ul>
+<p>I watched <a href="https://www.youtube.com/watch?v=z4eA2eC28qg">this video</a> by DevOps Toolbox. And I was ready to take on the world, at least I thought. It didn&rsquo;t click with me until I tried a browser based game called <a href="https://vim-adventures.com/">Vim Adventures</a>. After the video and the game I was able to navigate text using vim motions.</p>
+<p>In the video and game it&rsquo;s made clear that in <strong>Normal</strong> mode you can move your cursor not only per character, but you can move around words, sentences, paragraphs etc. A small note I made to remember these:</p>
+<ul>
+<li><code>w</code> moves the cursor to the first character of the next word</li>
+<li><code>b</code> moves the cursor to the first character of the previous word</li>
+<li><code>e</code> moves the cursor to the last character of the current word</li>
+<li><code>$</code> moves the cursor to the end of the line</li>
+<li><code>0</code> moves the cursor to the start of the line</li>
+<li><code>^</code> moves the cursor to the first non blank character of the line</li>
+<li><code>gg</code> moves towards the start of your file</li>
+<li><code>G</code> moves towards the end of your file</li>
+<li><code>H</code> moves to the top of your screen</li>
+<li><code>M</code> moves towards the middle of your screen</li>
+<li><code>L</code> moves towards the bottom of your screen</li>
+<li><code>{</code> moves towards the previous paragraph</li>
+<li><code>}</code> moves towards the next paragraph (blank line)</li>
+<li><code>Ctrl + D</code> moves your screen down</li>
+<li><code>Ctrl + U</code> moves your screen up</li>
+<li><code>zz</code> moves your screen in a way your cursor is in the middle.</li>
+</ul>
+<p>Those are my most-used shortcuts for navigation. This makes you a lot faster navigating around files, so there might be something about that <strong>Normal</strong>-mode after all. However, the editing still felt a bit clunky; I was always moving around, entering <strong>Insert</strong> mode with i , and then going back to <strong>Normal</strong> mode.</p>
+<h2 id="operators">Operators</h2>
+<p>The clunkiness came from the fact that I was navigating, but not really combining knowledge. For instance if I wanted to delete a word, I&rsquo;d move towards the end of the word, then move right with <code>l</code>, enter <strong>Insert</strong> mode and backspace until the word is gone. There are better ways to do so. Enter operators, if I&rsquo;d only would&rsquo;ve read the manual at <code>:help operator</code> sooner..</p>
+<p>Operators are commands you provide a motion and then the editor performs the command on the text based on the motion you provided. This maybe sounds difficult, but bear with me. The most important operators are:</p>
+<ul>
+<li><code>d</code> for delete</li>
+<li><code>c</code> for change, this deletes and sets the editor mode to Insert, so you can type the text immediatly</li>
+<li><code>y</code> for yank, this yanks/copies the text to a buffer/clipboard</li>
+</ul>
+<p>So, if you want to delete a word, you can type <code>dw</code>, which deletes from your current cursor position to the start of the next word. If you want to delete from your current position to the end of the line, you can type <code>d$</code>. You get the idea, you can combine operators with motions.
+To delete a whole line, you can type <code>dd</code>, which deletes the entire line you are on. The same applies to <code>yy</code> , which yanks the entire line. Or <code>cc</code> , which removes the whole line and sets you in Insert-mode.</p>
+<p>Pasting is done with <code>p</code> for paste after your cursor and <code>P</code> for paste before your cursor. What caught me offguard a few time is that your buffer/clipboard is filled when yanking but also with deleting text. So deleting a word will default to overwriting your clipboard. This caught me offguard a bit, since I usually copy/yank my text, delete the thing I want gone and then paste, but this will paste the deleted text.</p>
+<p>This may feel like a lot, but just start small with <code>dw</code>, <code>d$</code>, <code>dd</code>,<code>cw</code>,<code>cc</code>,<code>yw</code>, <code>yy</code> and <code>p</code> and you&rsquo;ll be amazed how fast you can edit text.</p>
+<h2 id="operators-on-steroids">Operators on Steroids</h2>
+<p>This enables us to edit text much faster by combining motions and operators. But wait, there&rsquo;s more. You can also repeat an action a few times by providing a number before the operator. So if you want to delete 3 words, you can type <code>d3w</code>, or if you want to delete 4 lines, you can type <code>d4d</code>. This also works with change and yank, so <code>c3w</code>, <code>y3w</code>, <code>c4d</code>, and <code>y4d</code> work too. The same applies to <code>dd</code> and <code>yy</code>; so, <code>3dd</code> deletes 3 lines and <code>4yy</code> yanks 4 lines relative to your cursor.</p>
+<p>There are also other tools, like delete until the character you provide, which is done with <code>d</code> + <code>t</code> + <code>character</code>. So if you want to delete until the next comma you can type <code>dt,</code>. This also works with change and yank, so <code>ct,</code> and <code>yt,</code> work too. If you want to include the comma, you can use <code>f</code> instead of <code>t</code>, so <code>df,</code>, <code>cf,</code> and <code>yf,</code>.</p>
+<p>With some googling, I found out you can delete something and not have it in your buffer/clipboard, by using the <code>_</code> register, so <code>_d3w</code> deletes 3 words without putting it in your clipboard.</p>
+<h2 id="undoredo">Undo/Redo</h2>
+<p>Mistakes happen, luckily you can undo and redo your actions. Undo is done with <code>u</code> and redo with <code>Ctrl + r</code>.</p>
+<h2 id="other-useful-commands">Other useful commands</h2>
+<p>There are some other useful commands I use often:</p>
+<ul>
+<li><code>.</code> repeats your last action, so if you deleted a word with <code>dw</code> you can repeat that with <code>.</code></li>
+<li><code>x</code> deletes the character under your cursor, this is like backspace in <strong>Insert</strong>-mode</li>
+<li><code>X</code> deletes the character before your cursor, this is like delete in <strong>Insert</strong>-mode</li>
+<li><code>r</code> + <code>character</code> replaces the character under your cursor with the character you provided</li>
+<li><code>R</code> enters <strong>Replace</strong>-mode, this is like <strong>Insert</strong>-mode but it overwrites text</li>
+<li><code>o</code> opens a new line below your current line and enters <strong>Insert</strong>-mode</li>
+<li><code>O</code> opens a new line above your current line and enters <strong>Insert</strong>-mode</li>
+<li><code>K</code> adds a new line above your cursor in <strong>Normal</strong>-mode</li>
+<li><code>P</code> pastes on the line above your cursor</li>
+<li><code>J</code> joins the current line with the next line</li>
+<li><code>D</code> deletes from your cursor to the end of the line, this is like <code>d$</code></li>
+<li><code>C</code> changes from your cursor to the end of the line, this is like <code>c$</code></li>
+<li><code>A</code> moves your cursor to the end of the line and enters <strong>Insert</strong>-mode</li>
+<li><code>I</code> moves your cursor to the first non-blank character of the line and enters <strong>Insert</strong>-mode</li>
+<li><code>ZZ</code> saves and exits the editor, this is like <code>:wq</code></li>
+<li><code>ZQ</code> exits the editor without saving, this is like <code>:q!</code></li>
+</ul>
+<p>There is also a trick in which you can do a motion towards text inside braces, parentheses or quotes. If on a line you have text in quotes, you can use <code>ci&quot;</code> to change the text inside the quotes. Or for instance if there are braces on a line you can delete the text inside by typing <code>di[</code>.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>I left out a significant amount of commands and motions, but this is a good start to get you going. In a subsequent post, I&rsquo;d like to demonstrate how to utilize substitutions, visual mode, and extend Neovim to make it a full-fledged IDE. These tips work in both Vim and Neovim, so if you&rsquo;re using Vim, you can use these too. There are several cheat sheets available online; just Google &ldquo;vim cheat sheet&rdquo; and you&rsquo;ll find several. But the best way to git gud is by putting in the hours and getting it in the fingers, Happy Vimming!</p>
+
+</content>
+<p>
+  
+    <a class="blog-tags" href="/tags/neovim/">#neovim</a>
+  
+    <a class="blog-tags" href="/tags/vim/">#vim</a>
+  
+    <a class="blog-tags" href="/tags/basics/">#basics</a>
+  
+</p>
+
+
+
+
+  </main>
+  <footer><small>
+  Christian Piet (CC BY 4.0) | Made with <a href="https://github.com/clente/hugo-bearcub">Bear Cub</a>
+</small></footer>
+
+    
+</body>
+
+</html>
