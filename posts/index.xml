@@ -7,8 +7,87 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
-    <lastBuildDate>Fri, 12 Sep 2025 10:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Fri, 19 Sep 2025 10:00:00 +0200</lastBuildDate>
     <atom:link href="https://manbearpiet.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Basics of Vim/Neovim continued</title>
+      <link>https://manbearpiet.github.io/posts/nvim-continued/</link>
+      <pubDate>Fri, 19 Sep 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/posts/nvim-continued/</guid>
+      <description>&lt;h1 id=&#34;basics-of-vimneovim-continued&#34;&gt;Basics of Vim/Neovim continued&lt;/h1&gt;&#xA;&lt;p&gt;In my previous post (&lt;a href=&#34;https://manbearpiet.com/posts/nvim/%29&#34;&gt;https://manbearpiet.com/posts/nvim/)&lt;/a&gt;, I mentioned several modes and basics of editing in Vim/Neovim. In this post, I&amp;rsquo;ll continue the topic and show you how to use Tutor and help, as well as what you can do with Visual mode.&lt;/p&gt;&#xA;&lt;h2 id=&#34;help-and-tutor&#34;&gt;Help and Tutor&lt;/h2&gt;&#xA;&lt;p&gt;In the last post, I mentioned how to access and quit help articles in Vim/Neovim; these articles contain gems. There is even a tutoring tutorial program you can access with the Commandline Mode command using &lt;code&gt;:Tutor&lt;/code&gt;.&#xA;This program will guide you through the Neovim tutorial and will contain help with links.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="basics-of-vimneovim-continued">Basics of Vim/Neovim continued</h1>
+<p>In my previous post (<a href="https://manbearpiet.com/posts/nvim/%29">https://manbearpiet.com/posts/nvim/)</a>, I mentioned several modes and basics of editing in Vim/Neovim. In this post, I&rsquo;ll continue the topic and show you how to use Tutor and help, as well as what you can do with Visual mode.</p>
+<h2 id="help-and-tutor">Help and Tutor</h2>
+<p>In the last post, I mentioned how to access and quit help articles in Vim/Neovim; these articles contain gems. There is even a tutoring tutorial program you can access with the Commandline Mode command using <code>:Tutor</code>.
+This program will guide you through the Neovim tutorial and will contain help with links.</p>
+<figure><img src="/images/nvim-continued/tutor.png"
+    alt="Select all text on line">
+</figure>
+
+<p>The default Tutor is <code>:Tutor tutor</code>, but there are also <code>:Tutor vim-01-beginner</code> and <code>:Tutor vim-02-beginner</code>.
+I couldn&rsquo;t access Tutor because I copied and pasted some flawed configuration code, d&rsquo;oh! But make sure to check <code>:Tutor</code>, it&rsquo;s excellent.
+If the area of the help is too small, you can drag the borders with ehh your mouse.</p>
+<p>Help can be accessed with the <code>:help</code>, or <code>:h</code>-command. This also supports tab-completion, and you can cycle through the articles with tab/shift-tab.</p>
+<figure><img src="/images/nvim-continued/help.png"
+    alt="Select all text on line">
+</figure>
+
+<h2 id="visual-mode">Visual Mode</h2>
+<p>Visual mode is a mode in which you select text relative to your cursor&rsquo;s position. If you&rsquo;re still using your mouse, although it doesn&rsquo;t exist, dragging across a sentence, double-clicking, and dragging across lines is what Visual mode is. It&rsquo;s a swift way to select a lot of text and allows you to use your operators. Visual mode grants you flexibility in selecting the text.</p>
+<p>Visual mode comes in three flavors:</p>
+<ul>
+<li>v</li>
+<li>Ctrl-v</li>
+<li>V</li>
+</ul>
+<h3 id="v">v</h3>
+<p><code>v</code>, starts visual mode with just the character under your cursor selected, and with the motion keys (e.g. hjkl), you can choose more text.
+Navigating with your cursor in the <code>v</code> mode will select all text between your visual starting position and your cursor&rsquo;s position. So if your cursor goes up with <code>k</code> in the middle of a sentence, it will select all text on the line backwards up to the position of the cursor.</p>
+<p>As an example if you want to visually select all text from your cursor up to the end of the line, you can do <code>v$</code>, which enters visual mode at your cursor position. Say you&rsquo;d want to yank/copy the selected text, you could press <code>y' to do so, delete it with </code>d&rsquo; or change it.</p>
+<p>This can be handy if you want to copy all text except the line ending. Of course, you can also press <code>Y</code>/<code>D</code>/<code>C</code> to do the same, but this will also include the line ending. <code>v</code> is excellent to use if you need precision.
+<figure><img src="/images/nvim-continued/v.png"
+    alt="Select all text on line">
+</figure>
+</p>
+<h3 id="ctrl-v">Ctrl-v</h3>
+<p><code>Ctrl-v</code> or blockwise Visual mode is a bit odd in the sense that it starts at the cursor&rsquo;s current position, but moving the cursor will select only the character relative to the cursor&rsquo;s starting position. So if you go up/down a line, it doesn&rsquo;t select all text on the line between your starting position and your cursor&rsquo;s position, like <code>v</code> does.</p>
+<p>The way I remember this is it feels a lot like selecting a column in a spreadsheet, then you&rsquo;re also not interested in the rows before, just in the cells above or under your starting position. Ctrl-v is excellent when you need extreme precision or when you want to edit leading characters. Try it with <code>gg</code> (start of the file), <code>Ctrl-v</code>, <code>GG</code> (end of file), and <code>d</code> to delete the selected position.</p>
+<p>One handy trick I frequently use in other IDEs is the multi-line insert; you can also do this with <code>Ctrl-v</code>. Select the positions you&rsquo;d want to enter text in, press <code>Shift+i</code>, make your change on a single line, and press <code>Esc</code>.
+<figure><img src="/images/nvim-continued/block.png"
+    alt="Select all text on line">
+</figure>
+</p>
+<h3 id="v-1">V</h3>
+<p><code>V</code> starts visual mode on the line your cursor is positioned at and selects all the text on that line. When you go up or down, it includes all text on that line and all text and other selected lines. This is the mode I use the most, as it allows me to select whole lines quickly.
+<figure><img src="/images/nvim-continued/groteV.png"
+    alt="Select all text on line">
+</figure>
+</p>
+<h2 id="fin">Fin</h2>
+<p>I don&rsquo;t frequently use visual mode, but some people like it, so it can be handy to have it in your toolbelt and know how to use it. The help for visual mode is excellent and can be found at <code>:h visual-mode</code>. I hope this was helpful. Happy coding, everyone!</p>
+<p>PS:
+There are some excellent resources I found on the web, be sure to checkout:</p>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=TQn2hJeHQbM&amp;list=PLep05UYkc6wTyBe7kPjQFWVXTlhKeQejM&amp;index=1">Advent of Neovim by TJ de Vries - YouTube playlist</a></li>
+<li>These posts by m4xshen:
+<ul>
+<li><a href="https://m4xshen.dev/posts/vim-basic-commands">Essential Vim commands for efficient text editing</a></li>
+<li><a href="https://m4xshen.dev/posts/vim-command-workflow">Practical Vim command workflow</a></li>
+<li><a href="https://m4xshen.dev/posts/vim-commands-for-navigation-between-brackets">3 Vim commands for blazingly fast navigation between brackets</a></li>
+</ul>
+</li>
+<li>VSCode Learn Vim extension by vintharas:
+<ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=vintharas.learn-vim">VSCode extension</a></li>
+<li><a href="https://www.youtube.com/watch?v=llo7kgSjcBM">Learn Vim - the VSCode extension</a></li>
+<li><a href="https://www.youtube.com/watch?v=zQ6Ua-8pM9g">Boost Your Coding Fu With VSCode and Vim - YouTube video</a></li>
+<li><a href="https://www.barbarianmeetscoding.com/boost-your-coding-fu-with-vscode-and-vim/">Boost your coding Fu with VSCode and Vim - Website</a></li>
+<li><a href="https://www.barbarianmeetscoding.com/boost-your-coding-fu-with-vscode-and-vim/table-of-contents">Free book online</a></li>
+</ul>
+</li>
+</ul>
+]]></content:encoded>
+    </item>
     <item>
       <title>Basics of Vim/Neovim</title>
       <link>https://manbearpiet.github.io/posts/nvim/</link>

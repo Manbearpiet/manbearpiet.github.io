@@ -3,24 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://manbearpiet.github.io/</loc>
-    <lastmod>2025-09-12T10:00:00+02:00</lastmod>
+    <lastmod>2025-09-19T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/posts/</loc>
-    <lastmod>2025-09-12T10:00:00+02:00</lastmod>
+    <lastmod>2025-09-19T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/basics/</loc>
-    <lastmod>2025-09-12T10:00:00+02:00</lastmod>
+    <lastmod>2025-09-19T10:00:00+02:00</lastmod>
   </url><url>
-    <loc>https://manbearpiet.github.io/posts/nvim/</loc>
-    <lastmod>2025-09-12T10:00:00+02:00</lastmod>
+    <loc>https://manbearpiet.github.io/posts/nvim-continued/</loc>
+    <lastmod>2025-09-19T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/neovim/</loc>
-    <lastmod>2025-09-12T10:00:00+02:00</lastmod>
+    <lastmod>2025-09-19T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/</loc>
-    <lastmod>2025-09-12T10:00:00+02:00</lastmod>
+    <lastmod>2025-09-19T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/vim/</loc>
+    <lastmod>2025-09-19T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/posts/nvim/</loc>
     <lastmod>2025-09-12T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/azure-key-vault/</loc>
