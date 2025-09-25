@@ -7,8 +7,195 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
-    <lastBuildDate>Fri, 19 Sep 2025 10:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Thu, 25 Sep 2025 10:00:00 +0200</lastBuildDate>
     <atom:link href="https://manbearpiet.github.io/tags/vim/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Other Neovim editing basics</title>
+      <link>https://manbearpiet.github.io/posts/nvim-search/</link>
+      <pubDate>Thu, 25 Sep 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/posts/nvim-search/</guid>
+      <description>&lt;h1 id=&#34;searching-replacing-and-commenting-in-neovim&#34;&gt;Searching, replacing, and commenting in Neovim&lt;/h1&gt;&#xA;&lt;p&gt;In my previous posts, I covered the basics of navigating Neovim and editing text. While moving around words, lines, or paragraphs in &lt;code&gt;Normal &#39; mode and selecting text with &lt;/code&gt;Visual &amp;rsquo; mode, it works swiftly to navigate around text; sometimes, you need to look for something specific one or multiple times. In this post, I will cover another set of basic editing features: searching, replacing text, and commenting.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="searching-replacing-and-commenting-in-neovim">Searching, replacing, and commenting in Neovim</h1>
+<p>In my previous posts, I covered the basics of navigating Neovim and editing text. While moving around words, lines, or paragraphs in <code>Normal ' mode and selecting text with </code>Visual &rsquo; mode, it works swiftly to navigate around text; sometimes, you need to look for something specific one or multiple times. In this post, I will cover another set of basic editing features: searching, replacing text, and commenting.</p>
+<h2 id="searching">Searching</h2>
+<p>There are several ways to search for text in Neovim. The fastest way is to use <code>Normal</code>-mode commands. You can also use <code>Visual</code>-mode to search for the selected text. Finally, you can use <code>Command</code>-mode to perform more complex searches and replacements.</p>
+<p>Searching in Neovim sometimes highlights text matches in your buffer/opened file. You can disable this highlighting using the <code>:nohlsearch</code>-command, or use the shortcut <code>:noh</code>. If you think &ldquo;Oh, I can&rsquo;t remember this command&rdquo;, you can map it to a key combination of your choice. In a later post, I will cover how to create custom mappings.</p>
+<h3 id="searching-in-normal-mode">Searching in Normal mode</h3>
+<p>The easiest way to search for text depends on your starting context/where your cursor is. If your cursor is on the word you&rsquo;re looking for, you can use <code>*</code> to search forward for the next occurrence of that word, or <code>#</code> to search backward. To go to the next occurrence of the word, you can press <code>n</code>, and to go to the previous occurrence, you can press <code>N</code>.</p>
+<p>The status line will show the search term and the current match number out of the total number of matches.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Search-method</th>
+          <th>Key/Command</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Backwards search of word under cursor</td>
+          <td><code>*</code></td>
+      </tr>
+      <tr>
+          <td>Forward search of word under cursor</td>
+          <td><code>#</code></td>
+      </tr>
+  </tbody>
+</table>
+<figure><img src="/images/nvim-search/ster.png"
+    alt="Select all text on line">
+</figure>
+
+<p>However, if you&rsquo;re nowhere near the word you&rsquo;re looking for, you can also search for the term directly. You can use <code>/</code> to search forward by pressing <code>/</code> or <code>?</code> to search backward.</p>
+<p>After typing <code>/</code> or <code>?</code>, you can type the word or phrase you want to search for and press <code>Enter</code>. Neovim will then move the cursor to the next occurrence of that word or phrase.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Search-method</th>
+          <th>Key/Command</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Backwards search</td>
+          <td><code>?&lt;pattern&gt;&lt;CR&gt;</code></td>
+      </tr>
+      <tr>
+          <td>Forward search</td>
+          <td><code>/&lt;pattern&gt;&lt;CR&gt;</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><code>&lt;CR&gt;</code> means pressing the <code>Enter</code>-key. You can ignore casing using <code>\c</code> at the end of your search term, or enforce casing with <code>\C</code>. You can also disable case sensitivity for all searches by adding <code>:set ignorecase</code> to ignore it, and <code>:set noignorecase</code> to enable case-sensitivity again. If you want to override this setting and enforce case sensitivity when searching, you can add <code>set smartcase</code> to your configuration file. This will make searches case-sensitive if your search term contains uppercase letters.</p>
+<figure><img src="/images/nvim-search/slash.png"
+    alt="Select all text on line">
+</figure>
+
+<h3 id="regex-searching">Regex searching</h3>
+<p>The keen-eyed among you might have noticed that, when pressing <code>*</code> and <code>#</code>, the editor populates the search commands with the term under your cursor. So, if you&rsquo;re wondering how to search for this specific word manually, you can see that after pressing <code>*</code> and <code>#</code>, the search term is populated. You can then edit this term to your liking and press <code>Enter</code> to search for it.</p>
+<p>You can also use regular expressions in your search terms. For example, if you want to search for all text on a line that starts with &ldquo;foo&rdquo; and ends with &ldquo;bar&rdquo;, you can use the search term <code>/foo.*bar</code>. For more information on regular expressions, you can read <code>:h regular-expression</code> and <code>:h magic</code>.</p>
+<figure><img src="/images/nvim-search/regex.png"
+    alt="Select all text on line">
+</figure>
+
+<p>There are also options to search for an offset of characters/lines before/after your matched text. You can read more on pattern searching at <code>:h pattern-searches</code> or at the Vim <a href="https://neovim.io/doc/user/usr_03.html#_simple-searches">user manual</a> written by Bram Molenaar (the creator of Vim).</p>
+<h3 id="searching-with-visual-mode">Searching with Visual mode</h3>
+<p>Sometimes you want to search for a specific piece of text near your cursor, but it&rsquo;s not a single word. In this case, you can use <code>Visual</code>-mode to select the text you want to search for and then press <code>*</code> or <code>#</code> to search for the next or previous occurrence of that text.</p>
+<p>This works exactly the same as in <code>Normal</code>-mode, but now you can select the text you want to search for. This is especially useful if you wish to search for a specific set of characters or a phrase.</p>
+<figure><img src="/images/nvim-search/vis.png"
+    alt="Select all text on line">
+</figure>
+
+<h2 id="replacing">Replacing</h2>
+<p>All this searching is great, but sometimes you want to replace text. You can do this in <code>Command</code>-mode using the <code>:substitute</code>, or <code>:s</code> command. The <code>:s</code> command allows you to search for a specific term and replace it with another term. Providing no replacement term will delete the matched text.</p>
+<p>The substitute command is shown as follows in the help (<code>:h :s</code>):
+<code>:[range]s[ubstitute]/{pattern}/{string}/[flags] [count]</code></p>
+<p>The <code>range</code> specifies the lines you want to search and replace in. If you don&rsquo;t specify a range, it will only search and replace in the current line.</p>
+<p>You can specify a range using line numbers, for example, <code>:1,19s</code> will search and replace in lines 1 to 19. You can also use <code>%</code> to specify the entire file, for example, <code>:%s/&lt;pattern&gt;&lt;CR&gt;</code> will search and replace in the whole file. Command ranges are explained in more detail at <a href="https://neovim.io/doc/user/usr_10.html#10.3">user manual - 10.3 - Command Ranges</a>.</p>
+<p>The pattern is the text you want to search for, just like we did earlier with the <code>/</code> and <code>?</code> commands. The string is the text you want to replace the pattern with.</p>
+<p>The flags are optional and can be used to modify the behavior of the substitute command. The most common flags are:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Flag</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>i</code></td>
+          <td>Ignore casing when searching for the pattern.</td>
+      </tr>
+      <tr>
+          <td><code>I</code></td>
+          <td>Enforce casing when searching for the pattern.</td>
+      </tr>
+      <tr>
+          <td><code>g</code></td>
+          <td>Replace all occurrences of the pattern in the line. If you don&rsquo;t specify this flag, only the first occurrence will be replaced.</td>
+      </tr>
+      <tr>
+          <td><code>c</code></td>
+          <td>Confirm each replacement.</td>
+      </tr>
+  </tbody>
+</table>
+<p>You can find more info on flags for substitute at <code>:h :s_flags</code>.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Replace-example</th>
+          <th>Key/Command</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Replace matched pattern on current line</td>
+          <td><code>:s/&lt;pattern&gt;/&lt;replacing text&gt;&lt;CR&gt;</code></td>
+      </tr>
+      <tr>
+          <td>Replace first match searched across entire file</td>
+          <td><code>:%s/&lt;pattern&gt;/Iamthereplacingtext</code></td>
+      </tr>
+      <tr>
+          <td>Replace all matches across the entire file</td>
+          <td><code>:%s/&lt;pattern&gt;/Iamthereplacingtext/g</code></td>
+      </tr>
+      <tr>
+          <td>Case insensitivy search and remove all pattern matches across the entire file and ask for confirmation on each try</td>
+          <td><code>:%s/&lt;pattern&gt;//gci</code></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="example">Example</h3>
+<p>Example of replacing all occurrences of &lsquo;dns&rsquo; with nothing (deleting), across the entire file, ignoring case, and asking for confirmation on each replacement:</p>
+<p><figure><img src="/images/nvim-search/before.png"
+    alt="Select all text on line">
+</figure>
+
+<figure><img src="/images/nvim-search/replace.png"
+    alt="Select all text on line">
+</figure>
+
+<figure><img src="/images/nvim-search/confirm.png"
+    alt="Select all text on line">
+</figure>
+</p>
+<p>There are several options to repeat a search and flags you can use. This should be sufficient to get you started. You can read more about the substitute command at <code>:h :s</code> and <code>:h substitute</code>.</p>
+<h2 id="commenting">Commenting</h2>
+<p>Another common task when editing code is commenting and uncommenting code. There are several ways to do this in Neovim, accelerated by plugins, but there are also native methods available. You can read help on commenting at <code>:h commenting</code>.</p>
+<p>In <code>Normal</code>-mode you can use <code>gcc</code> to comment or uncomment the current line. You can also use <code>gc</code> in <code>Visual</code>-mode to comment or uncomment the selected lines.</p>
+<p><code>gcc</code> works by toggling the comment on the current line. If the line is already commented, it will uncomment it. If the line is not commented, it will comment it. This also supports multiple lines if you provide a count before the command; for example, <code>3gcc</code> will comment or uncomment the following three lines.</p>
+<p>Do note that commenting doesn&rsquo;t work if Neovim is unaware of the filetype you&rsquo;re editing. You can check the filetype with <code>:set filetype?</code>. If Neovim doesn&rsquo;t know the filetype, it won&rsquo;t know how to comment the code. There are options to set the file type, but I find it easier to start a file with <code>:e myfile.&lt;filetype&gt;</code>.</p>
+<figure><img src="/images/nvim-search/comment.png"
+    alt="Select all text on line">
+</figure>
+
+<table>
+  <thead>
+      <tr>
+          <th>Comment-method</th>
+          <th>Key/Command</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Comment/uncomment current line</td>
+          <td><code>gcc</code></td>
+      </tr>
+      <tr>
+          <td>Comment/uncomment next 3 lines</td>
+          <td><code>3gcc</code></td>
+      </tr>
+      <tr>
+          <td>Comment/uncomment selected lines</td>
+          <td>Visually select and press <code>gc</code> in Visual mode</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="the-end">The End</h2>
+<p>That&rsquo;s it for the basics of navigating, editing, searching, replacing, and commenting in Neovim. I hope you found this post helpful. In my next post, I will cover how to customize your experience using options and create custom mappings to further speed up your workflow. Happy coding, everyone!</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>Basics of Vim/Neovim continued</title>
       <link>https://manbearpiet.github.io/posts/nvim-continued/</link>
