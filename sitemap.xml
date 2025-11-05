@@ -3,10 +3,31 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://manbearpiet.github.io/</loc>
-    <lastmod>2025-09-25T10:00:00+02:00</lastmod>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/posts/</loc>
-    <lastmod>2025-09-25T10:00:00+02:00</lastmod>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/azure/</loc>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/azure/login/</loc>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/federated-credentials/</loc>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/github-actions/</loc>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/github-workflows/</loc>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/posts/githublogonazure/</loc>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manbearpiet.github.io/tags/</loc>
+    <lastmod>2025-11-05T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/basics/</loc>
     <lastmod>2025-09-25T10:00:00+02:00</lastmod>
@@ -15,9 +36,6 @@
     <lastmod>2025-09-25T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/posts/nvim-search/</loc>
-    <lastmod>2025-09-25T10:00:00+02:00</lastmod>
-  </url><url>
-    <loc>https://manbearpiet.github.io/tags/</loc>
     <lastmod>2025-09-25T10:00:00+02:00</lastmod>
   </url><url>
     <loc>https://manbearpiet.github.io/tags/vim/</loc>

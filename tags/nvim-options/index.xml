@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Nvim Options on Azure and DevOops</title>
+    <link>http://localhost:1313/tags/nvim-options/</link>
+    <description>Recent content in Nvim Options on Azure and DevOops</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <copyright>Christian Piet (CC BY 4.0)</copyright>
+    <lastBuildDate>Fri, 26 Sep 2025 10:00:00 +0200</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/nvim-options/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Neovim options and keybindings</title>
+      <link>http://localhost:1313/posts/nvim-options/</link>
+      <pubDate>Fri, 26 Sep 2025 10:00:00 +0200</pubDate>
+      <guid>http://localhost:1313/posts/nvim-options/</guid>
+      <description>&lt;h1 id=&#34;neovim-options-and-keybindings&#34;&gt;Neovim options and keybindings&lt;/h1&gt;&#xA;&lt;p&gt;While Neovim works lovely out of the box with its default settings, you might want to customize it to your liking. In this post, I&amp;rsquo;ll show you how to set options and keybindings in Neovim using Lua.&lt;/p&gt;&#xA;&lt;h2 id=&#34;lua&#34;&gt;Lua?&lt;/h2&gt;&#xA;&lt;p&gt;Lua is a lightweight, high-level programming language that is easy to learn and use. It is often used as a scripting language in applications and games. Neovim has built-in support for Lua, which allows you to configure and extend Neovim using Lua scripts.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<h1 id="neovim-options-and-keybindings">Neovim options and keybindings</h1>
+<p>While Neovim works lovely out of the box with its default settings, you might want to customize it to your liking. In this post, I&rsquo;ll show you how to set options and keybindings in Neovim using Lua.</p>
+<h2 id="lua">Lua?</h2>
+<p>Lua is a lightweight, high-level programming language that is easy to learn and use. It is often used as a scripting language in applications and games. Neovim has built-in support for Lua, which allows you to configure and extend Neovim using Lua scripts.</p>
+<p>In Tutor Lesson 7.3 &ldquo;Configuring NVIM&rdquo;, there are instructions on how to set up your <code>init.lua</code> file, which is the main configuration file for Neovim. You could also use <code>init.vim</code>, but since I&rsquo;ve tried just Lua, I&rsquo;ll stick to that.</p>
+<p><a href="https://neovim.io/doc/user/lua-guide.html">https://neovim.io/doc/user/lua-guide.html</a></p>
+<p><a href="https://neovim.io/doc/user/luaref.html">https://neovim.io/doc/user/luaref.html</a></p>
+<p><a href="https://learnxinyminutes.com/lua/">https://learnxinyminutes.com/lua/</a></p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>

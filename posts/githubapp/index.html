@@ -132,7 +132,8 @@ From there, we have a GitHub App ready to be installed on our repositories. Afte
 <blockquote>
 <p>To authenticate as itself, the app will use a JSON Web Token (JWT).
 Your app should authenticate as itself when it needs to generate an installation access token. An installation access token is required to authenticate as an app installation.
-Your app should also authenticate as itself when it needs to make API requests to manage resources related to the app.</p></blockquote>
+Your app should also authenticate as itself when it needs to make API requests to manage resources related to the app.</p>
+</blockquote>
 <p>First, we need to write some code to generate a JWT. With that JWT, we can authenticate to GitHub, request an installation token, and then make API requests. However, I had yet to learn what an installation token is.</p>
 <p>I had to look up the meaning of &lsquo;installation&rsquo; in this context; the installation is the registration of the app in a GitHub organization. The installation ID is the identifier of that installation. GitHub gives the following guidance to find the Installation ID:
 You can also use the REST API to find the installation ID for an installation of your app. For example, you can get an installation ID with the GET /users/{username}/installation, GET /repos/{owner}/{repo}/installation, GET /orgs/{org}/installation, or GET /app/installations endpoints.</p>

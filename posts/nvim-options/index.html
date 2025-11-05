@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="http://localhost:1313/images/favicon-32x32.png" />
+<title>Neovim options and keybindings | Azure and DevOops</title>
+<meta name="title" content="Neovim options and keybindings" />
+<meta name="description" content="Neovim options and keybindings
+While Neovim works lovely out of the box with its default settings, you might want to customize it to your liking. In this post, I&rsquo;ll show you how to set options and keybindings in Neovim using Lua.
+Lua?
+Lua is a lightweight, high-level programming language that is easy to learn and use. It is often used as a scripting language in applications and games. Neovim has built-in support for Lua, which allows you to configure and extend Neovim using Lua scripts." />
+<meta name="author" content="Christian Piet" />
+<meta name="keywords" content="Neovim,Keybindings,Lua,Nvim options," />
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="Neovim options and keybindings" />
+<meta property="og:description" content="Neovim options and keybindings
+While Neovim works lovely out of the box with its default settings, you might want to customize it to your liking. In this post, I&rsquo;ll show you how to set options and keybindings in Neovim using Lua.
+Lua?
+Lua is a lightweight, high-level programming language that is easy to learn and use. It is often used as a scripting language in applications and games. Neovim has built-in support for Lua, which allows you to configure and extend Neovim using Lua scripts." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/nvim-options/" />
+
+<meta property="og:image" content="http://localhost:1313/images/social_card_bg_hu_39dcc9700402a648.webp"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2025-09-26T10:00:00+02:00" />
+<meta property="article:modified_time" content="2025-09-26T10:00:00+02:00" /><meta property="og:site_name" content="Azure and DevOops" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://localhost:1313/images/social_card_bg_hu_39dcc9700402a648.webp"/>
+<meta name="twitter:title" content="Neovim options and keybindings"/>
+<meta name="twitter:description" content="Neovim options and keybindings
+While Neovim works lovely out of the box with its default settings, you might want to customize it to your liking. In this post, I&rsquo;ll show you how to set options and keybindings in Neovim using Lua.
+Lua?
+Lua is a lightweight, high-level programming language that is easy to learn and use. It is often used as a scripting language in applications and games. Neovim has built-in support for Lua, which allows you to configure and extend Neovim using Lua scripts."/>
+
+
+
+<meta itemprop="name" content="Neovim options and keybindings">
+<meta itemprop="description" content="Neovim options and keybindings
+While Neovim works lovely out of the box with its default settings, you might want to customize it to your liking. In this post, I&rsquo;ll show you how to set options and keybindings in Neovim using Lua.
+Lua?
+Lua is a lightweight, high-level programming language that is easy to learn and use. It is often used as a scripting language in applications and games. Neovim has built-in support for Lua, which allows you to configure and extend Neovim using Lua scripts."><meta itemprop="datePublished" content="2025-09-26T10:00:00+02:00" />
+<meta itemprop="dateModified" content="2025-09-26T10:00:00+02:00" />
+<meta itemprop="wordCount" content="128">
+
+<meta itemprop="image" content="http://localhost:1313/images/social_card_bg_hu_39dcc9700402a648.webp"/>
+
+
+<meta itemprop="keywords" content="Neovim,Keybindings,Lua,Nvim options," />
+
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  
+  <link href="/herman.min.css" rel="stylesheet">
+
+  
+
+  
+
+  
+</head>
+
+<body>
+  <header><a class="skip-link" href="#main-content">Skip to main content</a>
+
+<a href="/" class="title"><h1>Azure and DevOops</h1></a>
+<nav>
+  <a href="/">Home</a>
+
+  <a href="/posts/">Blog</a>
+
+<a href='http://localhost:1313/index.xml'>RSS</a>
+
+
+
+
+
+
+
+</nav>
+</header>
+  <main id="main-content">
+
+<h1>Neovim options and keybindings</h1>
+<p class="byline">
+  <time datetime='2025-09-26' pubdate>
+    2025-09-26
+  </time>
+  · Christian Piet
+</p>
+
+<content>
+  <h1 id="neovim-options-and-keybindings">Neovim options and keybindings</h1>
+<p>While Neovim works lovely out of the box with its default settings, you might want to customize it to your liking. In this post, I&rsquo;ll show you how to set options and keybindings in Neovim using Lua.</p>
+<h2 id="lua">Lua?</h2>
+<p>Lua is a lightweight, high-level programming language that is easy to learn and use. It is often used as a scripting language in applications and games. Neovim has built-in support for Lua, which allows you to configure and extend Neovim using Lua scripts.</p>
+<p>In Tutor Lesson 7.3 &ldquo;Configuring NVIM&rdquo;, there are instructions on how to set up your <code>init.lua</code> file, which is the main configuration file for Neovim. You could also use <code>init.vim</code>, but since I&rsquo;ve tried just Lua, I&rsquo;ll stick to that.</p>
+<p><a href="https://neovim.io/doc/user/lua-guide.html">https://neovim.io/doc/user/lua-guide.html</a></p>
+<p><a href="https://neovim.io/doc/user/luaref.html">https://neovim.io/doc/user/luaref.html</a></p>
+<p><a href="https://learnxinyminutes.com/lua/">https://learnxinyminutes.com/lua/</a></p>
+
+</content>
+<p>
+  
+    <a class="blog-tags" href="/tags/neovim/">#neovim</a>
+  
+    <a class="blog-tags" href="/tags/keybindings/">#keybindings</a>
+  
+    <a class="blog-tags" href="/tags/lua/">#lua</a>
+  
+    <a class="blog-tags" href="/tags/nvim-options/">#nvim options</a>
+  
+</p>
+
+
+
+
+  </main>
+  <footer><small>
+  Christian Piet (CC BY 4.0) | Made with <a href="https://github.com/clente/hugo-bearcub">Bear Cub</a>
+</small></footer>
+
+    
+</body>
+
+</html>

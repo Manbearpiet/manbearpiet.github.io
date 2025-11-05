@@ -36,7 +36,8 @@ Client Apps use access tokens to access data, that we (probably) own, on behalf 
 <p>I&rsquo;ve mentioned Access Tokens several times now without explaining what they actually are.
 Access tokens with regards to Entra ID are implementations of JWTs. Access tokens or bearer tokens are valid for around 1 hour. In the abstract of <a href="https://datatracker.ietf.org/doc/html/rfc7519">RFC 7519</a> there&rsquo;s an excellent introduction of JWTs:</p>
 <blockquote>
-<p>JSON Web Token (JWT) is a compact, URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is used as the payload of a JSON Web Signature (JWS) structure or as the plaintext of a JSON Web Encryption (JWE) structure, enabling the claims to be digitally signed or integrity protected with a Message Authentication Code (MAC) and/or encrypted.</p></blockquote>
+<p>JSON Web Token (JWT) is a compact, URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is used as the payload of a JSON Web Signature (JWS) structure or as the plaintext of a JSON Web Encryption (JWE) structure, enabling the claims to be digitally signed or integrity protected with a Message Authentication Code (MAC) and/or encrypted.</p>
+</blockquote>
 <p>In the abstract above it&rsquo;s mentioned that a JWT is an encoded JSON object, this means we can decode it if we know what it&rsquo;s decoded with.
 On Microsoft Learn, there is excellent guidance and examples of access tokens I found <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/access-tokens">here</a></p>
 
@@ -77,7 +78,8 @@ If we pasted our example access token in there, we can see colored highlighting 
 A header, a body and a signature.</p>
 <blockquote>
 <p>If you&rsquo;ve looked carefully you can see that the JSON objects are &lsquo;glued&rsquo; together with <code>.</code>-characters.
-For GitHub I had to make my own access tokens and I forgot to add the last dot, doh!</p></blockquote>
+For GitHub I had to make my own access tokens and I forgot to add the last dot, doh!</p>
+</blockquote>
 <h3 id="header">Header</h3>
 
 
@@ -93,7 +95,8 @@ The <a href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.9"><code>typ</co
 <h2 id="body">Body</h2>
 <p>After the header and a seperating dot-character, jwt.ms it it&rsquo;s decoded form shows a JSON-body. This body contains claims. In the RFC7519 claims are defined as:</p>
 <blockquote>
-<p>Claim: A piece of information asserted about a subject. A claim is represented as a name/value pair consisting of a Claim Name and a Claim Value.</p></blockquote>
+<p>Claim: A piece of information asserted about a subject. A claim is represented as a name/value pair consisting of a Claim Name and a Claim Value.</p>
+</blockquote>
 <p>These claims represent information on the token, for instance:</p>
 <ul>
 <li>What resource is the meant token meant for</li>
@@ -144,7 +147,8 @@ All of the other flows are flows that retrieve tokens in a on-behalf-of flow, be
 <h2 id="web-apps">Web apps</h2>
 <p>The second factor is where is the client/app running, if it&rsquo;s a webapp you&rsquo;d want the access token not to be exposed through your machine/browser, it should flow directly from the authorisation endpoint to the webserver. If your app is running on your machine you shouldn&rsquo;t use this flow.</p>
 <blockquote>
-<p>We assume the app is known in the authorisation server and the user is allowed to use the app.</p></blockquote>
+<p>We assume the app is known in the authorisation server and the user is allowed to use the app.</p>
+</blockquote>
 <p>Before this app can access data on-behalf-of you at the resource server, it can ask for your consent. After you did so it will receive an authorization code (from the authorisation server) and the app will use it&rsquo;s own credentials and the authorisation code to request an access token at the token server, to access your data. This flow is called Authorisation Code flow.</p>
 <p>If you keep it to just these steps for authorisation code, there will be two flaws you might have spotted.
 Since an access token has a default lifetime of an hour, you&rsquo;ll have to do this whole authorisation dance again, which isn&rsquo;t particularly user-friendly.</p>

@@ -7,8 +7,48 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
-    <lastBuildDate>Thu, 25 Sep 2025 10:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Wed, 05 Nov 2025 10:00:00 +0200</lastBuildDate>
     <atom:link href="https://manbearpiet.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Azure</title>
+      <link>https://manbearpiet.github.io/tags/azure/</link>
+      <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/tags/azure/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Azure/Login</title>
+      <link>https://manbearpiet.github.io/tags/azure/login/</link>
+      <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/tags/azure/login/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>Federated Credentials</title>
+      <link>https://manbearpiet.github.io/tags/federated-credentials/</link>
+      <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/tags/federated-credentials/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>GitHub Actions</title>
+      <link>https://manbearpiet.github.io/tags/github-actions/</link>
+      <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/tags/github-actions/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    <item>
+      <title>GitHub Workflows</title>
+      <link>https://manbearpiet.github.io/tags/github-workflows/</link>
+      <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/tags/github-workflows/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
     <item>
       <title>Basics</title>
       <link>https://manbearpiet.github.io/tags/basics/</link>

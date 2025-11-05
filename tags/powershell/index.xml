@@ -28,7 +28,8 @@
 
 
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Find-PSResource</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Name</span> <span class="n">Pester</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-ExpandProperty</span> <span class="n">Description</span></span></span></code></pre></div><blockquote>
-<p>Pester provides a framework for running BDD style Tests to execute and validate PowerShell commands inside of PowerShell and offers a powerful set of Mocking Functions that allow tests to mimic and mock the functionality of any command inside of a piece of PowerShell code being tested. Pester tests can execute any command or script that is accessible to a pester test file. This can include functions, Cmdlets, Modules, and scripts. Pester can be run in ad hoc style in a console, or it can be integrated into the Build scripts of a Continuous Integration system.</p></blockquote>
+<p>Pester provides a framework for running BDD style Tests to execute and validate PowerShell commands inside of PowerShell and offers a powerful set of Mocking Functions that allow tests to mimic and mock the functionality of any command inside of a piece of PowerShell code being tested. Pester tests can execute any command or script that is accessible to a pester test file. This can include functions, Cmdlets, Modules, and scripts. Pester can be run in ad hoc style in a console, or it can be integrated into the Build scripts of a Continuous Integration system.</p>
+</blockquote>
 <p>Pester is a PowerShell module and can be used via its own Domain Specific Language (DSL), so some notations are different or represent things other than those in &rsquo;normal&rsquo; PowerShell. You can use it to test almost anything on PowerShell and beyond PowerShell, but more on that later.</p>
 <h3 id="pester-versions">Pester versions</h3>
 <p>Pester is included in Windows installations of Windows PowerShell, but it contains an outdated version (major version 3/3.4.0). There are breaking changes from that version to the latest. So make sure you get the latest version, so you&rsquo;re not missing out on new cool features:</p>
@@ -256,7 +257,8 @@ The third assertion tests whether the output is exactly what we expect it to be 
 <blockquote>
 <p>Dot sourcing operator .</p>
 <p>Runs a script in the current scope so that any functions, aliases, and variables that the script creates are added to the current scope, overriding existing ones. Parameters declared by the script become variables. Parameters for which no value has been given become variables with no value. However, the automatic variable $args is preserved.
-. .\sample.ps1</p></blockquote>
+. .\sample.ps1</p>
+</blockquote>
 <p>Even better would to change the extension of the script file containing your functions to <strong>.psm1</strong> making it a full-fledged <a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/10-script-modules?view=powershell-7.4#script-modules">scriptmodule</a>. This way you can segregate functions into private and public/user-facing functions. Be sure to give the directory and the script the same name. This way, you can use Import-Module or #requires, as well as #using statements in your scripts.</p>
 <p>I prefer Import-Module over dot-sourcing since dot-sourcing exposes all of the functions. If you have separate script files for every function, you&rsquo;ll need to dot source every file containing the functions you want to test. You could choose to define all functions in the same psm1 file, but that&rsquo;ll also expose all private functions.</p>
 <h3 id="testing-private-functions-in-a-manifest-module">Testing private functions in a manifest module</h3>

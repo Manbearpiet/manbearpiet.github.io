@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>GitHub Actions on Azure and DevOops</title>
+    <link>https://manbearpiet.github.io/tags/github-actions/</link>
+    <description>Recent content in GitHub Actions on Azure and DevOops</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <copyright>Christian Piet (CC BY 4.0)</copyright>
+    <lastBuildDate>Wed, 05 Nov 2025 10:00:00 +0200</lastBuildDate>
+    <atom:link href="https://manbearpiet.github.io/tags/github-actions/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Speeding up GitHub Workflow Federated authentication to the Azure Platform</title>
+      <link>https://manbearpiet.github.io/posts/githublogonazure/</link>
+      <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
+      <guid>https://manbearpiet.github.io/posts/githublogonazure/</guid>
+      <description>&lt;p&gt;This week we were running into issues because our pipelines in GitHub Actions were taking too long to authenticate to the Azure platform using the &lt;code&gt;azure/login&lt;/code&gt; action with federated credentials. Initially it took around 25-30 seconds to authenticate, but over time this increased to over 3-4 minutes, which is not acceptable in our CI/CD pipelines.&lt;/p&gt;&#xA;&lt;p&gt;So I decided to investigate the issue and found a workaround that significantly speeds up the authentication process.&#xA;In this blog post, I&amp;rsquo;ll share how I managed to reduce the authentication time from several minutes to just a few seconds.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>This week we were running into issues because our pipelines in GitHub Actions were taking too long to authenticate to the Azure platform using the <code>azure/login</code> action with federated credentials. Initially it took around 25-30 seconds to authenticate, but over time this increased to over 3-4 minutes, which is not acceptable in our CI/CD pipelines.</p>
+<p>So I decided to investigate the issue and found a workaround that significantly speeds up the authentication process.
+In this blog post, I&rsquo;ll share how I managed to reduce the authentication time from several minutes to just a few seconds.</p>
+<h2 id="why">Why</h2>
+<p>We have several GitHub Actions workflows that deploy resources to Azure. To authenticate securely, we use the <code>azure/login</code> action with federated credentials, which allows us to avoid storing long-lived secrets in GitHub. However, we noticed that the authentication process was taking an unacceptable long time, which was delaying our deployments. In some cases we do matrix jobs which logon to several customers, these minutes really add up in total runtime of the pipeline.</p>
+<h2 id="investigation">Investigation</h2>
+<p>I started by looking into familair options for me, I knew Emanual Palm created a <a href="https://github.com/PalmEmanuel/AzAuth">PowerShell module to logon without azure/login</a>. This worked great, but unfortunately in some customers approval for external modules/actions take time or are plainly not allowed (outside of Microsoft).</p>
+<p>So I wondered if there any native methods to logon to Azure using federated credentials without the overhead of the <code>azure/login</code> action.
+I found in Azure PowerShell it&rsquo;s <code>Connect-AzAccount</code> <a href="https://learn.microsoft.com/en-gb/powershell/module/az.accounts/connect-azaccount?view=azps-14.6.0#-federatedtoken">supports an argument <code>-FederatedToken</code></a>, which allows you to pass a JWT token of a federated identity provider, in our case GitHub Actions. This is exactly what <code>azure/login</code> function does for us under the hood, but it seems to have less overhead.</p>
+<h2 id="solution">Solution</h2>
+<p>An example of how the <code>Connect-AzAccount</code> with these details looks like:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-pwsh" data-lang="pwsh"><span class="line"><span class="ln">1</span><span class="cl"><span class="nv">$arguments</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="n">Tenant</span> <span class="p">=</span> <span class="nv">$env:AZURE_TENANT_ID</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="n">SubscriptionId</span> <span class="p">=</span> <span class="nv">$env:AZURE_SUBSCRIPTION_ID</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="n">FederatedToken</span> <span class="p">=</span> <span class="nv">$env:AZURE_FEDERATED_TOKEN</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="n">ApplicationId</span> <span class="p">=</span> <span class="nv">$env:AZURE_CLIENT_ID</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="nb">Connect-AzAccount</span> <span class="nv">@arguments</span></span></span></code></pre></div><h3 id="azure-powershell">Azure PowerShell</h3>
+<p>I borrowed the following workflow example from Emanuel his blog post, definitely check his excellent post out for more details and explanation how this actually works at: <a href="https://pipe.how/get-oidctoken">Azure Workload Identity Federation</a>.</p>
+<p>If I integrate this into a demo GitHub Actions workflow, it looks like this:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Test Workload Identity authentication</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="l">workflow_dispatch</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="nt">jobs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w"> </span><span class="l">My-Azure-Environment</span><span class="w"> </span><span class="c"># Make sure you set safeguards to your environments like branch requirements</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nt">permissions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">      </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Get token</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">        </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l">pwsh</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w"> </span><span class="c"># These can stay the same as in azure/login</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">          </span><span class="nt">TENANT_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ vars.TENANT_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">          </span><span class="nt">CLIENT_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.APP_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">          </span><span class="nt">SUBSCRIPTION_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.SUB_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="sd">          # As blogged by Emanuel Palm: https://pipe.how/get-oidctoken, slightly modified
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="sd">          $Url = $env:ACTIONS_ID_TOKEN_REQUEST_URL
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="sd">          $Params = @{
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="sd">            Uri = &#34;$Url&amp;audience=api://AzureADTokenExchange&#34;
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="sd">            Authentication = &#39;Bearer&#39;
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="sd">            Token = $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN | ConvertTo-SecureString -AsPlainText -Force
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="sd">          }
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="sd">          # Get the OIDC token from GitHub Actions and use it to authenticate to Azure
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="sd">          $arguments = @{
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="sd">            Tenant = $env:TENANT_ID
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="sd">            SubscriptionId = $env:SUBSCRIPTION_ID
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="sd">            ApplicationId = $env:CLIENT_ID
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="sd">            FederatedToken = (Invoke-RestMethod @Params).value
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="sd">          }
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="sd">          # Unfortunately Az.Accounts is not installed by default on GitHub runners, so we need to install it first
+</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="sd">          # We could cache the module or use ModuleFast from Justin Grote, but for simplicity in this example, this also works
+</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="sd">          Install-Module -Name Az.Accounts -Force -Scope CurrentUser | Import-Module
+</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="sd">
+</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="sd">          Connect-AzAccount @arguments</span></span></span></code></pre></div><h3 id="azure-cli">Azure CLI</h3>
+<p>Ofcourse I haven&rsquo;t forgotten the Azure CLI lovers out there. You can achieve the same with the Azure CLI using the <code>az login</code> command with the <code>--federated-token</code> argument:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Test Workload Identity authentication</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="l">workflow_dispatch</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w"></span><span class="nt">jobs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w"> </span><span class="l">My-Azure-Environment</span><span class="w"> </span><span class="c"># Make sure you set safeguards to your environments like branch requirements</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nt">permissions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">      </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Get token</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">        </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l">pwsh</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">          </span><span class="nt">TENANT_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ vars.TENANT_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">          </span><span class="nt">CLIENT_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.APP_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">          </span><span class="nt">SUBSCRIPTION_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.SUB_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="sd">          $Url = $env:ACTIONS_ID_TOKEN_REQUEST_URL
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="sd">          $Params = @{
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="sd">            Uri = &#34;$Url&amp;audience=api://AzureADTokenExchange&#34;
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="sd">            Authentication = &#39;Bearer&#39;
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="sd">            Token = $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN | ConvertTo-SecureString -AsPlainText -Force
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="sd">          }
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="sd">          $OidcToken = (Invoke-RestMethod @Params).value
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="sd">          az login --federated-token $OidcToken --service-principal --username $env:CLIENT_ID --tenant $env:TENANT_ID</span></span></span></code></pre></div><h3 id="improved-azure-powershell">Improved Azure PowerShell</h3>
+<p>In our real-world scenario, we also added caching of the Az.Accounts module to speed up the logon process.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w"> </span><span class="l">My-Azure-Environment</span><span class="w"> </span><span class="c"># Make sure you set safeguards to your environments like branch requirements</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="nt">permissions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">      </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w"> </span><span class="c"># This is required for requesting the ID token of the pipeline</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">      </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l">read</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">      </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/checkout@v5</span><span class="w">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Install and cache PowerShell modules</span><span class="w">
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">potatoqualitee/psmodulecache@v6.2.1</span><span class="w">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">          </span><span class="nt">modules-to-cache</span><span class="p">:</span><span class="w"> </span><span class="l">Az.Accounts</span><span class="w">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Get token</span><span class="w">
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">        </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l">pwsh</span><span class="w">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">          </span><span class="nt">TENANT_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ vars.TENANT_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">          </span><span class="nt">CLIENT_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.APP_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">          </span><span class="nt">SUBSCRIPTION_ID</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.SUB_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="sd">          $Url = $env:ACTIONS_ID_TOKEN_REQUEST_URL
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="sd">          $Params = @{
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="sd">            Uri = &#34;$Url&amp;audience=api://AzureADTokenExchange&#34;
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="sd">            Authentication = &#39;Bearer&#39;
+</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="sd">            Token = $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN | ConvertTo-SecureString -AsPlainText -Force
+</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="sd">          }
+</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="sd">
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="sd">          $arguments = @{
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="sd">            Tenant = $env:TENANT_ID
+</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="sd">            SubscriptionId = $env:SUBSCRIPTION_ID
+</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="sd">            ApplicationId = $env:CLIENT_ID
+</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="sd">            FederatedToken = (Invoke-RestMethod @Params).value
+</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="sd">          }
+</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="sd">          Connect-AzAccount @arguments</span></span></span></code></pre></div><h2 id="results">Results</h2>
+<p>I combined the test in a single pipeline for both logons, and the results were impressive:</p>
+
+
+
+
+
+<pre tabindex="0"><code>gh run view 1234567
+
+✓ main Test Workload Identity authentication WeAreInSpark/OurFantasticRepository#172 · 1234567
+Triggered via workflow_dispatch about 2 minutes ago
+
+JOBS
+✓ test in 13s (ID 123456)
+✓ test2 in 11s (ID 123456)</code></pre><p>As you can see, the Azure PowerShell logon took only 13 seconds, and the Azure CLI logon took just 11 seconds. This is a significant improvement compared to the previous several minutes it took using the <code>azure/login</code> action. I hope this helps others facing similar issues with federated authentication in GitHub Actions. Happy coding!</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>
