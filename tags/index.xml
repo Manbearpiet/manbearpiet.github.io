@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Azure and DevOops</title>
     <link>https://manbearpiet.github.io/tags/</link>
     <description>Recent content in Tags on Azure and DevOops</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
     <lastBuildDate>Wed, 05 Nov 2025 10:00:00 +0200</lastBuildDate>
@@ -15,7 +15,6 @@
       <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/azure/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Azure/Login</title>
@@ -23,7 +22,6 @@
       <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/azure/login/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Federated Credentials</title>
@@ -31,7 +29,6 @@
       <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/federated-credentials/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>GitHub Actions</title>
@@ -39,7 +36,6 @@
       <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/github-actions/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>GitHub Workflows</title>
@@ -47,7 +43,6 @@
       <pubDate>Wed, 05 Nov 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/github-workflows/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Basics</title>
@@ -55,7 +50,6 @@
       <pubDate>Thu, 25 Sep 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/basics/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Neovim</title>
@@ -63,7 +57,6 @@
       <pubDate>Thu, 25 Sep 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/neovim/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Vim</title>
@@ -71,7 +64,6 @@
       <pubDate>Thu, 25 Sep 2025 10:00:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/vim/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Azure Key Vault</title>
@@ -79,7 +71,6 @@
       <pubDate>Mon, 07 Jul 2025 12:30:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/azure-key-vault/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>GitHub</title>
@@ -87,7 +78,6 @@
       <pubDate>Mon, 07 Jul 2025 12:30:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/github/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>GitHub Apps</title>
@@ -95,7 +85,6 @@
       <pubDate>Mon, 07 Jul 2025 12:30:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/github-apps/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Tokens</title>
@@ -103,7 +92,6 @@
       <pubDate>Mon, 07 Jul 2025 12:30:00 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/tokens/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Pester</title>
@@ -111,7 +99,6 @@
       <pubDate>Tue, 21 Jan 2025 10:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/pester/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>PowerShell</title>
@@ -119,7 +106,6 @@
       <pubDate>Tue, 21 Jan 2025 10:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/powershell/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Testing Framework</title>
@@ -127,7 +113,6 @@
       <pubDate>Tue, 21 Jan 2025 10:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/testing-framework/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Unit Testing</title>
@@ -135,7 +120,6 @@
       <pubDate>Tue, 21 Jan 2025 10:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/unit-testing/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>$PSCmdlet.ThrowTerminatingError()</title>
@@ -143,7 +127,6 @@
       <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/pscmdlet.throwterminatingerror/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Error</title>
@@ -151,7 +134,6 @@
       <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/error/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Exception</title>
@@ -159,7 +141,6 @@
       <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/exception/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Non-Terminating Error</title>
@@ -167,7 +148,6 @@
       <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/non-terminating-error/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Terminating Error</title>
@@ -175,7 +155,6 @@
       <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/terminating-error/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Throw</title>
@@ -183,7 +162,6 @@
       <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/throw/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Try/Catch</title>
@@ -191,7 +169,6 @@
       <pubDate>Wed, 20 Nov 2024 20:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/try/catch/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>ArgumentCompleters</title>
@@ -199,7 +176,6 @@
       <pubDate>Wed, 20 Nov 2024 13:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/argumentcompleters/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Azure PowerShell</title>
@@ -207,7 +183,6 @@
       <pubDate>Wed, 20 Nov 2024 13:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/azure-powershell/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Parameters</title>
@@ -215,7 +190,6 @@
       <pubDate>Wed, 20 Nov 2024 13:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/parameters/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Necromancing</title>
@@ -223,7 +197,6 @@
       <pubDate>Wed, 04 Oct 2023 12:47:03 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/necromancing/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Restarting Blog</title>
@@ -231,7 +204,6 @@
       <pubDate>Wed, 04 Oct 2023 12:47:03 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/restarting-blog/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Assigning Azure Policies</title>
@@ -239,7 +211,6 @@
       <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/assigning-azure-policies/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Azure Guest Configuration</title>
@@ -247,7 +218,6 @@
       <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/azure-guest-configuration/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Azure Policy</title>
@@ -255,7 +225,6 @@
       <pubDate>Wed, 25 Aug 2021 08:07:31 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/azure-policy/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Azure Front Door</title>
@@ -263,7 +232,6 @@
       <pubDate>Wed, 04 Aug 2021 19:31:39 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/azure-front-door/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>Basic Tour</title>
@@ -271,7 +239,6 @@
       <pubDate>Wed, 04 Aug 2021 19:31:39 +0200</pubDate>
       <guid>https://manbearpiet.github.io/tags/basic-tour/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>DSC</title>
@@ -279,7 +246,6 @@
       <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/dsc/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
     <item>
       <title>GPO</title>
@@ -287,7 +253,6 @@
       <pubDate>Tue, 02 Feb 2021 08:07:31 +0100</pubDate>
       <guid>https://manbearpiet.github.io/tags/gpo/</guid>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
     </item>
   </channel>
 </rss>
