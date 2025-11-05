@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Access Tokens on Azure and DevOops</title>
     <link>http://localhost:1313/tags/access-tokens/</link>
     <description>Recent content in Access Tokens on Azure and DevOops</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
     <lastBuildDate>Wed, 14 Feb 2024 19:41:37 +0100</lastBuildDate>
@@ -15,80 +15,6 @@
       <pubDate>Wed, 14 Feb 2024 19:41:37 +0100</pubDate>
       <guid>http://localhost:1313/posts/tokens/</guid>
       <description>&lt;h1 id=&#34;tokens&#34;&gt;Tokens&lt;/h1&gt;&#xA;&lt;p&gt;If you&amp;rsquo;ve automated against products like Entra ID, Azure ARM or Azure DevOps you&amp;rsquo;ve might run into tokens like access tokens or OAuth.&lt;/p&gt;&#xA;&lt;p&gt;Several of my former colleagues were already using them to access stuff like our ITSM or Azure and I had no idea what they were and how to use them.&#xA;In this blog I hope to give you the insights I was looking for with what they are, how they are generated, how you can use them.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<h1 id="tokens">Tokens</h1>
-<p>If you&rsquo;ve automated against products like Entra ID, Azure ARM or Azure DevOps you&rsquo;ve might run into tokens like access tokens or OAuth.</p>
-<p>Several of my former colleagues were already using them to access stuff like our ITSM or Azure and I had no idea what they were and how to use them.
-In this blog I hope to give you the insights I was looking for with what they are, how they are generated, how you can use them.</p>
-<p>My main focus is on the Entra ID platform, but most concepts apply on other Identity providers too.</p>
-<h2 id="oldschool-situation">Oldschool situation</h2>
-<p>A puzzle when you&rsquo;re developing software is that you need to know for sure who is using your software, to be able to give the user the best experience. You might want to give them tailored views and access to the user or admin functionality.</p>
-<p>In oldschool IT we used to have a big fortress behind a firewall that had identity services in Active Directory (AD), from the point of view of an application server you can see all the users and the AD groups they&rsquo;re member of.
-The Domain Controller servers would verify that users can prove that they are who they claim to be (Authentication) and host the groups and their membershipss, facilitating Authorization (access delegation, what you are (not) allowed to access).
-If a piece of software supported role-based access control (RBAC), you&rsquo;d create an AD group for the role and add users to the group. The appserver could access the Active Directory and in that way check if someone should have access and what role they should have.</p>
-<p>In some cases you&rsquo;d need continous network access to application servers hosted on a remote location, in the same domain, and you or your network administrator was kind of enough to facilitate a site-to-site VPN. Thus creating a line-of-sight from your domain controllers (hosting your users and groups) and the app-servers.</p>
-<p>However you can&rsquo;t always make VPN&rsquo;s to each supplier, and last 20 years more and more software is hosted on public internet. This is a movement from the older setup in which each server could verify who you claim to be and what you can access. But you don&rsquo;t want a seperate logon-account for each piece of software, maintaining seperate passwords, duplicate group setups et cetera. There is software which extends the trust-boundary from your on-premises Active Directory to suppliers called Federated Services, but I find management complicated which doesn&rsquo;t make it more secure.</p>
-<h2 id="oauth">OAuth</h2>
-<p>The struggle of knowing who someone is and what they should be able to access isn&rsquo;t only a problem in our on-premises world, but also in consumer situations. We used to have a username and password for each seperate service and they&rsquo;d store the details. This would become a tiresome dance of resetting password and password reuse until the service got hacked and you&rsquo;d have to think of a new password.
-To solve this accounts everywhere situation OAuth was developed. It centralizes identity (you just have 1 account/login) and that handles Authentication and Authorization.</p>
-<p>This open standard allows users to have a single useraccount (identity) and for themselves to decide when they want to share what data with which external service (you can logon with your Google/Facebook account to a lot of websites). Third party websites/services can state what data they need from you to operate and as a consumer you can allow or decline this access. You wouldn&rsquo;t want to share your google account logon details to use an external service, just the data it needs to operate. A taxi app should have access to my name, mailaddress, maybe my profile picture but not access to all my mail or contacts.</p>
-<p>For the origin story there is an <a href="https://en.wikipedia.org/wiki/OAuth#History">excellent Wikipedia article about it</a>.</p>
-<p>The architecture of the OAuth standard describes:</p>
-<ul>
-<li>A protected resource (data hosted somewhere and offered via an API)</li>
-<li>a resource owner (someone/something who owns the data),</li>
-<li>a client (an app that consumes the data)</li>
-<li>an authorisation server (that grants access to the data)</li>
-</ul>
-<h3 id="to-do-app">To do app</h3>
-<h1 id="voeg-stukje-toe-over-delegaten-van-toegang">VOEG STUKJE TOE OVER DELEGATEN VAN TOEGANG</h1>
-<p>An example I like to make to visualize this is, I frequently use a third party (non-google) to-do app which can schedule events in my Google Calendar. This app (client) doesn&rsquo;t own my calendar data (protected resource), but I do like to use it to schedule events in my calendar.</p>
-<p>When I first logged into the to-do app, I pushed a big &ldquo;Logon with Google&rdquo;-button, which redirected me to a logon screen from Google, after a successful logon Google showed an enumeration which data of me the app required to operate. After I confirmed at Google the app was allowed to access the data, I was redirected back to the app and could start using it.</p>
-<p>To access my protected calendar data at server from Google, the app requests an access tokens for my data at the authorisation server of Google. Google double checks if I added it to my used apps (so it knows it exists and it can request metadata about me) and if it&rsquo;s allowed to the requested calendar data. If so it returns an access token to the client.</p>
-<p>With this access token, the to-do app can go to the API-server hosting my calendar data and asks what calendar events I have scheduled, show me these events or even submit new events to my calendar. Awesome!, without sharing my password it can do just what I ask it to, yus!</p>
-<h2 id="access-tokens">Access tokens</h2>
-<h1 id="check-voor-self-contained-tokens">Check voor self-contained tokens: <a href="https://www.oauth.com/oauth2-servers/access-tokens/self-encoded-access-tokens/">https://www.oauth.com/oauth2-servers/access-tokens/self-encoded-access-tokens/</a></h1>
-<p>Access tokens play a central role in the OAuth standard, they contain information about which client app requested access, to who&rsquo;ms data and what data it can access or change and service as an access pass at the protected resource. The protected resource just serves the data, after verifying that the token is meant for them and the clientapp is allowed to access the data.</p>
-<p>Access tokens are also called JWT&rsquo;s (JSON Web Tokens) and are described in <a href="https://www.rfc-editor.org/rfc/rfc7519">RFC7519</a>. Access tokens in OAuth are Base64 URL encoded JSON-objects. The Base 64 URL encoding allows for embedding of tokens in a URL, without breaking URL&rsquo;s because of amibigous characters. JSON is an object structure which is easy to work with.</p>
-<p><a href="https://datatracker.ietf.org/doc/html/rfc5849">OAuth version 1</a> worked great within browsers, but it had some issues in native and mobile apps. The author of the spec Eran Hammer wrote an <a href="http://hueniverse.com/2010/05/15/introducing-oauth-2-0/">awesome blog</a> introducing OAuth 2, the version commonly used now. I&rsquo;ll briefly summarize it but, it&rsquo;s a nice read. There also is a nice <a href="https://www.oauth.com/oauth2-servers/differences-between-oauth-1-2/">article</a> from OAuth about it, with more in-depth readable examples.</p>
-<p>OAuth 1 required that the protected resource had access to the client credentials to validate the request. Which meant that the to-do app has to share it&rsquo;s credentials with the google calendar API server, ha the irony. Also it had a single flow, which didn&rsquo;t support a lot of scenario&rsquo;s. The tokens were valid for a long periods of time. And the  authorisation server wasn&rsquo;t explicitly split from the protected resource server.</p>
-<p>The OAuth version 2 introduced a lot of improvements:</p>
-<ul>
-<li>New auth flows (new types of clients are supported)</li>
-<li>Bearer token support (the token itself became a secret that could be used to authenticate)</li>
-<li>Simpler token signatures</li>
-<li>Implementation of the refresh token concept (short living access tokens and long lived authorisations)</li>
-<li>Seperation of authorization server and protected resource server</li>
-</ul>
-<p>This centralization of identity is awesome, but the start of this blog focused around IT-management of users,not consumers their own accounts and their data.
-In our IT-environments we don&rsquo;t manage just a single account, but all of the accounts of all the users. It helps that you just have to manage a single of a useridentity, however you&rsquo;d want to manage access to your users their data on scale not setup access on a per user basis. All of these accounts have data stored in services (mail data, calendar data etc.), to scale this efficiently this all needs to be managed centrally.</p>
-<h2 id="enterprise-implementations">Enterprise implementations</h2>
-<p>OAuth 2 is a big change in how we grant access to data. As a company you&rsquo;re (hopefully) protective of your data and of your users. All your users interact with data via client-apps, some mails or appointments you really don&rsquo;t want to expose to competitors or the public.</p>
-<p>If we go back to the fundaments of the standard, it means we have a lot of protected resources with data we need to make sure we need to protect. We&rsquo;d also want have grip on which client-apps interact with which data of users, are these secure. And lastly which users have access to which clientapps.</p>
-<p>The same fundamental principles still apply on enterprise identities too.
-Enter the modern cloud identity IAM&rsquo;s like Microsoft Entra ID, in which we manage users, client-apps and delegate clients to access API&rsquo;s providing raw data access. The users are using a single identity which they sign-on (single sign-on), and they can .</p>
-<p>When a user wants to login with their account to a portal/client app to use the app with their data, the app has to have access their data. Initially new clientapps are not known at the identity server (my apps) yet and are untrusted. Or maybe the app has no permission to access data of this user. What&rsquo;ll happen?</p>
-<p>In the case that the app isn&rsquo;t known yet the user will be forwared to their identity provider and faced with a table similar to that of consumers stating, this clientapp wants to access this data, is this ok?</p>
-<p>As an admin you&rsquo;re sometimes crying on what people (users and admins alike) click &ldquo;Yes&rdquo;, &ldquo;Okay&rdquo;, &ldquo;Confirm&rdquo; on, in these cases you&rsquo;d want to be extra careful, because you could grant a malicous &lsquo;free AI mega-cool&rsquo; app access to all emails of the user. To make sure that these situations not happen, there are luckily settings to disallow users to add applications to the authorisation server. But check your cloud identity provider if you&rsquo;re allowing users to add new client apps. And make sure to talk with your it-staff with admin access that they understand what they click yes on.</p>
-<p>You don&rsquo;t want to confront users each week with the question, hey can this app still access your data? To prevent that the longer-living refresh token was introduced in OAuth 2, with which a short lived access token can be requested. This creates a situation in which the short living access token is used to retrieve the data and is refreshed when expired. But you also don&rsquo;t want your new users to have to click their first day through all of the &lsquo;can this app access this data on your behalf?&rsquo; messages. So as an admin there&rsquo;s usually an option to acknowledge that the app can be used (at the authorisation server) and this app can access the users data from the protected resource on their behalf.</p>
-<h2 id="daemon-apps">Daemon apps</h2>
-<p>My previous examples are all reasoned from a point of view of which you&rsquo;d delegate a client app to access protected data on the users behalf (on behalf of, OBO). But in some cases you might want to grant access to an &lsquo;daemon&rsquo; app that should act on it&rsquo;s own on all email data or without a user in between it telling it what to do. In oldschool IT, we&rsquo;d have a service account to do these actions. It&rsquo;s an entity that acts on its own and not on behalf of.</p>
-<p>In the OAuth 2 standard there&rsquo;s are seperate roles for the resource owner (user), the client (app), the authorisation server and the protected resource (API).
-In a daemon app scenario these steps aren&rsquo;t the same as in a OBO-user flow. The client and the resource owner are the same entity, it has it&rsquo;s own login and requests the data for itself to consume, therefore daemon apps will request an access token at the authorisation server for the resource directly.</p>
-<h2 id="open-id-connect">Open ID Connect</h2>
-<p>While OAuth 2 could do Authentication and Authorisation, for authentication a different open standard is used by many cloud identity providers called <a href="https://openid.net/">Open ID Connect (OIDC)</a>. They have <a href="https://openid.net/developers/how-connect-works/">excellent documentation</a> on the functionality of the standard.</p>
-<p>Open ID Connect is an authentication protocol based on the OAuth 2 standard. It creates a more simple solution to the question &ldquo;What is the identity of the person currently using the browser or mobile app that is connected?&rdquo;</p>
-<p>A paraphrased version of the steps documented on the documentation:</p>
-<ol>
-<li>A user navigates to a website or app (client)</li>
-<li>The user clicks sign-in and types in username/password</li>
-<li>The client app sends a request to Open ID Provider</li>
-<li>The provider authenticates the user, and fetches their authorisations</li>
-<li>The provider then responds back with an identity (ID) token and usually an access token</li>
-<li>The</li>
-</ol>
-<h2 id="end">End</h2>
-<p>I could</p>
-]]></content:encoded>
     </item>
     <item>
       <title>Access Tokens, access tokens everywhere</title>
@@ -96,149 +22,6 @@ In a daemon app scenario these steps aren&rsquo;t the same as in a OBO-user flow
       <pubDate>Wed, 04 Oct 2023 17:52:10 +0200</pubDate>
       <guid>http://localhost:1313/posts/access-tokens/</guid>
       <description>&lt;p&gt;Identities in a cloud world, we all have to deal with them whether we love or hate them.&#xA;If you&amp;rsquo;ve created automated actions to interact with Azure or MSGraph you&amp;rsquo;ll probably have requested an access token, or maybe you&amp;rsquo;ve used the Azure Portal or an e-mail-client like Outlook. Each of these rely on concepts called OIDC and OAuth, used for authentication and authorisation respectively. In this blog I&amp;rsquo;ll explain what a access token is and how they are used in a Microsoft Entra ID context.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<p>Identities in a cloud world, we all have to deal with them whether we love or hate them.
-If you&rsquo;ve created automated actions to interact with Azure or MSGraph you&rsquo;ll probably have requested an access token, or maybe you&rsquo;ve used the Azure Portal or an e-mail-client like Outlook. Each of these rely on concepts called OIDC and OAuth, used for authentication and authorisation respectively. In this blog I&rsquo;ll explain what a access token is and how they are used in a Microsoft Entra ID context.</p>
-<h2 id="relevance">Relevance</h2>
-<p>Nowadays as a user I don&rsquo;t have to login seperately in my Outlook, SharePoint, Teams etc. on my workstation each time my temporary access to the application is expired. Also I&rsquo;m used to the fact that my Teams app can view my calendar info and show me files from my OneDrive or the company SharePoint. By implementing technologies like single-sign-on and federation, we&rsquo;re able to click on-and-on within and cross-application, without realizing what cool technology makes this possible.</p>
-<p>All of this data is served via Web-APIs via HTTPS on resource servers (a server hosting Exchange data, a SharePoint server etc.), some of these API&rsquo;s are public, but for the ones that are not, access tokens are a means to prove authentication to these Web-APIs. With public in this case I mean unauthenticated, not public or private networking.</p>
-<p>The authentication protocol OpenID-Connect (how we prove who we are) and authorisation protocol OAuth (access info without giving your password) were created to safely operate in a public routable world, because we can&rsquo;t rely on everything to always be behind the &lsquo;safe&rsquo; private network with the big firewall in front of it and our precious Active Directory to prove who who we are. Nor can we federate all the things using ADFS.</p>
-<p>So by integrating applications with OAuth we can access applications safely with the use of access tokens, without having to pass your password to each app.</p>
-<h2 id="access-tokens">Access Tokens</h2>
-<p>Access tokens in the Microsoft Identity Platform are JSON Web Tokens (JWT).</p>
-<p>Each time you use client apps, that integrate with Entra ID using OAuth, to access data (on behalf of you), made available via Web APIs, access tokens are exchanged to access these Web APIs securely.
-Client Apps use access tokens to access data, that we (probably) own, on behalf of us, via API&rsquo;s on a resource server.</p>
-<p>One way I like to put the below picture in practice is by thinking of the resource-owner (the user) as myself. I&rsquo;ve provided evidence (password or passwordless) to the identity platform (Entra-ID) to proof who I claim to be, by logging into <code>https://login.microsoftonline.com</code>.</p>
-<p>The client-app on the left I&rsquo;m using to view my calendar, can be Outlook or Teams (both can access calendar data). The resource server as as an Microsoft Exchange Online server serving my calendar data in response to authenticated requests (using Access tokens).</p>
-<figure><img src="/images/access-tokens/oauth2.png"
-    alt="Microsoft Identity Platform">
-</figure>
-
-<h2 id="access-tokens-1">Access Tokens</h2>
-<p>I&rsquo;ve mentioned Access Tokens several times now without explaining what they actually are.
-Access tokens with regards to Entra ID are implementations of JWTs. Access tokens or bearer tokens are valid for around 1 hour. In the abstract of <a href="https://datatracker.ietf.org/doc/html/rfc7519">RFC 7519</a> there&rsquo;s an excellent introduction of JWTs:</p>
-<blockquote>
-<p>JSON Web Token (JWT) is a compact, URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is used as the payload of a JSON Web Signature (JWS) structure or as the plaintext of a JSON Web Encryption (JWE) structure, enabling the claims to be digitally signed or integrity protected with a Message Authentication Code (MAC) and/or encrypted.</p>
-</blockquote>
-<p>In the abstract above it&rsquo;s mentioned that a JWT is an encoded JSON object, this means we can decode it if we know what it&rsquo;s decoded with.
-On Microsoft Learn, there is excellent guidance and examples of access tokens I found <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/access-tokens">here</a></p>
-
-
-
-
-
-<pre tabindex="0"><code>eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Imk2bEdrM0ZaenhSY1ViMkMzbkVRN3N5SEpsWSJ9.eyJhdWQiOiI2ZTc0MTcyYi1iZTU2LTQ4NDMtOWZmNC1lNjZhMzliYjEyZTMiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3L3YyLjAiLCJpYXQiOjE1MzcyMzEwNDgsIm5iZiI6MTUzNzIzMTA0OCwiZXhwIjoxNTM3MjM0OTQ4LCJhaW8iOiJBWFFBaS84SUFBQUF0QWFaTG8zQ2hNaWY2S09udHRSQjdlQnE0L0RjY1F6amNKR3hQWXkvQzNqRGFOR3hYZDZ3TklJVkdSZ2hOUm53SjFsT2NBbk5aY2p2a295ckZ4Q3R0djMzMTQwUmlvT0ZKNGJDQ0dWdW9DYWcxdU9UVDIyMjIyZ0h3TFBZUS91Zjc5UVgrMEtJaWpkcm1wNjlSY3R6bVE9PSIsImF6cCI6IjZlNzQxNzJiLWJlNTYtNDg0My05ZmY0LWU2NmEzOWJiMTJlMyIsImF6cGFjciI6IjAiLCJuYW1lIjoiQWJlIExpbmNvbG4iLCJvaWQiOiI2OTAyMjJiZS1mZjFhLTRkNTYtYWJkMS03ZTRmN2QzOGU0NzQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhYmVsaUBtaWNyb3NvZnQuY29tIiwicmgiOiJJIiwic2NwIjoiYWNjZXNzX2FzX3VzZXIiLCJzdWIiOiJIS1pwZmFIeVdhZGVPb3VZbGl0anJJLUtmZlRtMjIyWDVyclYzeERxZktRIiwidGlkIjoiNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3IiwidXRpIjoiZnFpQnFYTFBqMGVRYTgyUy1JWUZBQSIsInZlciI6IjIuMCJ9.pj4N-w_3Us9DrBLfpCt</code></pre><p>Microsoft has a JavaScript based website which can decode an access token locally <a href="https://jwt.ms/">jwt.ms</a>.
-If we pasted our example access token in there, we can see colored highlighting on 3 different sections and a decoded version with corresponding higlighting.</p>
-
-
-
-
-
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;typ&#34;</span><span class="p">:</span> <span class="s2">&#34;JWT&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;alg&#34;</span><span class="p">:</span> <span class="s2">&#34;RS256&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;kid&#34;</span><span class="p">:</span> <span class="s2">&#34;i6lGk3FZzxRcUb2C3nEQ7syHJlY&#34;</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="p">}</span><span class="err">.</span><span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;aud&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;iss&#34;</span><span class="p">:</span> <span class="s2">&#34;https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nt">&#34;iat&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="nt">&#34;nbf&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nt">&#34;exp&#34;</span><span class="p">:</span> <span class="mi">1537234948</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="nt">&#34;aio&#34;</span><span class="p">:</span> <span class="s2">&#34;AXQAi/8IAAAAtAaZLo3ChMif6KOnttRB7eBq4/DccQzjcJGxPYy/C3jDaNGxXd6wNIIVGRghNRnwJ1lOcAnNZcjvkoyrFxCttv33140RioOFJ4bCCGVuoCag1uOTT22222gHwLPYQ/uf79QX+0KIijdrmp69RctzmQ==&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nt">&#34;azp&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="nt">&#34;azpacr&#34;</span><span class="p">:</span> <span class="s2">&#34;0&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Abe Lincoln&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nt">&#34;oid&#34;</span><span class="p">:</span> <span class="s2">&#34;690222be-ff1a-4d56-abd1-7e4f7d38e474&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nt">&#34;preferred_username&#34;</span><span class="p">:</span> <span class="s2">&#34;abeli@microsoft.com&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">  <span class="nt">&#34;rh&#34;</span><span class="p">:</span> <span class="s2">&#34;I&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">  <span class="nt">&#34;scp&#34;</span><span class="p">:</span> <span class="s2">&#34;access_as_user&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="nt">&#34;sub&#34;</span><span class="p">:</span> <span class="s2">&#34;HKZpfaHyWadeOouYlitjrI-KffTm222X5rrV3xDqfKQ&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="nt">&#34;tid&#34;</span><span class="p">:</span> <span class="s2">&#34;72f988bf-86f1-41af-91ab-2d7cd011db47&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="nt">&#34;uti&#34;</span><span class="p">:</span> <span class="s2">&#34;fqiBqXLPj0eQa82S-IYFAA&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">  <span class="nt">&#34;ver&#34;</span><span class="p">:</span> <span class="s2">&#34;2.0&#34;</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span><span class="err">.</span><span class="p">[</span><span class="err">Signature</span><span class="p">]</span></span></span></code></pre></div><p>If you look closely it&rsquo;s not a single object, but three seperate objects.
-A header, a body and a signature.</p>
-<blockquote>
-<p>If you&rsquo;ve looked carefully you can see that the JSON objects are &lsquo;glued&rsquo; together with <code>.</code>-characters.
-For GitHub I had to make my own access tokens and I forgot to add the last dot, doh!</p>
-</blockquote>
-<h3 id="header">Header</h3>
-
-
-
-
-
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">  <span class="nt">&#34;typ&#34;</span><span class="p">:</span> <span class="s2">&#34;JWT&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nt">&#34;alg&#34;</span><span class="p">:</span> <span class="s2">&#34;RS256&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="nt">&#34;kid&#34;</span><span class="p">:</span> <span class="s2">&#34;i6lGk3FZzxRcUb2C3nEQ7syHJlY&#34;</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">}</span><span class="err">.</span></span></span></code></pre></div><p>The first JSON object in this decoded token is the (JOSE) Header of the JWT.
-The <a href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.9"><code>typ</code></a>-key defines it is a JWT and <a href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.1"><code>alg</code></a> that in this case the JWT is MAC&rsquo;d with the HMC SHA-256 algorithm. Message Authentication Code (MAC) support is integrated be able to validate authenticity of a JWT using a signature. Lastly the <a href="https://www.rfc-editor.org/rfc/rfc7515#section-4.1.4"><code>kid</code></a> identifies the key with which the MAC operation.</p>
-<h2 id="body">Body</h2>
-<p>After the header and a seperating dot-character, jwt.ms it it&rsquo;s decoded form shows a JSON-body. This body contains claims. In the RFC7519 claims are defined as:</p>
-<blockquote>
-<p>Claim: A piece of information asserted about a subject. A claim is represented as a name/value pair consisting of a Claim Name and a Claim Value.</p>
-</blockquote>
-<p>These claims represent information on the token, for instance:</p>
-<ul>
-<li>What resource is the meant token meant for</li>
-<li>Who issued the token</li>
-<li>How long is it valid for</li>
-</ul>
-
-
-
-
-
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">  <span class="nt">&#34;aud&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">  <span class="nt">&#34;iss&#34;</span><span class="p">:</span> <span class="s2">&#34;https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">  <span class="nt">&#34;iat&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nt">&#34;nbf&#34;</span><span class="p">:</span> <span class="mi">1537231048</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nt">&#34;exp&#34;</span><span class="p">:</span> <span class="mi">1537234948</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nt">&#34;aio&#34;</span><span class="p">:</span> <span class="s2">&#34;AXQAi/8IAAAAtAaZLo3ChMif6KOnttRB7eBq4/DccQzjcJGxPYy/C3jDaNGxXd6wNIIVGRghNRnwJ1lOcAnNZcjvkoyrFxCttv33140RioOFJ4bCCGVuoCag1uOTT22222gHwLPYQ/uf79QX+0KIijdrmp69RctzmQ==&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nt">&#34;azp&#34;</span><span class="p">:</span> <span class="s2">&#34;6e74172b-be56-4843-9ff4-e66a39bb12e3&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="nt">&#34;azpacr&#34;</span><span class="p">:</span> <span class="s2">&#34;0&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Abe Lincoln&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="nt">&#34;oid&#34;</span><span class="p">:</span> <span class="s2">&#34;690222be-ff1a-4d56-abd1-7e4f7d38e474&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nt">&#34;preferred_username&#34;</span><span class="p">:</span> <span class="s2">&#34;abeli@microsoft.com&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="nt">&#34;rh&#34;</span><span class="p">:</span> <span class="s2">&#34;I&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nt">&#34;scp&#34;</span><span class="p">:</span> <span class="s2">&#34;access_as_user&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nt">&#34;sub&#34;</span><span class="p">:</span> <span class="s2">&#34;HKZpfaHyWadeOouYlitjrI-KffTm222X5rrV3xDqfKQ&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nt">&#34;tid&#34;</span><span class="p">:</span> <span class="s2">&#34;72f988bf-86f1-41af-91ab-2d7cd011db47&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">  <span class="nt">&#34;uti&#34;</span><span class="p">:</span> <span class="s2">&#34;fqiBqXLPj0eQa82S-IYFAA&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">  <span class="nt">&#34;ver&#34;</span><span class="p">:</span> <span class="s2">&#34;2.0&#34;</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}</span><span class="err">.</span></span></span></code></pre></div><p>In the RFC there&rsquo;s a section that references claims names for JWT&rsquo;s can be divided up into 3 classes:</p>
-<ul>
-<li>Registered Claim Names, IANA registered interoperable claims;</li>
-<li>Public Claim Names, a collision resistant public name;</li>
-<li>Private Claim Names, neither IANA Registered claim nor collision resistant;</li>
-</ul>
-<p>So not every JWT for every service will look the same, luckily we have services like <a href="https://jwt.io/">jwt.io</a> and <a href="https://jwt.ms/">jwt.ms</a> to decode it.</p>
-<p>Do notice that the registered claims <code>iat</code>, <code>nbf</code> and <code>exp</code> their values are in a specific numerical format we don&rsquo;t see often in a Windows world.
-This is called Epoch time or Unix time,which you can read more about in <a href="https://en.wikipedia.org/wiki/Unix_time">wikipedia</a>
-In this case it&rsquo;s seconds since the Epoch to which you can convert to with PowerShell using <code>Get-Date -UFormat %s</code>.</p>
-<h1 id="token-issuance">Token Issuance</h1>
-<p>There are multiple flows how token issuance/flows/grants occur, this has to do with several factors.
-But the end goal of all of them is getting a token to access the resource.</p>
-<h2 id="daemon-appspipelines">Daemon apps/pipelines</h2>
-<p>Firstly who &lsquo;owns&rsquo; the resource, or can grant access to the resource.</p>
-<p>If you build a daemon app that fetches data that it owns, the resource owner is the same as the client (the client will have the credentials). This will use a flow called client credentials to retrieve a token (in an authentication request it&rsquo;ll use app-id/secret).</p>
-<p>Differently phrased if an app acts on behalf of the resource owner, it is not the same party as the resource owner. These are not the apps you interact with as a regular user, they just do it&rsquo;s own thing. If you build scheduled scripts, this will probably be the authentication flow you&rsquo;ll probably use. Simply said the client will request a token for itself to the authorisation server.
-All of the other flows are flows that retrieve tokens in a on-behalf-of flow, because the client doesn&rsquo;t own the resource.</p>
-<h2 id="web-apps">Web apps</h2>
-<p>The second factor is where is the client/app running, if it&rsquo;s a webapp you&rsquo;d want the access token not to be exposed through your machine/browser, it should flow directly from the authorisation endpoint to the webserver. If your app is running on your machine you shouldn&rsquo;t use this flow.</p>
-<blockquote>
-<p>We assume the app is known in the authorisation server and the user is allowed to use the app.</p>
-</blockquote>
-<p>Before this app can access data on-behalf-of you at the resource server, it can ask for your consent. After you did so it will receive an authorization code (from the authorisation server) and the app will use it&rsquo;s own credentials and the authorisation code to request an access token at the token server, to access your data. This flow is called Authorisation Code flow.</p>
-<p>If you keep it to just these steps for authorisation code, there will be two flaws you might have spotted.
-Since an access token has a default lifetime of an hour, you&rsquo;ll have to do this whole authorisation dance again, which isn&rsquo;t particularly user-friendly.</p>
-<p>To temporarily fix this there&rsquo;s another token (yay), called a refresh token. A refresh token is a token with a longer lifetime, which during it&rsquo;s lifetime can be used to directly request an access token to the token server (without bothering user with another allow this app to view my &ldquo;X&rdquo; and &ldquo;Y&rdquo;).</p>
-<p>Once the refresh token expires the app can request another access token and will get both an access token and a new refresh token. And it&rsquo;ll continue to show you your precious data/e-mails/calendar appointments.</p>
-<h2 id="ropc">ROPC</h2>
-<p>Some apps just don&rsquo;t support redirects, but do have to get data on-behalf-of the customer. Apps can use the Resource Owner Password Credentials flow to request tokens (and potentially refresh tokens), to access data on your behalf.</p>
-<p>This is similar to the client-credentials flow, but different in the case that the client (app) isn&rsquo;t the same party as the resource-owner (you). Differently phrased these apps need your username/password to get a token (and potentially a refresh token), to access your data. But since you&rsquo;ve already sent your username + password, you must be asolutely sure this app processed the credentials properly. When I read this it sounded like oldschool accounts everywhere (20 years ago) and hope that the app doesn&rsquo;t get hacked and your credentials get exposed.</p>
-]]></content:encoded>
     </item>
   </channel>
 </rss>
