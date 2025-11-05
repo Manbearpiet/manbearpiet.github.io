@@ -23,7 +23,7 @@ In this blog post, I&rsquo;ll share how I managed to reduce the authentication t
 <h2 id="investigation">Investigation</h2>
 <p>I started by looking into familair options for me, I knew Emanual Palm created a <a href="https://github.com/PalmEmanuel/AzAuth">PowerShell module to logon without azure/login</a>. This worked great, but unfortunately in some customers approval for external modules/actions take time or are plainly not allowed (outside of Microsoft).</p>
 <p>So I wondered if there any native methods to logon to Azure using federated credentials without the overhead of the <code>azure/login</code> action.
-I found in Azure PowerShell it&rsquo;s <code>Connect-AzAccount</code> <a href="https://learn.microsoft.com/en-gb/powershell/module/az.accounts/connect-azaccount?view=azps-14.6.0#-federatedtoken">supports an argument <code>-FederatedToken</code></a>, which allows you to pass a JWT token of a federated identity provider, in our case GitHub Actions. This is exactly what <code>azure/login</code> function does for us under the hood, but it seems to have less overhead.</p>
+I found in Azure PowerShell its <code>Connect-AzAccount</code> <a href="https://learn.microsoft.com/en-gb/powershell/module/az.accounts/connect-azaccount?view=azps-14.6.0#-federatedtoken">supports an argument <code>-FederatedToken</code></a>, which allows you to pass a JWT token of a federated identity provider, in our case GitHub Actions. This is exactly what <code>azure/login</code> function does for us under the hood, but it seems to have less overhead.</p>
 <h2 id="solution">Solution</h2>
 <p>An example of how the <code>Connect-AzAccount</code> with these details looks like:</p>
 
