@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Testing Framework on Azure and DevOops</title>
     <link>https://manbearpiet.github.io/tags/testing-framework/</link>
     <description>Recent content in Testing Framework on Azure and DevOops</description>
-    <generator>Hugo</generator>
+    <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Christian Piet (CC BY 4.0)</copyright>
     <lastBuildDate>Tue, 21 Jan 2025 10:00:00 +0100</lastBuildDate>
@@ -15,6 +15,771 @@
       <pubDate>Tue, 21 Jan 2025 10:00:00 +0100</pubDate>
       <guid>https://manbearpiet.github.io/posts/pester/</guid>
       <description>&lt;p&gt;Most developers reach a point where they can fluently write code in their language of choice. As features are added and the codebase expands, a critical question arises: do these changes break existing functionality? Do they work as expected? Testing frameworks like PowerShell&amp;rsquo;s Pester are designed to address these concerns.&lt;/p&gt;&#xA;&lt;p&gt;In this blog, I will give you an overview of what Pester is, how you can write your own tests, how you need to structure them, and what value it can bring to your development.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Most developers reach a point where they can fluently write code in their language of choice. As features are added and the codebase expands, a critical question arises: do these changes break existing functionality? Do they work as expected? Testing frameworks like PowerShell&rsquo;s Pester are designed to address these concerns.</p>
+<p>In this blog, I will give you an overview of what Pester is, how you can write your own tests, how you need to structure them, and what value it can bring to your development.</p>
+<h2 id="why">Why</h2>
+<p>You might think, what are we actually doing? Why are we testing? If you think of it in a very high abstraction, when we write code, we solve problems by creating logic that handles information, events, or inputs in a way that results in an end result/output that we want. So there&rsquo;s input, and at the end, we expect a certain result or output. By using a test framework like Pester, we can validate that with a given input, executing our code results in the desired output.</p>
+<p>And since I mostly write PowerShell, it&rsquo;s convenient to choose a testing module/framework written in the same language. The most used Testing framework for PowerShell is the Pester-module.</p>
+<h2 id="pester">Pester</h2>
+<p>I found this awesome description on the module description in the PowerShell Gallery.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Find-PSResource</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Name</span> <span class="n">Pester</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-ExpandProperty</span> <span class="n">Description</span></span></span></code></pre></div><blockquote>
+<p>Pester provides a framework for running BDD style Tests to execute and validate PowerShell commands inside of PowerShell and offers a powerful set of Mocking Functions that allow tests to mimic and mock the functionality of any command inside of a piece of PowerShell code being tested. Pester tests can execute any command or script that is accessible to a pester test file. This can include functions, Cmdlets, Modules, and scripts. Pester can be run in ad hoc style in a console, or it can be integrated into the Build scripts of a Continuous Integration system.</p>
+</blockquote>
+<p>Pester is a PowerShell module and can be used via its own Domain Specific Language (DSL), so some notations are different or represent things other than those in &rsquo;normal&rsquo; PowerShell. You can use it to test almost anything on PowerShell and beyond PowerShell, but more on that later.</p>
+<h3 id="pester-versions">Pester versions</h3>
+<p>Pester is included in Windows installations of Windows PowerShell, but it contains an outdated version (major version 3/3.4.0). There are breaking changes from that version to the latest. So make sure you get the latest version, so you&rsquo;re not missing out on new cool features:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Find-PSResource</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Name</span> <span class="n">Pester</span> <span class="p">|</span> <span class="nb">Install-PSResource</span></span></span></code></pre></div><p>The current version while writing this blog is <strong>5.7.1</strong>, but do know that Pester 6 is <a href="https://github.com/pester/Pester/releases/tag/6.0.0-alpha5">in the making</a>, so new breaking changes are coming up. It will drop support for older versions of PowerShell, so make sure you start with the latest stable version of PowerShell and Pester, to prevent unnecessary rework.</p>
+<h2 id="structure">Structure</h2>
+<p>To start, we&rsquo;ll have to start with understanding the DSL and the idea of testing our code.</p>
+<p>Pester tests are written in files with the <strong>.tests.ps1</strong>-extension. So a Pester test file example is &ldquo;function.tests.ps1&rdquo;. If you want to follow along, make sure you have <strong>.tests</strong> in front of the <strong>.ps1</strong>-extension.</p>
+<p>Consider the follow Pester file:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm"> example.tests.ps1
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">    Mind the keywords and how they&#39;re used, like BeforeAll, Describe, Context, and It.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="nb">Get-ToBeTestedOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">            <span class="nv">$Text</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="p">[</span><span class="no">Switch</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nv">$OutputSwitch</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$OutputSwitch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">            <span class="nv">$Text</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="n">Context</span> <span class="s1">&#39;Output validation&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="n">It</span> <span class="s1">&#39;Given no OutputSwitch-parameter, it outputs nothing&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">            <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>This file contains some setup in the <code>BeforeAll</code> scriptBlock, <code>BeforeAll</code> runs once before all the tests. That <code>BeforeAll</code> contains a function that is available in the actual tests.</p>
+<p>The file also has a <code>Describe</code> keyword, which is a mechanism to logically group tests. Do mind the curly braces that enclose all our tests. <code>Context</code> is a similar grouping construct that is nested within <code>Describe.</code> These are not required, but they have excellent use cases when you want to scope test runs or loops.</p>
+<p>Inside the <code>Context</code>-block is a single test, which is represented by <code>It.</code> The&rsquo; It `Block has a title, which is a description of what testcase it tests for. Again, mind the curly braces.</p>
+<p>Contained inside the <code>It</code>-block, we see a single-line script block that executes some code and is piped to an assertion, which you can recognize by the <code>Should</code>-keyword. If I use my dictionary: &ldquo;an assertion is a confident and forceful statement of fact or belief&rdquo;. So inside this It-block, we execute code, and we want to test for the assumption that our function with those arguments results in a NullOrEmpty output.</p>
+<p>There are other concepts within the language, like <code>Mocks,</code> which deserve their own post; I&rsquo;ll probably create a post about this concept in the near future.</p>
+<h2 id="running-tests">Running tests</h2>
+<p>When we want to execute this Pester file in VSCode, we can do so via the IDE itself, via the &ldquo;Run Tests&rdquo;:
+<figure><img src="/images/pester/vscode.png"
+    alt="Debug Test and Run Test buttons in VSCode">
+</figure>
+</p>
+<p>Or we can do so via the terminal:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nb">Invoke-Pester</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">1</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">10ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="p">[+]</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span> <span class="n">76ms</span> <span class="p">(</span><span class="n">19ms</span><span class="p">|</span><span class="n">48ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">77ms</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">1</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><h3 id="output-verbosity">Output verbosity</h3>
+<p>The output shows that the Pester did test discovery; more on that later. After Discovery, Pester ran the tests in the file, and after completion, the results were shown. The output is summarized in the results of the whole file. Personally, I like a bit more verbose output to get a better grasp on what&rsquo;s going on. In VSCode, we can click &ldquo;Debug Tests,&rdquo; and in the terminal, we can use the Output-parameter of Invoke-Pester and select the Detailed preference. More options on verbosity can be found on the module&rsquo;s documentation website <a href="https://pester.dev/docs/usage/output">pester.dev - Output Page</a>.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">file</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">1</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">11ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span> <span class="n">from</span> <span class="s1">&#39;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/example.tests.ps1&#39;</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="n">Describing</span> <span class="nb">Get-ToBeTestedOutput</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl"> <span class="p">[+]</span> <span class="n">Given</span> <span class="n">no</span> <span class="nb">OutputSwitch-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">nothing</span> <span class="n">3ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">2ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">89ms</span>
+</span></span><span class="line"><span class="ln">9</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">1</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>In this output style, we can see per test if it succeeded; yay, we can test stuff!</p>
+<h2 id="assertions">Assertions</h2>
+<p>PowerShell code can be written in several ways to reach the desired end result. To verify we actually achieved that end result, we write the <code>It</code>-blocks with an assertion. There are several assertions available to verify results with. I mostly use the following:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Assertion</th>
+          <th>Comment</th>
+          <th>Equivalent</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>Should -Be</code></td>
+          <td>Case-insensitively checks for equality of objects (and everything is an object, yay!). You can also check arrays with this assertion. <!-- raw HTML omitted -->Reading the docs, I also found out <code>-Be</code> is sensitive to array order, so be careful about that.</td>
+          <td>-eq</td>
+      </tr>
+      <tr>
+          <td><code>Should -BeIn</code></td>
+          <td>Checks if an item is present in the array.</td>
+          <td>-in</td>
+      </tr>
+      <tr>
+          <td><code>Should -BeLike</code></td>
+          <td>Wildcard match a string output</td>
+          <td>-like</td>
+      </tr>
+      <tr>
+          <td><code>Should -Match</code></td>
+          <td>Match a string output using regular expressions</td>
+          <td>-match</td>
+      </tr>
+      <tr>
+          <td><code>Should -Throw</code></td>
+          <td>Verify if an exception was thrown. Nice throwback to my <a href="https://manbearpiet.com/posts/powershellerrors/">&ldquo;How to work with errors in PowerShell&rdquo; -blogpost</a>, right?</td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<p>You can find the documentation on all available assertions at <a href="https://pester.dev/docs/assertions/">pester.dev - Assertion Reference</a>.</p>
+<h3 id="considerations-when-writing-tests">Considerations when writing tests</h3>
+<p>When we looked at the function code we wanted to test, we asserted that it doesn&rsquo;t output if the switch isn&rsquo;t provided. However, we didn&rsquo;t test if it outputs anything when we do provide it, and especially, does it output what we want?</p>
+<p>Let&rsquo;s add those in the mix:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm"> example.tests.ps1
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">    Mind the assertions and negations used to test the function.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="nb">Get-ToBeTestedOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">            <span class="nv">$Text</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="p">[</span><span class="no">Switch</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nv">$OutputSwitch</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$OutputSwitch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">            <span class="nv">$Text</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given no OutputSwitch-parameter, it outputs nothing&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given OutputSwitch-parameter, it outputs the text&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Given Text-parameter, it outputs the correct text&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s2">&#34;I am output, look at me&#34;</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>If you look closely, I changed the assertion on the second test to contain &lsquo;a result by adding a negation <code>-Not</code> to invert the logic on the assertion, and it tests for any output if OutputSwitch-switch is provided.
+The third assertion tests whether the output is exactly what we expect it to be using the <code>-Be</code> assertion. If you&rsquo;ve created similar tests before, you might&rsquo;ve spotted that the second test can be considered redundant since the third test tests the same. If it has the result we want, it implicitly as a result, and thus is not $null or empty. Let&rsquo;s run the test to validate our assertions:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Describing</span> <span class="nb">Get-ToBeTestedOutput</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> <span class="p">[+]</span> <span class="n">Given</span> <span class="n">no</span> <span class="nb">OutputSwitch-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">nothing</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"> <span class="p">[+]</span> <span class="n">Given</span> <span class="nb">OutputSwitch-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">the</span> <span class="n">text</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"> <span class="p">[+]</span> <span class="n">Given</span> <span class="nb">Text-parameter</span><span class="p">,</span> <span class="n">it</span> <span class="n">outputs</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">text</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">30ms</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">3</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>You might think yay, less code; let&rsquo;s shove that all in a single It-block, less code, more time for us.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm">    Mind the test structure inside the It-block.
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="nb">Get-ToBeTestedOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">        <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">            <span class="nv">$Text</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">            <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">            <span class="p">[</span><span class="no">Switch</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="nv">$OutputSwitch</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$OutputSwitch</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">            <span class="nv">$Text</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Outputs what we want, nothing if we don&#39;&#39;t want it to and something if we need it to&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="nb">Get-ToBeTestedOutput</span> <span class="n">-Text</span> <span class="s2">&#34;I am output, look at me&#34;</span> <span class="n">-OutputSwitch</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s2">&#34;I am output, look at me&#34;</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>If we run this:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Describing</span> <span class="nb">Get-ToBeTestedOutput</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"> <span class="p">[+]</span> <span class="n">Outputs</span> <span class="n">what</span> <span class="n">we</span> <span class="n">want</span><span class="p">,</span> <span class="n">nothing</span> <span class="k">if</span> <span class="n">we</span> <span class="n">don</span><span class="err">&#39;</span><span class="n">t</span> <span class="n">want</span> <span class="n">it</span> <span class="n">to</span> <span class="n">and</span> <span class="n">something</span> <span class="k">if</span> <span class="n">we</span> <span class="n">need</span> <span class="n">it</span> <span class="n">to</span> <span class="n">18ms</span> <span class="p">(</span><span class="n">16ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">148ms</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">1</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>Pester code written this way can get hard to read in the output (if you/colleagues even take the time to make a decent description); it is not very friendly to read as test code and is annoying to maintain. <strong>A good practice is to stick to a single assertion per <code>It</code>-block.</strong> This keeps it easy to read, both in the output and the IDE. If you need another test, you can just add another one at the bottom; you don&rsquo;t have to think about what happened to the state in the earlier tests.</p>
+<h2 id="functions">Functions</h2>
+<p>To prevent us from repeating ourselves in code, PowerShell has the concept of functions. Functions are named script blocks and can be reused throughout the code. Functions can also contain parameters, which can tweak the function&rsquo;s behavior based on information provided via parameters. Functions are nice mechanisms that provide functionality to our users flexibly.</p>
+<p>To access the functions of our scripts, we&rsquo;d have to execute the whole script. This means we&rsquo;d also apply the operations inside the script instead of asserting our code does what we want it to do.</p>
+<p>Imagine you write a script to wipe a machine. You wouldn&rsquo;t want to execute the whole script just to test it! Instead, you&rsquo;d want to know if it calls the right endpoints/external functions with the right information and handles input as expected.</p>
+<p>If we want to test functions in scripts, we need to separate them from the script logic. We can do this by placing the functions in an external PowerShell script file. By doing so, you can use <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_operators?view=powershell-7.4#dot-sourcing-operator-"><code>dot-sourcing</code></a>, to make the functions available in your own scripts.</p>
+<h3 id="dot-sourcing-vs-import-module">Dot-sourcing vs. Import-Module</h3>
+<p>If you&rsquo;re unfamiliar with dotsourcing, the Microsoft learn page <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_operators?view=powershell-7.4#dot-sourcing-operator-">about_Operators</a> has a nice explanation on it:</p>
+<blockquote>
+<p>Dot sourcing operator .</p>
+<p>Runs a script in the current scope so that any functions, aliases, and variables that the script creates are added to the current scope, overriding existing ones. Parameters declared by the script become variables. Parameters for which no value has been given become variables with no value. However, the automatic variable $args is preserved.
+. .\sample.ps1</p>
+</blockquote>
+<p>Even better would to change the extension of the script file containing your functions to <strong>.psm1</strong> making it a full-fledged <a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/10-script-modules?view=powershell-7.4#script-modules">scriptmodule</a>. This way you can segregate functions into private and public/user-facing functions. Be sure to give the directory and the script the same name. This way, you can use Import-Module or #requires, as well as #using statements in your scripts.</p>
+<p>I prefer Import-Module over dot-sourcing since dot-sourcing exposes all of the functions. If you have separate script files for every function, you&rsquo;ll need to dot source every file containing the functions you want to test. You could choose to define all functions in the same psm1 file, but that&rsquo;ll also expose all private functions.</p>
+<h3 id="testing-private-functions-in-a-manifest-module">Testing private functions in a manifest module</h3>
+<p>For example, a lot of PowerShell modules use this file structure:</p>
+
+
+
+
+
+<pre tabindex="0"><code>├── Private
+│   └── New-DummyOutputPrivate.ps1
+├── Public
+│   └── New-DummyOutput.ps1
+├── testModule.psd1
+└── testModule.psm1</code></pre><p>It&rsquo;s a common pattern to split functions in your module into public-facing functions that users of your module can use, as well as private functions that can be used in other functions but not directly by your users. Since we&rsquo;re trying to test all our code, we need access to all functions in a module. For this concept, Pester has the language concept of <a href="https://pester.dev/docs/commands/InModuleScope">InModuleScope</a>. InModuleScope injects code into a module, that allows us to expose internal functions and allows us to Pester test private functions too. Public functions are available from importing the module, so those can be tested that way.</p>
+<p>Since private functions are not accessible directly from outside the module, we can&rsquo;t test the private function in Pester using the usual method.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="p">.</span> <span class="s2">&#34;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/testModule/testModule.psm1&#34;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nb">gcm New-Dummy</span><span class="p">*</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="n">CommandType</span>     <span class="n">Name</span>            <span class="n">Version</span>    <span class="n">Source</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="p">-----------</span>     <span class="p">----</span>            <span class="p">-------</span>    <span class="p">------</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="kd">Function</span><span class="w">        </span><span class="nb">New-DummyOutput</span> <span class="mf">0.0</span>        <span class="n">testModule</span></span></span></code></pre></div><p>So, we need InModuleScope to fix this for Pester.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm"> New-DummyOutputPrivate.ps1
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">    This is not exposed by default, as seen in the script block above; we need to implement InModuleScope for that.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">New-DummyOutputPrivate</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="s2">&#34;I am a private Function&#34;</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="cm"> New-DummyOutput.ps1
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="cm">    Public functions are exposed on import, so if the function is not private, we can test them straight away.
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">New-DummyOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="s2">&#34;I am a public Function&#34;</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="cm"> example.tests.ps1
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="cm">    Note the use of InModuleScope
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="s2">&#34;</span><span class="nv">$PSScriptRoot</span><span class="s2">/testModule&#34;</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Validates output of New-DummyOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="nb">New-DummyOutput</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s1">&#39;I am a public Function&#39;</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="n">InModuleScope</span> <span class="n">testModule</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="n">It</span> <span class="s1">&#39;Validates output of New-DummyOutputPrivate&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">            <span class="nb">New-DummyOutputPrivate</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s1">&#39;I am a private Function&#39;</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>The first time you run this on a module that&rsquo;s not imported, it&rsquo;ll error with:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="p">[-]</span> <span class="n">Discovery</span> <span class="k">in</span> <span class="n">C:</span><span class="p">\</span><span class="n">Git</span><span class="p">\</span><span class="n">blog</span><span class="p">\</span><span class="n">content</span><span class="p">\</span><span class="n">script</span><span class="p">\</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span> <span class="n">failed</span> <span class="n">with</span><span class="err">:</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">System</span><span class="p">.</span><span class="py">Management</span><span class="p">.</span><span class="py">Automation</span><span class="p">.</span><span class="n">RuntimeException</span><span class="err">:</span> <span class="n">No</span> <span class="n">modules</span> <span class="n">named</span> <span class="s1">&#39;testModule&#39;</span> <span class="n">are</span> <span class="n">currently</span> <span class="n">loaded</span><span class="p">.</span></span></span></code></pre></div><p>Don&rsquo;t worry for now. If you run the code again, it will work. In the next section, we&rsquo;ll dive into the phases of Pester and fix that error.</p>
+<h2 id="discovery-and-run">Discovery and Run</h2>
+<p>Pester has two phases of running the code in your Pester-file:</p>
+<ul>
+<li><strong>Discovery</strong>, this runs all of the Discovery-blocks.</li>
+<li><strong>Run</strong>, the codeblocks during the test phases.</li>
+</ul>
+<p>The <strong>Discovery</strong>-phase discovers the structure of your test file searching for <code>Describe</code>, <code>Context</code>, and <code>It</code>. You can loop over objects that are created before the discovery phase using the <code>BeforeDiscovery</code>-keyword to prevent having to write the same tests over and over again with different subjects. Before the discovery phase, Pester runs all of the <code>BeforeDiscovery</code>-blocks, even when selecting just a specific test to run. That burned me before.</p>
+<p>The <strong>Run</strong>-phase runs your code inside the <code>BeforeAll</code>,<code>BeforeEach</code>, <code>AfterAll</code>, <code>AfterEach</code>, and, of course, the <code>It</code>-blocks. This is the phase we used earlier. Since the run phase is performed after the discovery phase, any code in the run phase is not available during the discovery phase.</p>
+<h3 id="beforediscovery">BeforeDiscovery</h3>
+<p>We had the following test-code earlier:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm"> example.tests.ps1
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">    Errors out the first time when ran, because testModule isn&#39;t in $PSModulePath, but is referenced with InModuleScope.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="s2">&#34;</span><span class="nv">$PSScriptRoot</span><span class="s2">/testModule&#34;</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Validates output of New-DummyOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="nb">New-DummyOutput</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s1">&#39;I am a public Function&#39;</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="n">InModuleScope</span> <span class="n">testModule</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="n">It</span> <span class="s1">&#39;Validates output of New-DummyOutputPrivate&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nb">New-DummyOutputPrivate</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s1">&#39;I am a private Function&#39;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>This gave the error:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="p">[-]</span> <span class="n">Discovery</span> <span class="k">in</span> <span class="n">C:</span><span class="p">\</span><span class="n">Git</span><span class="p">\</span><span class="n">blog</span><span class="p">\</span><span class="n">content</span><span class="p">\</span><span class="n">script</span><span class="p">\</span><span class="n">example</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span> <span class="n">failed</span> <span class="n">with</span><span class="err">:</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="n">System</span><span class="p">.</span><span class="py">Management</span><span class="p">.</span><span class="py">Automation</span><span class="p">.</span><span class="n">RuntimeException</span><span class="err">:</span> <span class="n">No</span> <span class="n">modules</span> <span class="n">named</span> <span class="s1">&#39;testModule&#39;</span> <span class="n">are</span> <span class="n">currently</span> <span class="n">loaded</span><span class="p">.</span></span></span></code></pre></div><p>This error is happening because the module is not present in the directories specified in my <code>$env:PSModulePath</code>.
+The <code>InModuleScope' keyword is part of the Discovery phase, so it can't find the module referenced with the </code>InModuleScope<code>keyword. If we change the</code>BeforeAll<code>at the top to</code>BeforeDiscovery`, it will be available during Discovery and won&rsquo;t give us errors anymore during initial runs.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm"> example.tests.ps1
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">    BeforeDiscovery makes sure the module is always imported before it runs the Discovery Phase
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="s2">&#34;</span><span class="nv">$PSScriptRoot</span><span class="s2">/testModule&#34;</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="n">Describe</span> <span class="s1">&#39;Get-ToBeTestedOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Validates output of New-DummyOutput&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="nb">New-DummyOutput</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s1">&#39;I am a public Function&#39;</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="n">InModuleScope</span> <span class="n">testModule</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="n">It</span> <span class="s1">&#39;Validates output of New-DummyOutputPrivate&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="nb">New-DummyOutputPrivate</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s1">&#39;I am a private Function&#39;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c"># Output</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="nb">Invoke-Pester</span> <span class="s1">&#39;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/example.tests.ps1&#39;</span> <span class="n">-Output</span> <span class="n">Detailed</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="n">Pester</span> <span class="n">v5</span><span class="p">.</span><span class="py">7</span><span class="p">.</span><span class="py">1</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">2</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">54ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span> <span class="n">from</span> <span class="s1">&#39;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/example.tests.ps1&#39;</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="n">Describing</span> <span class="nb">Get-ToBeTestedOutput</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">  <span class="p">[+]</span> <span class="n">Validates</span> <span class="n">output</span> <span class="n">of</span> <span class="nb">New-DummyOutput</span> <span class="n">5ms</span> <span class="p">(</span><span class="n">4ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">  <span class="p">[+]</span> <span class="n">Validates</span> <span class="n">output</span> <span class="n">of</span> <span class="nb">New-DummyOutputPrivate</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">72ms</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">2</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><h2 id="foreachtestcases">ForEach/TestCases</h2>
+<p>Consider/Run the following test:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm"> count.tests.ps1
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">    Mind the assignment during the BeforeDiscovery and Foreach implementation with that variable.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nv">$array</span> <span class="p">=</span> <span class="mf">1</span><span class="p">.</span><span class="mf">.10</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="n">Describe</span> <span class="s2">&#34;Count count🦇&#34;</span> <span class="n">-ForEach</span> <span class="nv">$array</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="n">It</span> <span class="s2">&#34;The number &lt;_&gt; should be less than 11&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="nv">$_</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-BeLessThan</span> <span class="mf">11</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>The <strong>Describe</strong> keyword in this block is followed by <code>ForEach</code> and iterates on the <code>$array</code> variable, effectively running all of the tests in the <code>Describe</code> for each item in <code>$array</code>. The title has &lt;_&gt; referencing the current item, similar to <code>$_</code> in Foreach-Object in regular pwsh. You can also access properties this way:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cm"> deskitem.tests.ps1
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="cm">    Mind the assignment of complex objects during BeforeDiscovery and the looping over all items and a subset of items.
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">#&gt;</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nv">$itemsOnMyDesk</span> <span class="p">=</span> <span class="vm">@</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">            <span class="n">Name</span>  <span class="p">=</span> <span class="s1">&#39;Pencil&#39;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">            <span class="n">Count</span> <span class="p">=</span> <span class="mf">3</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">            <span class="n">Name</span>           <span class="p">=</span> <span class="s1">&#39;GamePC&#39;</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">            <span class="n">Count</span>          <span class="p">=</span> <span class="mf">1</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">            <span class="n">Color</span>          <span class="p">=</span> <span class="s1">&#39;White&#39;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">            <span class="n">NoiseLevel</span>     <span class="p">=</span> <span class="vm">$true</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">            <span class="n">InstalledGames</span> <span class="p">=</span> <span class="vm">@</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">                <span class="s1">&#39;Diablo 4&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">                <span class="s1">&#39;Supreme Commander: Forged Alliance Forever&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">                <span class="s1">&#39;Battlefield V&#39;</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">            <span class="p">)</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="n">Describe</span> <span class="s2">&#34;Desktop items&#34;</span> <span class="n">-ForEach</span> <span class="nv">$itemsOnMyDesk</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="n">It</span> <span class="s2">&#34;&lt;_.Name&gt; has a Count-property&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="nv">$_</span><span class="p">.</span><span class="py">Count</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="nv">$PC</span> <span class="p">=</span> <span class="nv">$_</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">Name</span> <span class="o">-EQ</span> <span class="s1">&#39;GamePC&#39;</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="n">Context</span> <span class="s2">&#34;GamePC&#34;</span> <span class="n">-Foreach</span> <span class="nv">$PC</span><span class="p">.</span><span class="py">InstalledGames</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="n">It</span> <span class="s2">&#34;Should not be a timesink (&lt;_&gt;)&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">            <span class="nv">$_</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-Be</span> <span class="s2">&#34;Satisfactory&#34;</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>This gives us the following results:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nb">Invoke-Pester</span> <span class="s1">&#39;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/tests.tests.ps1&#39;</span> <span class="n">-Output</span> <span class="n">Detailed</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="n">Pester</span> <span class="n">v5</span><span class="p">.</span><span class="py">7</span><span class="p">.</span><span class="py">1</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">5</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">8ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span> <span class="n">from</span> <span class="s1">&#39;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/tests.tests.ps1&#39;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="n">Describing</span> <span class="n">Desktop</span> <span class="n">items</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="p">[+]</span> <span class="n">Pencil</span> <span class="n">has</span> <span class="n">a</span> <span class="nb">Count-property</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="n">Describing</span> <span class="n">Desktop</span> <span class="n">items</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="p">[+]</span> <span class="n">GamePC</span> <span class="n">has</span> <span class="n">a</span> <span class="nb">Count-property</span> <span class="n">4ms</span> <span class="p">(</span><span class="n">4ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"> <span class="n">Context</span> <span class="n">GamePC</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">   <span class="p">[+]</span> <span class="n">Should</span> <span class="n">not</span> <span class="n">be</span> <span class="n">a</span> <span class="n">timesink</span> <span class="p">(</span><span class="n">Diablo</span> <span class="mf">4</span><span class="p">)</span> <span class="n">3ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">2ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"> <span class="n">Context</span> <span class="n">GamePC</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">   <span class="p">[+]</span> <span class="n">Should</span> <span class="n">not</span> <span class="n">be</span> <span class="n">a</span> <span class="n">timesink</span> <span class="p">(</span><span class="n">Supreme</span> <span class="n">Commander</span><span class="err">:</span> <span class="n">Forged</span> <span class="n">Alliance</span> <span class="n">Forever</span><span class="p">)</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl"> <span class="n">Context</span> <span class="n">GamePC</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">   <span class="p">[+]</span> <span class="n">Should</span> <span class="n">not</span> <span class="n">be</span> <span class="n">a</span> <span class="n">timesink</span> <span class="p">(</span><span class="n">Battlefield</span> <span class="n">V</span><span class="p">)</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">60ms</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">5</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>The Pester file above tests items in a predefined set of test cases/items to test. You can access the current looped object in the titles, loop over their properties, etc. I personally like to put the <code>BeforeDiscovery</code>-blocks close to where they are used if they are only used once, but you can also choose to place the <code>BeforeDiscovery</code>-blocks at the top of the describe block.</p>
+<h2 id="the-power-of-discovery">The Power of Discovery</h2>
+<p>If we spice up our module a bit, we can start to discover why this Discover phase can be so powerful. The final section of this blog will be without the training wheels; it&rsquo;s just a repetition of earlier mentioned concepts. Don&rsquo;t get intimidated by the amount code; much is still the same, and the Pester code just has some setup for scale.</p>
+<p>We all want to know what parameters for functions do, so it can be convenient to check at least all your public functions for comment-based help and parameter descriptions.</p>
+<p>I borrowed this code of Brandon Olin his excellent <a href="https://github.com/devblackops/Stucco/blob/main/tests/Help.tests.ps1">Stucco PowerShell Module template engine</a>, who borrowed it (with love) from <a href="https://raw.githubusercontent.com/juneb/PesterTDD/master/Module.Help.Tests.ps1">juneb on GitHub</a>.</p>
+<p>Consider the following function definitions:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c"># New-DummyOutput.ps1</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">New-DummyOutput</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="cm">&lt;#
+</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="cm">        .</span><span class="sd">SYNOPSIS</span><span class="cm">
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="cm">     A short one-line action-based description, e.g. &#39;Tests if a function is valid&#39;
+</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="cm">        .</span><span class="sd">DESCRIPTION</span><span class="cm">
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="cm">     A longer description of the function, its purpose, common use cases, etc.
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="cm">        .</span><span class="sd">NOTES</span><span class="cm">
+</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="cm">     Information or caveats about the function e.g., &#39;This function is not supported in Linux.&#39;
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="cm">        .</span><span class="sd">LINK</span><span class="cm">
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="cm">     Specify a URI to a help page, this will show when Get-Help -Online is used.
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="cm">        .</span><span class="sd">EXAMPLE</span><span class="cm">
+</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="cm">     Test-MyTestFunction -Verbose
+</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="cm">     Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="cm">     #&gt;</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="c"># I am a very helpful parameter</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="nv">$message</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="s2">&#34;I am a public Function: </span><span class="nv">$message</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c"># New-DummyOutput2.ps1</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">New-DummyOutput2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">[</span><span class="nb">CmdletBinding</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="p">[</span><span class="nb">Parameter</span><span class="p">()]</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">        <span class="p">[</span><span class="no">String</span><span class="p">]</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="nv">$message</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="s2">&#34;I am a public Function: </span><span class="nv">$message</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>I added &lsquo;ProgressAction&rsquo; to <code>$commonParams</code> that was added in PowerShell 7.4. <code>FilterOutCommonParams</code> is a function with an access modifier so that the function is available both in the discovery phase and outside of it. Then, we import the module, just like we did earlier.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="vm">global:</span><span class="nb">FilterOutCommonParams</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">        <span class="k">param</span> <span class="p">(</span><span class="nv">$Params</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">        <span class="nv">$commonParams</span> <span class="p">=</span> <span class="vm">@</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">            <span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ErrorAction&#39;</span><span class="p">,</span> <span class="s1">&#39;ErrorVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;InformationAction&#39;</span><span class="p">,</span> <span class="s1">&#39;InformationVariable&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">            <span class="s1">&#39;OutBuffer&#39;</span><span class="p">,</span> <span class="s1">&#39;OutVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;PipelineVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;Verbose&#39;</span><span class="p">,</span> <span class="s1">&#39;WarningAction&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">            <span class="s1">&#39;WarningVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;Confirm&#39;</span><span class="p">,</span> <span class="s1">&#39;Whatif&#39;</span><span class="p">,</span> <span class="s1">&#39;ProgressAction&#39;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="c"># We&#39;re not interested in these, we just want the custom parameters</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">        <span class="nv">$params</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="p">{</span> <span class="nv">$_</span><span class="p">.</span><span class="py">Name</span> <span class="n">-notin</span> <span class="nv">$commonParams</span> <span class="p">}</span> <span class="p">|</span> <span class="nb">Sort-Object</span> <span class="n">-Property</span> <span class="n">Name</span> <span class="n">-Unique</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="c"># We need to import our own module, so we can iterate over it&#39;s functions/cmdlets</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="s2">&#34;</span><span class="nv">$PSScriptRoot</span><span class="s2">/testModule&#34;</span> <span class="n">-Force</span> <span class="n">-Verbose:</span><span class="vm">$false</span> <span class="n">-ErrorAction</span> <span class="n">Stop</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="c"># Create a splat for get</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="nv">$getCommandsplat</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="n">Module</span>      <span class="p">=</span> <span class="p">(</span><span class="nb">Get-Module</span> <span class="n">testModule</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">        <span class="n">CommandType</span> <span class="p">=</span> <span class="p">[</span><span class="no">System.Management.Automation.CommandTypes[]</span><span class="p">]</span><span class="s1">&#39;Cmdlet, Function&#39;</span> <span class="c"># Not alias</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$PSVersionTable</span><span class="p">.</span><span class="py">PSVersion</span><span class="p">.</span><span class="py">Major</span> <span class="o">-lt</span> <span class="mf">6</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="nv">$getCommandsplat</span><span class="p">.</span><span class="n">CommandType</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="p">+=</span> <span class="s1">&#39;Workflow&#39;</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="c">#Commands is available in all subsequent BeforeDiscovery Blocks and can be used in ForEach</span>
+</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="nv">$commands</span> <span class="p">=</span> <span class="nb">Get-Command</span> <span class="nv">@getCommandsplat</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">
+</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="c">## When testing help, remember that help is cached at the beginning of each session.</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="c">## To test, restart session.</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>From there on, we make sure we get just the cmdlets and functions from our module, with a conditional statement to also make sure to add in workflows for earlier versions of PowerShell. No idea what those are; not relevant for now. The found (public) functions and cmdlets are stored in a variable called <code>$commands</code>.</p>
+<p>Then you&rsquo;ll see the <strong>Describe</strong> keyword as we had earlier with a <code>ForEach</code> on that <code>$commands</code> variable, effectively running all of the tests in the <code>Describe</code> for each command in <code>$commands</code>. And it references the name of the current command in the ForEach loop. This is similar to <code>$_</code> in foreach-object, representing the current item.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Describe</span> <span class="s2">&#34;Test help for &lt;_.Name&gt;&#34;</span> <span class="n">-ForEach</span> <span class="nv">$commands</span> <span class="p">{</span></span></span></code></pre></div><p>When ran it&rsquo;ll look like:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">1</span><span class="cl"><span class="n">Describing</span> <span class="n">Test</span> <span class="n">help</span> <span class="k">for</span> <span class="nb">New-DummyOutput</span></span></span></code></pre></div><p>Then another <code>BeforeDiscovery</code> block is created inside of <code>Describe</code> with several variables; this is still within that loop over <code>$commands.</code> The writer of the Pester file wants to access the properties of the current item in the loop so that they can use them to iterate over again. A use case you could think of is testing multiple parameters for a single command, maybe? I usually put <code>BeforeDiscovery</code> blocks directly above the blocks I am going to use them in, or when I use the Discovery in multiple places, I place them on top in their shared parent.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-pwsh" data-lang="pwsh"><span class="line"><span class="ln">1</span><span class="cl"> <span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="c"># Get command help, parameters, and links</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="nv">$command</span> <span class="p">=</span> <span class="nv">$_</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="nv">$commandHelp</span> <span class="p">=</span> <span class="nb">Get-Help</span> <span class="nv">$command</span><span class="p">.</span><span class="py">Name</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nv">$commandParameters</span> <span class="p">=</span> <span class="k">global:</span><span class="n">FilterOutCommonParams</span> <span class="n">-Params</span> <span class="nv">$command</span><span class="p">.</span><span class="py">ParameterSets</span><span class="p">.</span><span class="py">Parameters</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="nv">$commandParameterNames</span> <span class="p">=</span> <span class="nv">$commandParameters</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="nv">$helpLinks</span> <span class="p">=</span> <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">relatedLinks</span><span class="p">.</span><span class="py">navigationLink</span><span class="p">.</span><span class="py">uri</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl"> <span class="p">}</span></span></span></code></pre></div><p>The <code>BeforeAll</code>-block with the same code makes sure that we have the same information available within our <code>Run</code>-phase. <strong>One important item is that in a loop in the Run phase, <code>$_</code> references the same <code>$commands</code> item as in the discovery phase</strong>. The rest of the BeforeAll block makes use of that mechanism, pointing to that same <code>$command</code>-variable.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-pwsh" data-lang="pwsh"><span class="line"><span class="ln"> 1</span><span class="cl"> <span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    <span class="c"># These vars are needed in both the discovery and test phases, so we need to duplicate them here</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">    <span class="nv">$command</span> <span class="p">=</span> <span class="nv">$_</span>
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    <span class="nv">$commandName</span> <span class="p">=</span> <span class="nv">$_</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">    <span class="nv">$commandHelp</span> <span class="p">=</span> <span class="nb">Get-Help</span> <span class="nv">$command</span><span class="p">.</span><span class="py">Name</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="nv">$commandParameters</span> <span class="p">=</span> <span class="k">global:</span><span class="n">FilterOutCommonParams</span> <span class="n">-Params</span> <span class="nv">$command</span><span class="p">.</span><span class="py">ParameterSets</span><span class="p">.</span><span class="py">Parameters</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">    <span class="nv">$commandParameterNames</span> <span class="p">=</span> <span class="nv">$commandParameters</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nv">$helpParameters</span> <span class="p">=</span> <span class="k">global:</span><span class="n">FilterOutCommonParams</span> <span class="n">-Params</span> <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Parameters</span><span class="p">.</span><span class="nb">Parameter</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="nv">$helpParameterNames</span> <span class="p">=</span> <span class="nv">$helpParameters</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"> <span class="p">}</span></span></span></code></pre></div><p>Then, several tests follow based on the <code>$commandHelp</code> help-object. It even includes a fancy HelpLinks-loop over the <code>$helpLinks</code> defined in the help documentation, ensuring that all related links are valid and accessible.</p>
+<p>It loops again over each individual custom parameter after omitting the common parameters with the <code>FilterOutCommonParams</code>-function and continues to test each custom-defined parameter.</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln">  1</span><span class="cl"><span class="c"># Help.Tests.ps1</span>
+</span></span><span class="line"><span class="ln">  2</span><span class="cl"><span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">  3</span><span class="cl">
+</span></span><span class="line"><span class="ln">  4</span><span class="cl">    <span class="kd">function</span><span class="w"> </span><span class="vm">global:</span><span class="nb">FilterOutCommonParams</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">  5</span><span class="cl">        <span class="k">param</span> <span class="p">(</span><span class="nv">$Params</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">  6</span><span class="cl">        <span class="nv">$commonParams</span> <span class="p">=</span> <span class="vm">@</span><span class="p">(</span>
+</span></span><span class="line"><span class="ln">  7</span><span class="cl">            <span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ErrorAction&#39;</span><span class="p">,</span> <span class="s1">&#39;ErrorVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;InformationAction&#39;</span><span class="p">,</span> <span class="s1">&#39;InformationVariable&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">  8</span><span class="cl">            <span class="s1">&#39;OutBuffer&#39;</span><span class="p">,</span> <span class="s1">&#39;OutVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;PipelineVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;Verbose&#39;</span><span class="p">,</span> <span class="s1">&#39;WarningAction&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="ln">  9</span><span class="cl">            <span class="s1">&#39;WarningVariable&#39;</span><span class="p">,</span> <span class="s1">&#39;Confirm&#39;</span><span class="p">,</span> <span class="s1">&#39;Whatif&#39;</span><span class="p">,</span> <span class="s1">&#39;ProgressAction&#39;</span>
+</span></span><span class="line"><span class="ln"> 10</span><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 11</span><span class="cl">        <span class="nv">$params</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="p">{</span> <span class="nv">$_</span><span class="p">.</span><span class="py">Name</span> <span class="n">-notin</span> <span class="nv">$commonParams</span> <span class="p">}</span> <span class="p">|</span> <span class="nb">Sort-Object</span> <span class="n">-Property</span> <span class="n">Name</span> <span class="n">-Unique</span>
+</span></span><span class="line"><span class="ln"> 12</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 13</span><span class="cl">    <span class="nb">Import-Module</span> <span class="n">-Name</span> <span class="s2">&#34;</span><span class="nv">$PSScriptRoot</span><span class="s2">/testModule&#34;</span> <span class="n">-Force</span> <span class="n">-Verbose:</span><span class="vm">$false</span> <span class="n">-ErrorAction</span> <span class="n">Stop</span>
+</span></span><span class="line"><span class="ln"> 14</span><span class="cl">    <span class="nv">$params</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 15</span><span class="cl">        <span class="n">Module</span>      <span class="p">=</span> <span class="p">(</span><span class="nb">Get-Module</span> <span class="n">testModule</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln"> 16</span><span class="cl">        <span class="n">CommandType</span> <span class="p">=</span> <span class="p">[</span><span class="no">System.Management.Automation.CommandTypes[]</span><span class="p">]</span><span class="s1">&#39;Cmdlet, Function&#39;</span> <span class="c"># Not alias</span>
+</span></span><span class="line"><span class="ln"> 17</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 18</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$PSVersionTable</span><span class="p">.</span><span class="py">PSVersion</span><span class="p">.</span><span class="py">Major</span> <span class="o">-lt</span> <span class="mf">6</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 19</span><span class="cl">        <span class="nv">$params</span><span class="p">.</span><span class="n">CommandType</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="p">+=</span> <span class="s1">&#39;Workflow&#39;</span>
+</span></span><span class="line"><span class="ln"> 20</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 21</span><span class="cl">    <span class="nv">$commands</span> <span class="p">=</span> <span class="nb">Get-Command</span> <span class="nv">@params</span>
+</span></span><span class="line"><span class="ln"> 22</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 23</span><span class="cl">    <span class="c">## When testing help, remember that help is cached at the beginning of each session.</span>
+</span></span><span class="line"><span class="ln"> 24</span><span class="cl">    <span class="c">## To test, restart session.</span>
+</span></span><span class="line"><span class="ln"> 25</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 26</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 27</span><span class="cl"><span class="n">Describe</span> <span class="s2">&#34;Test help for &lt;_.Name&gt;&#34;</span> <span class="n">-ForEach</span> <span class="nv">$commands</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 28</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 29</span><span class="cl">    <span class="n">BeforeDiscovery</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 30</span><span class="cl">        <span class="c"># Get command help, parameters, and links</span>
+</span></span><span class="line"><span class="ln"> 31</span><span class="cl">        <span class="nv">$command</span> <span class="p">=</span> <span class="nv">$_</span>
+</span></span><span class="line"><span class="ln"> 32</span><span class="cl">        <span class="nv">$commandHelp</span> <span class="p">=</span> <span class="nb">Get-Help</span> <span class="nv">$command</span><span class="p">.</span><span class="py">Name</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span>
+</span></span><span class="line"><span class="ln"> 33</span><span class="cl">        <span class="nv">$commandParameters</span> <span class="p">=</span> <span class="k">global:</span><span class="n">FilterOutCommonParams</span> <span class="n">-Params</span> <span class="nv">$command</span><span class="p">.</span><span class="py">ParameterSets</span><span class="p">.</span><span class="py">Parameters</span>
+</span></span><span class="line"><span class="ln"> 34</span><span class="cl">        <span class="nv">$commandParameterNames</span> <span class="p">=</span> <span class="nv">$commandParameters</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 35</span><span class="cl">        <span class="nv">$helpLinks</span> <span class="p">=</span> <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">relatedLinks</span><span class="p">.</span><span class="py">navigationLink</span><span class="p">.</span><span class="py">uri</span>
+</span></span><span class="line"><span class="ln"> 36</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 37</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 38</span><span class="cl">    <span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 39</span><span class="cl">        <span class="c"># These vars are needed in both the discovery and test phases, so we need to duplicate them here</span>
+</span></span><span class="line"><span class="ln"> 40</span><span class="cl">        <span class="nv">$command</span> <span class="p">=</span> <span class="nv">$_</span>
+</span></span><span class="line"><span class="ln"> 41</span><span class="cl">        <span class="nv">$commandName</span> <span class="p">=</span> <span class="nv">$_</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 42</span><span class="cl">        <span class="nv">$commandHelp</span> <span class="p">=</span> <span class="nb">Get-Help</span> <span class="nv">$command</span><span class="p">.</span><span class="py">Name</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span>
+</span></span><span class="line"><span class="ln"> 43</span><span class="cl">        <span class="nv">$commandParameters</span> <span class="p">=</span> <span class="k">global:</span><span class="n">FilterOutCommonParams</span> <span class="n">-Params</span> <span class="nv">$command</span><span class="p">.</span><span class="py">ParameterSets</span><span class="p">.</span><span class="py">Parameters</span>
+</span></span><span class="line"><span class="ln"> 44</span><span class="cl">        <span class="nv">$commandParameterNames</span> <span class="p">=</span> <span class="nv">$commandParameters</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 45</span><span class="cl">        <span class="nv">$helpParameters</span> <span class="p">=</span> <span class="k">global:</span><span class="n">FilterOutCommonParams</span> <span class="n">-Params</span> <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Parameters</span><span class="p">.</span><span class="nb">Parameter</span>
+</span></span><span class="line"><span class="ln"> 46</span><span class="cl">        <span class="nv">$helpParameterNames</span> <span class="p">=</span> <span class="nv">$helpParameters</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 47</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 48</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 49</span><span class="cl">    <span class="c"># If help is not found, synopsis in auto-generated help is the syntax diagram</span>
+</span></span><span class="line"><span class="ln"> 50</span><span class="cl">    <span class="n">It</span> <span class="s1">&#39;Help is not auto-generated&#39;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 51</span><span class="cl">        <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Synopsis</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeLike</span> <span class="s1">&#39;*`[`&lt;CommonParameters`&gt;`]*&#39;</span>
+</span></span><span class="line"><span class="ln"> 52</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 53</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 54</span><span class="cl">    <span class="c"># Should be a description for every function</span>
+</span></span><span class="line"><span class="ln"> 55</span><span class="cl">    <span class="n">It</span> <span class="s2">&#34;Has description&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 56</span><span class="cl">        <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Description</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln"> 57</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 58</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 59</span><span class="cl">    <span class="c"># Should be at least one example</span>
+</span></span><span class="line"><span class="ln"> 60</span><span class="cl">    <span class="n">It</span> <span class="s2">&#34;Has example code&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 61</span><span class="cl">     <span class="p">(</span><span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Examples</span><span class="p">.</span><span class="py">Example</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-First</span> <span class="mf">1</span><span class="p">).</span><span class="py">Code</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln"> 62</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 63</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 64</span><span class="cl">    <span class="c"># Should be at least one example description</span>
+</span></span><span class="line"><span class="ln"> 65</span><span class="cl">    <span class="n">It</span> <span class="s2">&#34;Has example help&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 66</span><span class="cl">     <span class="p">(</span><span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Examples</span><span class="p">.</span><span class="py">Example</span><span class="p">.</span><span class="py">Remarks</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-First</span> <span class="mf">1</span><span class="p">).</span><span class="py">Text</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln"> 67</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 68</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 69</span><span class="cl">    <span class="n">It</span> <span class="s2">&#34;Help link &lt;_&gt; is valid&#34;</span> <span class="n">-ForEach</span> <span class="nv">$helpLinks</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 70</span><span class="cl">     <span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="nv">$_</span> <span class="n">-UseBasicParsing</span><span class="p">).</span><span class="py">StatusCode</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="s1">&#39;200&#39;</span>
+</span></span><span class="line"><span class="ln"> 71</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 72</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 73</span><span class="cl">    <span class="n">Context</span> <span class="s2">&#34;Parameter &lt;_.Name&gt;&#34;</span> <span class="n">-Foreach</span> <span class="nv">$commandParameters</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 74</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 75</span><span class="cl">        <span class="n">BeforeAll</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 76</span><span class="cl">            <span class="nv">$parameter</span> <span class="p">=</span> <span class="nv">$_</span>
+</span></span><span class="line"><span class="ln"> 77</span><span class="cl">            <span class="nv">$parameterName</span> <span class="p">=</span> <span class="nv">$parameter</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 78</span><span class="cl">            <span class="nv">$parameterHelp</span> <span class="p">=</span> <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">parameters</span><span class="p">.</span><span class="nb">parameter</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">Name</span> <span class="o">-EQ</span> <span class="nv">$parameterName</span>
+</span></span><span class="line"><span class="ln"> 79</span><span class="cl">            <span class="nv">$parameterHelpType</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$parameterHelp</span><span class="p">.</span><span class="n">ParameterValue</span><span class="p">)</span> <span class="p">{</span> <span class="nv">$parameterHelp</span><span class="p">.</span><span class="py">ParameterValue</span><span class="p">.</span><span class="py">Trim</span><span class="p">()</span> <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 80</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 81</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 82</span><span class="cl">        <span class="c"># Should be a description for every parameter</span>
+</span></span><span class="line"><span class="ln"> 83</span><span class="cl">        <span class="n">It</span> <span class="s2">&#34;Has description&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 84</span><span class="cl">            <span class="nv">$parameterHelp</span><span class="p">.</span><span class="py">Description</span><span class="p">.</span><span class="py">Text</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span>
+</span></span><span class="line"><span class="ln"> 85</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 86</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 87</span><span class="cl">        <span class="c"># Required value in Help should match IsMandatory property of parameter</span>
+</span></span><span class="line"><span class="ln"> 88</span><span class="cl">        <span class="n">It</span> <span class="s2">&#34;Has correct [mandatory] value&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 89</span><span class="cl">            <span class="nv">$codeMandatory</span> <span class="p">=</span> <span class="nv">$_</span><span class="p">.</span><span class="py">IsMandatory</span><span class="p">.</span><span class="py">toString</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln"> 90</span><span class="cl">            <span class="nv">$parameterHelp</span><span class="p">.</span><span class="py">Required</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="nv">$codeMandatory</span>
+</span></span><span class="line"><span class="ln"> 91</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 92</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 93</span><span class="cl">        <span class="c"># Parameter type in help should match code</span>
+</span></span><span class="line"><span class="ln"> 94</span><span class="cl">        <span class="n">It</span> <span class="s2">&#34;Has correct parameter type&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 95</span><span class="cl">            <span class="nv">$parameterHelpType</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="nv">$parameter</span><span class="p">.</span><span class="py">ParameterType</span><span class="p">.</span><span class="py">Name</span>
+</span></span><span class="line"><span class="ln"> 96</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 97</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln"> 98</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 99</span><span class="cl">    <span class="n">Context</span> <span class="s2">&#34;Test &lt;_&gt; help parameter help for &lt;commandName&gt;&#34;</span> <span class="n">-Foreach</span> <span class="nv">$helpParameterNames</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">100</span><span class="cl">
+</span></span><span class="line"><span class="ln">101</span><span class="cl">        <span class="c"># Shouldn&#39;t find extra parameters in help.</span>
+</span></span><span class="line"><span class="ln">102</span><span class="cl">        <span class="n">It</span> <span class="s2">&#34;finds help parameter in code: &lt;_&gt;&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">103</span><span class="cl">            <span class="nv">$_</span> <span class="n">-in</span> <span class="nv">$parameterNames</span> <span class="p">|</span> <span class="n">Should</span> <span class="n">-Be</span> <span class="vm">$true</span>
+</span></span><span class="line"><span class="ln">104</span><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="ln">105</span><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="ln">106</span><span class="cl"><span class="p">}</span></span></span></code></pre></div><p>Running it gives the following results:</p>
+
+
+
+
+
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nb">Invoke-Pester</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="py">ps1</span> <span class="n">-Output</span> <span class="n">Detailed</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="n">Pester</span> <span class="n">v5</span><span class="p">.</span><span class="py">7</span><span class="p">.</span><span class="py">1</span>
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="n">Starting</span> <span class="n">discovery</span> <span class="k">in</span> <span class="mf">1</span> <span class="n">files</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="n">Discovery</span> <span class="n">found</span> <span class="mf">14</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">84ms</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="n">Running</span> <span class="n">tests</span> <span class="n">from</span> <span class="s1">&#39;/Users/christianpiet/Documents/InSpark/Git/Personal/blog/content/script/Help.tests.ps1&#39;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="n">Describing</span> <span class="n">Test</span> <span class="n">help</span> <span class="k">for</span> <span class="nb">New-DummyOutput</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="p">[+]</span> <span class="n">Help</span> <span class="n">is</span> <span class="n">not</span> <span class="nb">auto-generated</span> <span class="n">4ms</span> <span class="p">(</span><span class="n">3ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="p">[+]</span> <span class="n">Has</span> <span class="n">description</span> <span class="n">6ms</span> <span class="p">(</span><span class="n">6ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="p">[+]</span> <span class="n">Has</span> <span class="n">example</span> <span class="n">code</span> <span class="n">3ms</span> <span class="p">(</span><span class="n">2ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="p">[+]</span> <span class="n">Has</span> <span class="n">example</span> <span class="n">help</span> <span class="n">2ms</span> <span class="p">(</span><span class="n">2ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"> <span class="n">Context</span> <span class="nb">Parameter</span> <span class="n">message</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl">   <span class="p">[+]</span> <span class="n">Has</span> <span class="n">description</span> <span class="n">4ms</span> <span class="p">(</span><span class="n">2ms</span><span class="p">|</span><span class="n">2ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl">   <span class="p">[+]</span> <span class="n">Has</span> <span class="n">correct</span> <span class="p">[</span><span class="no">mandatory</span><span class="p">]</span> <span class="n">value</span> <span class="n">9ms</span> <span class="p">(</span><span class="n">8ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">   <span class="p">[+]</span> <span class="n">Has</span> <span class="n">correct</span> <span class="nb">parameter</span> <span class="nb">type </span><span class="n">3ms</span> <span class="p">(</span><span class="n">2ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">18</span><span class="cl">
+</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="n">Describing</span> <span class="n">Test</span> <span class="n">help</span> <span class="k">for</span> <span class="nb">New-DummyOutput2</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="p">[-]</span> <span class="n">Help</span> <span class="n">is</span> <span class="n">not</span> <span class="nb">auto-generated</span> <span class="n">12ms</span> <span class="p">(</span><span class="n">11ms</span><span class="p">|</span><span class="n">1ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">21</span><span class="cl">   <span class="n">Expected</span> <span class="n">like</span> <span class="n">wildcard</span> <span class="s1">&#39;*`[`&lt;CommonParameters`&gt;`]*&#39;</span> <span class="n">to</span> <span class="n">not</span> <span class="n">match</span> <span class="s1">&#39;
+</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="s1">   New-DummyOutput2 [[-message] &lt;string&gt;] [&lt;CommonParameters&gt;]
+</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="s1">   &#39;</span><span class="p">,</span> <span class="n">but</span> <span class="n">it</span> <span class="n">did</span> <span class="n">match</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl">   <span class="n">at</span> <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Synopsis</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeLike</span> <span class="s1">&#39;*`[`&lt;CommonParameters`&gt;`]*&#39;</span><span class="p">,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">50</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">   <span class="n">at</span> <span class="p">&lt;</span><span class="n">ScriptBlock</span><span class="p">&gt;,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">50</span>
+</span></span><span class="line"><span class="ln">26</span><span class="cl">  <span class="p">[-]</span> <span class="n">Has</span> <span class="n">description</span> <span class="n">37ms</span> <span class="p">(</span><span class="n">36ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">27</span><span class="cl">   <span class="n">Expected</span> <span class="n">a</span> <span class="n">value</span><span class="p">,</span> <span class="n">but</span> <span class="n">got</span> <span class="vm">$null</span> <span class="n">or</span> <span class="n">empty</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">28</span><span class="cl">   <span class="n">at</span> <span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Description</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span><span class="p">,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">55</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">   <span class="n">at</span> <span class="p">&lt;</span><span class="n">ScriptBlock</span><span class="p">&gt;,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">55</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">  <span class="p">[-]</span> <span class="n">Has</span> <span class="n">example</span> <span class="n">code</span> <span class="n">4ms</span> <span class="p">(</span><span class="n">4ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">   <span class="n">Expected</span> <span class="n">a</span> <span class="n">value</span><span class="p">,</span> <span class="n">but</span> <span class="n">got</span> <span class="vm">$null</span> <span class="n">or</span> <span class="n">empty</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">   <span class="n">at</span> <span class="p">(</span><span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Examples</span><span class="p">.</span><span class="py">Example</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-First</span> <span class="mf">1</span><span class="p">).</span><span class="py">Code</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span><span class="p">,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">60</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">   <span class="n">at</span> <span class="p">&lt;</span><span class="n">ScriptBlock</span><span class="p">&gt;,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">60</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">  <span class="p">[-]</span> <span class="n">Has</span> <span class="n">example</span> <span class="n">help</span> <span class="n">6ms</span> <span class="p">(</span><span class="n">6ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl">   <span class="n">Expected</span> <span class="n">a</span> <span class="n">value</span><span class="p">,</span> <span class="n">but</span> <span class="n">got</span> <span class="vm">$null</span> <span class="n">or</span> <span class="n">empty</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">36</span><span class="cl">   <span class="n">at</span> <span class="p">(</span><span class="nv">$commandHelp</span><span class="p">.</span><span class="py">Examples</span><span class="p">.</span><span class="py">Example</span><span class="p">.</span><span class="py">Remarks</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-First</span> <span class="mf">1</span><span class="p">).</span><span class="py">Text</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span><span class="p">,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">65</span>
+</span></span><span class="line"><span class="ln">37</span><span class="cl">   <span class="n">at</span> <span class="p">&lt;</span><span class="n">ScriptBlock</span><span class="p">&gt;,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">65</span>
+</span></span><span class="line"><span class="ln">38</span><span class="cl"> <span class="n">Context</span> <span class="nb">Parameter</span> <span class="n">message</span>
+</span></span><span class="line"><span class="ln">39</span><span class="cl">   <span class="p">[-]</span> <span class="n">Has</span> <span class="n">description</span> <span class="n">15ms</span> <span class="p">(</span><span class="n">12ms</span><span class="p">|</span><span class="n">3ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="n">Expected</span> <span class="n">a</span> <span class="n">value</span><span class="p">,</span> <span class="n">but</span> <span class="n">got</span> <span class="vm">$null</span> <span class="n">or</span> <span class="n">empty</span><span class="p">.</span>
+</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="n">at</span> <span class="nv">$parameterHelp</span><span class="p">.</span><span class="py">Description</span><span class="p">.</span><span class="py">Text</span> <span class="p">|</span> <span class="n">Should</span> <span class="o">-Not</span> <span class="n">-BeNullOrEmpty</span><span class="p">,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">83</span>
+</span></span><span class="line"><span class="ln">42</span><span class="cl">    <span class="n">at</span> <span class="p">&lt;</span><span class="n">ScriptBlock</span><span class="p">&gt;,</span> <span class="p">/</span><span class="n">Users</span><span class="p">/</span><span class="n">christianpiet</span><span class="p">/</span><span class="n">Documents</span><span class="p">/</span><span class="n">InSpark</span><span class="p">/</span><span class="n">Git</span><span class="p">/</span><span class="n">Personal</span><span class="p">/</span><span class="n">blog</span><span class="p">/</span><span class="n">content</span><span class="p">/</span><span class="n">script</span><span class="p">/</span><span class="n">Help</span><span class="p">.</span><span class="py">tests</span><span class="p">.</span><span class="n">ps1</span><span class="err">:</span><span class="mf">83</span>
+</span></span><span class="line"><span class="ln">43</span><span class="cl">   <span class="p">[+]</span> <span class="n">Has</span> <span class="n">correct</span> <span class="p">[</span><span class="no">mandatory</span><span class="p">]</span> <span class="n">value</span> <span class="n">1ms</span> <span class="p">(</span><span class="n">1ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">44</span><span class="cl">   <span class="p">[+]</span> <span class="n">Has</span> <span class="n">correct</span> <span class="nb">parameter</span> <span class="nb">type </span><span class="n">6ms</span> <span class="p">(</span><span class="n">5ms</span><span class="p">|</span><span class="n">0ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="n">Tests</span> <span class="n">completed</span> <span class="k">in</span> <span class="n">315ms</span>
+</span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="n">Tests</span> <span class="n">Passed</span><span class="err">:</span> <span class="mf">9</span><span class="p">,</span> <span class="n">Failed</span><span class="err">:</span> <span class="mf">5</span><span class="p">,</span> <span class="n">Skipped</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">Inconclusive</span><span class="err">:</span> <span class="mf">0</span><span class="p">,</span> <span class="n">NotRun</span><span class="err">:</span> <span class="mf">0</span></span></span></code></pre></div><p>So we can see 9 tests passed (the ones for <code>New-DummyOutput</code>) and <code>New-DummyOutput2</code> still requires some love.</p>
+<p>This approach works because everything in PowerShell is an object, even the help documentation. So, by creating a set of standards to which you want your code to submit, you can make a scaleable test suite for your modules.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>In this comprehensive guide, we&rsquo;ve explored the fundamentals of Pester, a powerful testing framework for PowerShell. We&rsquo;ve covered everything from setting up your environment and understanding the basic structure of Pester tests to leveraging advanced features like Discovery and <code>InModuleScope</code> for testing private functions.</p>
+<p>By adopting Pester, you can ensure the reliability and maintainability of your PowerShell code, leading to fewer bugs and increased confidence in your PowerShell code. The ability to automate testing and validate your code against predefined standards is invaluable in any development workflow.</p>
+<p>While this post provides a solid foundation, there&rsquo;s always more to learn. I encourage you to dive deeper into the Pester documentation, experiment with the examples provided, and explore the vast array of assertions and mocking capabilities that Pester offers. Happy testing!</p>
+]]></content:encoded>
     </item>
   </channel>
 </rss>
